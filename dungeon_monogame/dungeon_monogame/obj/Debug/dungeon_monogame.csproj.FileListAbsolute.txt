@@ -1,0 +1,17 @@
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x86\SDL2.dll
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x64\SDL2.dll
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x86\soft_oal.dll
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x64\soft_oal.dll
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x86\libSDL2-2.0.so.0
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x64\libSDL2-2.0.so.0
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x86\libopenal.so.1
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x64\libopenal.so.1
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\libSDL2-2.0.0.dylib
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\libopenal.1.dylib
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framework.dll.config
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\dungeon_monogame.exe
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\dungeon_monogame.pdb
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framework.dll
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csprojResolveAssemblyReference.cache
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.exe
+c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.pdb
