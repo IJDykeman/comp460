@@ -11,7 +11,10 @@ namespace dungeon_monogame
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        
+        Vector3 cameraPosition = new Vector3(0, .5f, 10);
+        Vector3 cameraLookAlongVector = -Vector3.UnitZ;
+        Vector3 cameraUpVector = Vector3.UnitY;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -63,8 +66,78 @@ namespace dungeon_monogame
                 Exit();
 
             // TODO: Add your update logic here
-
+            handleInput();
             base.Update(gameTime);
+        }
+
+        void handleInput()
+        {
+            KeyboardState newState = Keyboard.GetState();
+            // cameraLookAtVector = Vector3.Transform(cameraLookAtVector, Matrix.CreateRotationX(.01f));
+            // Is the SPACE key down?
+            float speed = .05f;
+            if (newState.IsKeyDown(Keys.W))
+            {
+                cameraPosition += cameraLookAlongVector * speed;
+            }
+            if (newState.IsKeyDown(Keys.S))
+            {
+                cameraPosition -= cameraLookAlongVector * speed;
+            }
+            if (newState.IsKeyDown(Keys.A))
+            {
+                cameraPosition +=  Vector3.Transform(Vector3.Normalize(cameraLookAlongVector * new Vector3(1,0,1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
+            }
+            if (newState.IsKeyDown(Keys.D))
+            {
+                cameraPosition -= Vector3.Transform(Vector3.Normalize(cameraLookAlongVector * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
+            }
+
+            if (newState.IsKeyDown(Keys.Q))
+            {
+                cameraLookAlongVector = Vector3.Transform(cameraLookAlongVector, Matrix.CreateRotationY(.01f));
+            }
+            if (newState.IsKeyDown(Keys.E))
+            {
+                cameraLookAlongVector = Vector3.Transform(cameraLookAlongVector, Matrix.CreateRotationY(-.01f));
+            }
+        }
+
+        void simpleDrawTest()
+        {
+            Chunk c = new Chunk();
+            c.remesh();
+            BasicEffect effect = new BasicEffect(graphics.GraphicsDevice);
+
+            effect.View = Matrix.CreateLookAt(
+                cameraPosition, cameraPosition + cameraLookAlongVector, cameraUpVector);
+
+            float aspectRatio =
+                graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight;
+            float fieldOfView = Microsoft.Xna.Framework.MathHelper.PiOver4;
+            float nearClipPlane = 1;
+            float farClipPlane = 200;
+
+            effect.Projection = Matrix.CreatePerspectiveFieldOfView(
+                fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
+
+
+            foreach (var pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                graphics.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
+                graphics.GraphicsDevice.DrawUserPrimitives(
+                    // We’ll be rendering two trinalges
+                    PrimitiveType.TriangleList,
+                    // The array of verts that we want to render
+                    c.vertices,
+                    // The offset, which is 0 since we want to start 
+                    // at the beginning of the floorVerts array
+                    0,
+                    // The number of triangles to draw
+                    c.vertices.Length / 3);
+            }
         }
 
         /// <summary>
@@ -76,6 +149,7 @@ namespace dungeon_monogame
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            simpleDrawTest();
 
             base.Draw(gameTime);
         }
