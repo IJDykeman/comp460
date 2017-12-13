@@ -70,6 +70,7 @@ namespace dungeon_monogame
             foreach (int i in Enumerable.Range(0, result.Length))
             {
                 result[i].Position = faces[i];
+                result[i].Color = Color.Red;
             }
             return result;
         }

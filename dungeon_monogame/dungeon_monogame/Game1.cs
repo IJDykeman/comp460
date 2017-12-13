@@ -14,6 +14,7 @@ namespace dungeon_monogame
         Vector3 cameraPosition = new Vector3(0, .5f, 10);
         Vector3 cameraLookAlongVector = -Vector3.UnitZ;
         Vector3 cameraUpVector = Vector3.UnitY;
+        Effect effect;
 
         public Game1()
         {
@@ -42,7 +43,10 @@ namespace dungeon_monogame
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+        //Content.RootDirectory = "Content";
+            // use C:\Program Files (x86)\MSBuild\MonoGame\v3.0\Tools pipeline tool for this
+            Content.Load<Texture2D>("dfg");
+            effect = Content.Load<Effect>("Effect");
             // TODO: use this.Content to load your game content here
         }
 
@@ -107,10 +111,6 @@ namespace dungeon_monogame
         {
             Chunk c = new Chunk();
             c.remesh();
-            BasicEffect effect = new BasicEffect(graphics.GraphicsDevice);
-
-            effect.View = Matrix.CreateLookAt(
-                cameraPosition, cameraPosition + cameraLookAlongVector, cameraUpVector);
 
             float aspectRatio =
                 graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight;
@@ -118,10 +118,11 @@ namespace dungeon_monogame
             float nearClipPlane = 1;
             float farClipPlane = 200;
 
-            effect.Projection = Matrix.CreatePerspectiveFieldOfView(
-                fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
-
-
+            effect.Parameters["Projection"].SetValue(Matrix.CreatePerspectiveFieldOfView(
+                fieldOfView, aspectRatio, nearClipPlane, farClipPlane));
+            effect.Parameters["View"].SetValue(Matrix.CreateLookAt(
+              cameraPosition, cameraPosition + cameraLookAlongVector, cameraUpVector));
+            effect.Parameters["World"].SetValue(Matrix.Identity);
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();

@@ -32,3 +32,7 @@ C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\A
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\dungeon_monogame.pdb
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framework.dll
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csprojResolveAssemblyReference.cache
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\dfg.png
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\dfg.xnb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\Effect.xnb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\Effect.fx
