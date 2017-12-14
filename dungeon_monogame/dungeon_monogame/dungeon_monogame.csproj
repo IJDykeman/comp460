@@ -43,6 +43,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Chunk.cs" />
+    <Compile Include="Globals.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="structs.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />

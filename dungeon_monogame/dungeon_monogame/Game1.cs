@@ -11,10 +11,10 @@ namespace dungeon_monogame
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Vector3 cameraPosition = new Vector3(0, .5f, 10);
-        Vector3 cameraLookAlongVector = -Vector3.UnitZ;
-        Vector3 cameraUpVector = Vector3.UnitY;
+
         Effect effect;
+        Chunk c;
+        Player player = new Player();
 
         public Game1()
         {
@@ -48,6 +48,9 @@ namespace dungeon_monogame
             Content.Load<Texture2D>("dfg");
             effect = Content.Load<Effect>("Effect");
             // TODO: use this.Content to load your game content here
+
+            c = new Chunk();
+            c.remesh();
         }
 
         /// <summary>
@@ -76,68 +79,66 @@ namespace dungeon_monogame
 
         void handleInput()
         {
-            KeyboardState newState = Keyboard.GetState();
-            // cameraLookAtVector = Vector3.Transform(cameraLookAtVector, Matrix.CreateRotationX(.01f));
-            // Is the SPACE key down?
-            float speed = .05f;
-            if (newState.IsKeyDown(Keys.W))
-            {
-                cameraPosition += cameraLookAlongVector * speed;
-            }
-            if (newState.IsKeyDown(Keys.S))
-            {
-                cameraPosition -= cameraLookAlongVector * speed;
-            }
-            if (newState.IsKeyDown(Keys.A))
-            {
-                cameraPosition +=  Vector3.Transform(Vector3.Normalize(cameraLookAlongVector * new Vector3(1,0,1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
-            }
-            if (newState.IsKeyDown(Keys.D))
-            {
-                cameraPosition -= Vector3.Transform(Vector3.Normalize(cameraLookAlongVector * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
-            }
-
-            if (newState.IsKeyDown(Keys.Q))
-            {
-                cameraLookAlongVector = Vector3.Transform(cameraLookAlongVector, Matrix.CreateRotationY(.01f));
-            }
-            if (newState.IsKeyDown(Keys.E))
-            {
-                cameraLookAlongVector = Vector3.Transform(cameraLookAlongVector, Matrix.CreateRotationY(-.01f));
-            }
+            player.handleInput();
         }
 
         void simpleDrawTest()
         {
-            Chunk c = new Chunk();
-            c.remesh();
+            
+            //BasicEffect effect = new BasicEffect(graphics.GraphicsDevice);
+     
+            //effect.View = Matrix.CreateLookAt(
+            //    cameraPosition, cameraPosition + cameraLookAlongVector, cameraUpVector);
 
             float aspectRatio =
                 graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight;
             float fieldOfView = Microsoft.Xna.Framework.MathHelper.PiOver4;
-            float nearClipPlane = 1;
-            float farClipPlane = 200;
+            float nearClipPlane = .1f;
+            float farClipPlane = 100;
 
-            effect.Parameters["Projection"].SetValue(Matrix.CreatePerspectiveFieldOfView(
+            //effect.Projection = Matrix.CreatePerspectiveFieldOfView(
+            //   fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
+            effect.CurrentTechnique = effect.Techniques["Colored"];
+            effect.Parameters["xProjection"].SetValue(Matrix.CreatePerspectiveFieldOfView(
                 fieldOfView, aspectRatio, nearClipPlane, farClipPlane));
-            effect.Parameters["View"].SetValue(Matrix.CreateLookAt(
-              cameraPosition, cameraPosition + cameraLookAlongVector, cameraUpVector));
-            effect.Parameters["World"].SetValue(Matrix.Identity);
+            effect.Parameters["xView"].SetValue(player.getViewMatrix());
+            effect.Parameters["xWorld"].SetValue(Matrix.Identity);
+            effect.Parameters["xAmbient"].SetValue(.3f);
+            effect.Parameters["xLightDirection"].SetValue(Vector3.Normalize(new Vector3(-4,-2,-1)));
+            effect.Parameters["xEnableLighting"].SetValue(true);
+            //effect.Parameters["xOpacity"].SetValue(1.0f);
+            
+
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 graphics.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-                graphics.GraphicsDevice.DrawUserPrimitives(
-                    // We’ll be rendering two trinalges
+                /*graphics.GraphicsDevice.DrawUserPrimitives(
+                 //We’ll be rendering two trinalges
                     PrimitiveType.TriangleList,
-                    // The array of verts that we want to render
+                 //The array of verts that we want to render
                     c.vertices,
-                    // The offset, which is 0 since we want to start 
-                    // at the beginning of the floorVerts array
+                 //The offset, which is 0 since we want to start 
+                 //at the beginning of the floorVerts array
                     0,
-                    // The number of triangles to draw
-                    c.vertices.Length / 3);
+                 //The number of triangles to draw
+                    c.vertices.Length / 3);*/
+                
+                VertexBuffer vertexBuffer = new VertexBuffer(graphics.GraphicsDevice, VertexPostitionColorPaintNormal.VertexDeclaration, c.vertices.Length, BufferUsage.WriteOnly);
+                vertexBuffer.SetData<VertexPostitionColorPaintNormal>(c.vertices);
+                short[] indices = new short[c.vertices.Length];
+                for (short i =0; i < c.vertices.Length; i++)
+                {
+                    indices[i] = i;
+                }
+
+                IndexBuffer indexBuffer = new IndexBuffer(graphics.GraphicsDevice, typeof(short), indices.Length, BufferUsage.WriteOnly);
+                indexBuffer.SetData(indices);
+                graphics.GraphicsDevice.Indices = indexBuffer;
+                graphics.GraphicsDevice.SetVertexBuffer(vertexBuffer);
+                graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
+                    indexBuffer.IndexCount / 3);
             }
         }
 

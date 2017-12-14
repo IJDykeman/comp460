@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace dungeon_monogame
 {
 
-    public struct VertexPostitionColorPaintNormal
+    public struct VertexPostitionColorPaintNormal : IVertexType
     {
         public Vector3 Position;
         public Color Color;
@@ -33,7 +33,13 @@ namespace dungeon_monogame
             new VertexElement(sizeof(float) * 3 + 8, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0)
         );
 
-
+        VertexDeclaration IVertexType.VertexDeclaration
+        {
+            get
+            {
+                return VertexDeclaration;
+            }
+        }
     }
 
 }
