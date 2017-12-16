@@ -42,7 +42,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AABB.cs" />
+    <Compile Include="Actor.cs" />
     <Compile Include="Chunk.cs" />
+    <Compile Include="ChunkManager.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="structs.cs" />

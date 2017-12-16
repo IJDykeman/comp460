@@ -97,6 +97,7 @@ PixelToFrame ColoredPS(VertexToPixel PSIn)
 	PixelToFrame Output = (PixelToFrame)0;
 	Output.Color = PSIn.Color;
 	Output.Color = Output.Color * PSIn.LightingFactor;
+	Output.Color = Output.Color * PSIn.Paint;
 	//Output.Color = float4(PSIn.LightingFactor, PSIn.LightingFactor, 1, 1);
 	return Output;
 	Output.Color = PSIn.Paint;

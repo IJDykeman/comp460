@@ -13,14 +13,14 @@ namespace dungeon_monogame
     {
         public Vector3 Position;
         public Color Color;
-        public Color PaintColor;
+        public Color IndirectLightColor;
         public Vector3 Normal;
 
         public VertexPostitionColorPaintNormal(Vector3 nPosition, Color nColor, Color nPaintColor, Vector3 nNormal)
         {
             Position = nPosition;
             Color = nColor;
-            PaintColor = nPaintColor;
+            IndirectLightColor = nPaintColor;
             Normal = nNormal;
         }
 
@@ -41,5 +41,62 @@ namespace dungeon_monogame
             }
         }
     }
+
+    struct Block
+    {
+        public int type;
+        public Color color;
+
+        public Block(int t, byte r, byte g, byte b)
+        {
+            type = t;
+            color = new Color(r, g, b);
+        }
+
+        public Block(int t, Color c)
+        {
+            type = t;
+            color = c;
+        }
+    }
+
+    struct IntLoc
+    {
+        public int i, j, k;
+
+        public IntLoc(int _i, int _j, int _k)
+        {
+            i = _i;
+            j = _j;
+            k = _k;
+        }
+        public IntLoc(Vector3 v)
+        {
+            i = (int)Math.Floor(v.X);
+            j = (int)Math.Floor(v.Y);
+            k = (int)Math.Floor(v.Z);
+        }
+
+        public Vector3 toVector3()
+        {
+            return new Vector3(i, j, k);
+        }
+
+        public override int GetHashCode()
+        {
+            return (i.ToString() + "_" + j.ToString() + "_" + k.ToString()).GetHashCode();
+        }
+
+        public static IntLoc operator %(IntLoc l, int n)
+        {
+            return new IntLoc(Globals.mod(l.i, n), Globals.mod(l.j, n), Globals.mod(l.k, n));
+        }
+
+        public static IntLoc operator -(IntLoc a, IntLoc b)
+        {
+            return new IntLoc(a.i - b.i, a.j - b.j, a.k - b.k);
+        }
+    }
+
 
 }

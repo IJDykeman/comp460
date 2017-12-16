@@ -9,12 +9,12 @@ namespace dungeon_monogame
     /// </summary>
     public class Game1 : Game
     {
-        GraphicsDeviceManager graphics;
+        public static GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
         Effect effect;
-        Chunk c;
-        Player player = new Player();
+        ChunkManager chunkManager;
+        Player player;
 
         public Game1()
         {
@@ -49,8 +49,8 @@ namespace dungeon_monogame
             effect = Content.Load<Effect>("Effect");
             // TODO: use this.Content to load your game content here
 
-            c = new Chunk();
-            c.remesh();
+            chunkManager = new ChunkManager();
+            player = new Player();
         }
 
         /// <summary>
@@ -74,6 +74,8 @@ namespace dungeon_monogame
 
             // TODO: Add your update logic here
             handleInput();
+
+            player.update(gameTime.ElapsedGameTime.Milliseconds / 1000f, chunkManager);
             base.Update(gameTime);
         }
 
@@ -107,39 +109,8 @@ namespace dungeon_monogame
             effect.Parameters["xLightDirection"].SetValue(Vector3.Normalize(new Vector3(-4,-2,-1)));
             effect.Parameters["xEnableLighting"].SetValue(true);
             //effect.Parameters["xOpacity"].SetValue(1.0f);
-            
 
-            foreach (var pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                graphics.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-
-                /*graphics.GraphicsDevice.DrawUserPrimitives(
-                 //We’ll be rendering two trinalges
-                    PrimitiveType.TriangleList,
-                 //The array of verts that we want to render
-                    c.vertices,
-                 //The offset, which is 0 since we want to start 
-                 //at the beginning of the floorVerts array
-                    0,
-                 //The number of triangles to draw
-                    c.vertices.Length / 3);*/
-                
-                VertexBuffer vertexBuffer = new VertexBuffer(graphics.GraphicsDevice, VertexPostitionColorPaintNormal.VertexDeclaration, c.vertices.Length, BufferUsage.WriteOnly);
-                vertexBuffer.SetData<VertexPostitionColorPaintNormal>(c.vertices);
-                short[] indices = new short[c.vertices.Length];
-                for (short i =0; i < c.vertices.Length; i++)
-                {
-                    indices[i] = i;
-                }
-
-                IndexBuffer indexBuffer = new IndexBuffer(graphics.GraphicsDevice, typeof(short), indices.Length, BufferUsage.WriteOnly);
-                indexBuffer.SetData(indices);
-                graphics.GraphicsDevice.Indices = indexBuffer;
-                graphics.GraphicsDevice.SetVertexBuffer(vertexBuffer);
-                graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
-                    indexBuffer.IndexCount / 3);
-            }
+            chunkManager.draw(effect);
         }
 
         /// <summary>
