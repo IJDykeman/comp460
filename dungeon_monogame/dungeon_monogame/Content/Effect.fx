@@ -46,6 +46,9 @@ Texture xTexture;
 sampler TextureSampler = sampler_state { texture = <xTexture>; magfilter = POINT; minfilter = POINT; mipfilter = POINT; AddressU = mirror; AddressV = mirror; };
 //change LINEAR to POINT for blocky textures
 
+
+
+
 //------- Technique: Colored --------
 
 VertexToPixel ColoredVS(float4 inPos : POSITION, float3 inNormal : NORMAL, float4 inColor : COLOR, float4 inPaint : COLOR1)
@@ -84,6 +87,7 @@ PixelToFrame ColoredPS(VertexToPixel PSIn)
 	
 }
 
+
 technique Colored
 {
 	pass Pass0
@@ -92,4 +96,84 @@ technique Colored
 		PixelShader = compile  ps_3_0 ColoredPS();
 	}
 }
+
+
+
+//------- Technique: Diffuse --------
+
+VertexToPixel DiffuseVS(float4 inPos : POSITION, float3 inNormal : NORMAL, float4 inColor : COLOR, float4 inPaint : COLOR1)
+{
+	VertexToPixel Output = (VertexToPixel)0;
+	float4x4 preViewProjection = mul(xView, xProjection);
+	float4x4 preWorldViewProjection = mul(xWorld, preViewProjection);
+	Output.Position = mul(inPos, preWorldViewProjection);
+	Output.Color = inColor;
+	return Output;
+}
+
+PixelToFrame DirectOutputPS(VertexToPixel PSIn)
+{
+	PixelToFrame Output = (PixelToFrame)0;
+	Output.Color = PSIn.Color;
+	return Output;
+	
+}
+
+technique Diffuse
+{
+	pass Pass0
+	{
+		VertexShader = compile vs_3_0 DiffuseVS();
+		PixelShader = compile  ps_3_0 DirectOutputPS();
+	}
+}
+
+
+
+//------- Technique: Normal --------
+
+VertexToPixel NormalVS(float4 inPos : POSITION, float3 inNormal : NORMAL, float4 inColor : COLOR, float4 inPaint : COLOR1)
+{
+	VertexToPixel Output = (VertexToPixel)0;
+	float4x4 preViewProjection = mul(xView, xProjection);
+	float4x4 preWorldViewProjection = mul(xWorld, preViewProjection);
+	Output.Position = mul(inPos, preWorldViewProjection);
+	Output.Color = float4(inNormal.xyz / 2.0 + .5, 1);
+	return Output;
+}
+
+
+technique Normal
+{
+	pass Pass0
+	{
+		VertexShader = compile vs_3_0 NormalVS();
+		PixelShader = compile  ps_3_0 DirectOutputPS();
+	}
+}
+
+
+
+//------- Technique: Indirect --------
+
+VertexToPixel IndirectVS(float4 inPos : POSITION, float3 inNormal : NORMAL, float4 inColor : COLOR, float4 inPaint : COLOR1)
+{
+	VertexToPixel Output = (VertexToPixel)0;
+	float4x4 preViewProjection = mul(xView, xProjection);
+	float4x4 preWorldViewProjection = mul(xWorld, preViewProjection);
+	Output.Position = mul(inPos, preWorldViewProjection);
+	Output.Color = inPaint;
+	return Output;
+}
+
+
+technique Indirect
+{
+	pass Pass0
+	{
+		VertexShader = compile vs_3_0 IndirectVS();
+		PixelShader = compile  ps_3_0 DirectOutputPS();
+	}
+}
+
 

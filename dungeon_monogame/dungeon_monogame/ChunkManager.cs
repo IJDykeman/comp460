@@ -19,7 +19,7 @@ namespace dungeon_monogame
             {
                 int s = 25;
                 //var loc = new IntLoc(Globals.random.Next(-s, s), Globals.random.Next(-s, s), Globals.random.Next(-s, s));
-                var loc = new IntLoc(Globals.random.Next(5, s), Globals.random.Next(5, s), Globals.random.Next(5, s));
+                var loc = new IntLoc(Globals.random.Next(0, s), Globals.random.Next(0, s), Globals.random.Next(0, s));
                 set(loc , new Block(1, new Color(Globals.random.Next(0, 256), Globals.random.Next(0, 256), Globals.random.Next(0, 256))));
             }
             for (int x = -25; x<25; x++){

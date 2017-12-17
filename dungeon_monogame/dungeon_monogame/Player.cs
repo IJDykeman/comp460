@@ -20,11 +20,13 @@ namespace dungeon_monogame
         private KeyboardState oldKeyboardState;
         private float upDownRot = -2;
         private float leftRightRot = 0;
+        float speed = 5f;
+        private bool flying = false;
 
         public Player()
         {
             Vector3 cameraPosition = new Vector3(0, 10, 0);
-            playerActor = new Actor(new AABB(cameraPosition, .8f, .8f, .8f));
+            playerActor = new Actor(new AABB(cameraPosition, 1.6f, .8f, .8f));
             Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
         }
 
@@ -33,7 +35,7 @@ namespace dungeon_monogame
             KeyboardState newState = Keyboard.GetState();
             // cameraLookAtVector = Vector3.Transform(cameraLookAtVector, Matrix.CreateRotationX(.01f));
             // Is the SPACE key down?
-            float speed = 5f;
+            
             Vector3 velocity = playerActor.getVelocity();
             if (newState.IsKeyDown(Keys.W))
             {
@@ -54,7 +56,14 @@ namespace dungeon_monogame
 
             if (newState.IsKeyDown(Keys.Space))
             {
-                velocity += Vector3.UnitY * speed;
+                if (flying)
+                {
+                    velocity += Vector3.UnitY * speed;
+                }
+                else if (playerActor.isOnGround())
+                {
+                    playerActor.addVelocity(Vector3.UnitY * 4);
+                }
             }
             if (newState.IsKeyDown(Keys.LeftShift))
             {
@@ -65,7 +74,14 @@ namespace dungeon_monogame
                 mouseEngaged = !mouseEngaged;
             }
 
-            playerActor.setVelocity(velocity);
+            if (!flying && (velocity * new Vector3(1,0,1)).Length() !=0)
+            {
+                velocity.Y = 0;
+                velocity.Normalize();
+                velocity *= speed;
+            }
+
+            playerActor.setInstantaneousMovement(velocity);
 
             MouseState newMouseState = Mouse.GetState();
             if (mouseEngaged)
@@ -73,7 +89,6 @@ namespace dungeon_monogame
                 leftRightRot += -(newMouseState.X - oldMouseState.X) * .005f;
                 upDownRot +=    -(newMouseState.Y - oldMouseState.Y) * .005f;
                 upDownRot = MathHelper.Clamp(upDownRot, (float)(-4.5f), (float)(-1.6f));
-                Console.WriteLine(upDownRot);
                 Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
             }
             oldMouseState = Mouse.GetState();
@@ -92,7 +107,12 @@ namespace dungeon_monogame
         public Matrix getViewMatrix()
         {
             return Matrix.CreateLookAt(
-              playerActor.getCenterLocation(), playerActor.getCenterLocation() + getFacingVector(), cameraUpVector);
+              getCameraLocation(), playerActor.getCenterLocation() + getFacingVector(), cameraUpVector);
+        }
+
+        public Vector3 getCameraLocation()
+        {
+            return playerActor.getCenterLocation() +Vector3.UnitY * .4f;
         }
 
         private Vector3 getFacingVector()

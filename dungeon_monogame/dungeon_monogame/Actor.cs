@@ -10,7 +10,10 @@ namespace dungeon_monogame
     class Actor
     {
         private AABB aabb;
-        Vector3 velocity;
+        private Vector3 velocity;
+        private Vector3 instantaneuousMovement;
+        private bool currentlyOnGround = false;
+
         public Actor(AABB aabb)
         {
             this.aabb = aabb;
@@ -18,12 +21,13 @@ namespace dungeon_monogame
 
         public void physicsUpdate(float deltaTime, ChunkManager space)
         {
-            velocity.Y -= Globals.G * deltaTime;
-            //velocity.Z = 0;
-            Console.WriteLine(velocity);
-            //Console.WriteLine(space.solid(new IntLoc(getCenterLocation())));
+            currentlyOnGround = false;
+            this.velocity.Y -= Globals.G * deltaTime;
+            Vector3 desiredMovement = deltaTime * this.velocity +instantaneuousMovement * deltaTime;
+            
+
             Vector3 currentLocation = aabb.getCenter();
-            Vector3 desiredFinalLocation = aabb.getCenter() + deltaTime * velocity;
+            Vector3 desiredFinalLocation = aabb.getCenter() + desiredMovement;
             Vector3 finalLocation = new Vector3();
             foreach (Globals.axes axis in Globals.allAxes)
             {
@@ -38,7 +42,7 @@ namespace dungeon_monogame
                     for (float a2 = aabb.axisMin(otherAxis2); a2 <= aabb.axisMax(otherAxis2); a2 += .5f)
                     {
 
-                        if (Globals.along(velocity, axis) < 0)
+                        if (Globals.along(desiredMovement, axis) < 0)
                         {
                             Vector3 queryLocation = Globals.unit(axis) * aabb.axisMin(axis) +
                                                     Globals.unit(otherAxis1) * a1 +
@@ -48,12 +52,16 @@ namespace dungeon_monogame
                             {
                                 Vector3 move = Globals.unit(axis) * (1-(Globals.along(queryLocation, axis) - (float)Math.Floor(Globals.along(queryLocation, axis)))) + Globals.unit(axis) * .001f;
                                 prospectiveLocation += move;
-                                velocity -= Globals.along(velocity, axis) * Globals.unit(axis);
-
+                                desiredMovement -= Globals.along(desiredMovement, axis) * Globals.unit(axis);
+                                if (axis == Globals.axes.y)
+                                {
+                                    currentlyOnGround = true;
+                                }
+                                velocity -= Globals.unit(axis) * Globals.along(velocity, axis);
                                 
                             }
                         }
-                        else if (Globals.along(velocity, axis) > 0)
+                        else if (Globals.along(desiredMovement, axis) > 0)
                         {
                             Vector3 queryLocation = Globals.unit(axis) * aabb.axisMax(axis) +
                                                     Globals.unit(otherAxis1) * a1 +
@@ -63,7 +71,9 @@ namespace dungeon_monogame
                             {
                                 float moveAmount = (Globals.along(queryLocation, axis) - (float)Math.Floor(Globals.along(queryLocation, axis))) + .001f;
                                 prospectiveLocation -= Globals.unit(axis) * moveAmount;
-                                velocity -= Globals.along(velocity, axis) * Globals.unit(axis);
+                                desiredMovement -= Globals.along(desiredMovement, axis) * Globals.unit(axis);
+                                velocity -= Globals.unit(axis) * Globals.along(velocity, axis);
+
 
                             }
                         }
@@ -72,7 +82,6 @@ namespace dungeon_monogame
                 finalLocation += prospectiveLocation * Globals.unit(axis);
             }
             aabb.setCenter(finalLocation);
-
             
         }
 
@@ -89,6 +98,21 @@ namespace dungeon_monogame
         internal Vector3 getVelocity()
         {
             return velocity;
+        }
+
+        public void addVelocity(Vector3 v)
+        {
+            velocity += v;
+        }
+
+        public void setInstantaneousMovement(Vector3 v)
+        {
+            instantaneuousMovement = v;
+        }
+
+        public bool isOnGround()
+        {
+            return currentlyOnGround;
         }
     }
 }

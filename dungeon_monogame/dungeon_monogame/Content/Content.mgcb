@@ -31,3 +31,15 @@
 /processorParam:DebugMode=Auto
 /build:Effect.fx
 
+#begin DeferredRender.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:DeferredRender.fx
+
+#begin RenderSceneFromGBuffer.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:RenderSceneFromGBuffer.fx
+
