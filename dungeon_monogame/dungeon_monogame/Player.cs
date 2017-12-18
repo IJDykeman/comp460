@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -26,8 +27,11 @@ namespace dungeon_monogame
         public Player()
         {
             Vector3 cameraPosition = new Vector3(0, 10, 0);
-            playerActor = new Actor(new AABB(cameraPosition, 1.6f, .8f, .8f));
+            playerActor = new Actor(new AABB(1.6f, .8f, .8f));
+            playerActor.setLocation(cameraPosition);
             Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
+            GameObject sword = new GameObject(MagicaVoxel.Read(@"C:\Users\Isaac\Desktop\comp460\voxel_models\simple_sword.vox"), new Vector3(1,20,0), Vector3.One * .1f);
+            playerActor.addChild(sword);
         }
 
         public void handleInput()
@@ -107,12 +111,12 @@ namespace dungeon_monogame
         public Matrix getViewMatrix()
         {
             return Matrix.CreateLookAt(
-              getCameraLocation(), playerActor.getCenterLocation() + getFacingVector(), cameraUpVector);
+              getCameraLocation(), playerActor.getLocation() + getFacingVector(), cameraUpVector);
         }
 
         public Vector3 getCameraLocation()
         {
-            return playerActor.getCenterLocation() +Vector3.UnitY * .4f;
+            return playerActor.getLocation() +Vector3.UnitY * .4f;
         }
 
         private Vector3 getFacingVector()
@@ -120,5 +124,10 @@ namespace dungeon_monogame
             return Vector3.Transform(Vector3.UnitZ, Matrix.CreateRotationX(upDownRot) * Matrix.CreateRotationY(leftRightRot));
         }
 
+
+        internal void draw(Effect effect)
+        {
+            playerActor.draw(effect, Matrix.Identity);
+        }
     }
 }

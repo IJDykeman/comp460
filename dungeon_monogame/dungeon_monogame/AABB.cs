@@ -8,26 +8,18 @@ namespace dungeon_monogame
 {
     class AABB
     {
-        Vector3 centerPosition;
         public float height, xWidth, zWidth;
 
-        public Vector3 getCenter()
-        {
-            return centerPosition;
-        }
 
-        public AABB(Vector3 _centerPosition, float _height, float _xWidth, float _zWidth)
+
+        public AABB(float _height, float _xWidth, float _zWidth)
         {
-            centerPosition = _centerPosition;
             height = _height;
             xWidth = _xWidth;
             zWidth = _zWidth;
         }
 
-        Vector3 center()
-        {
-            return centerPosition;
-        }
+
 
         public float axisMin(Globals.axes axis){
             switch (axis){
@@ -54,11 +46,5 @@ namespace dungeon_monogame
         }
 
 
-
-
-        internal void setCenter(Vector3 prospectiveLocation)
-        {
-            centerPosition = prospectiveLocation;
-        }
     }
 }

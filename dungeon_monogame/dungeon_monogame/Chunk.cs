@@ -20,6 +20,7 @@ namespace dungeon_monogame
         private short[] indices;
         public VertexBuffer vertexBuffer;
         public IndexBuffer indexBuffer;
+        bool meshValid = false;
 
         private static readonly Vector3[] probes = new Vector3[]{
                 new Vector3(.5f, .5f, .5f),
@@ -31,7 +32,9 @@ namespace dungeon_monogame
 
         public Chunk()
         {
+            
             blocks = new Block[chunkWidth, chunkWidth, chunkWidth];
+            remesh();
             for (int i=0; i<chunkWidth; i++)
             {
                 for (int j = 0; j < chunkWidth; j++)
@@ -52,6 +55,7 @@ namespace dungeon_monogame
         public void setBlock(IntLoc loc, Block val)
         {
             blocks[loc.i, loc.j, loc.k] = val;
+            meshValid = false;
         }
 
         public bool withinBounds(IntLoc loc)
@@ -83,6 +87,7 @@ namespace dungeon_monogame
             vertexBuffer.SetData<VertexPostitionColorPaintNormal>(vertices);
             indexBuffer = new IndexBuffer(Game1.graphics.GraphicsDevice, typeof(short), indices.Length, BufferUsage.WriteOnly);
             indexBuffer.SetData(indices);
+            meshValid = true;
         }
 
         VertexPostitionColorPaintNormal[] getVertices(Vector3 offset, Color c)

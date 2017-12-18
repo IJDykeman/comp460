@@ -11,23 +11,30 @@ namespace dungeon_monogame
     class ChunkManager
     {
         Dictionary<IntLoc, Chunk> chunks;
+        
 
         public ChunkManager()
         {
             chunks = new Dictionary<IntLoc, Chunk>();
+
+        }
+
+        public void makeColorfulFloor()
+        {
             for (int i = 0; i < 1000; i++)
             {
                 int s = 25;
                 //var loc = new IntLoc(Globals.random.Next(-s, s), Globals.random.Next(-s, s), Globals.random.Next(-s, s));
-                var loc = new IntLoc(Globals.random.Next(0, s), Globals.random.Next(0, s), Globals.random.Next(0, s));
-                set(loc , new Block(1, new Color(Globals.random.Next(0, 256), Globals.random.Next(0, 256), Globals.random.Next(0, 256))));
+                //var loc = new IntLoc(Globals.random.Next(0, s), Globals.random.Next(0, s), Globals.random.Next(0, s));
+                //set(loc , new Block(1, new Color(Globals.random.Next(0, 256), Globals.random.Next(0, 256), Globals.random.Next(0, 256))));
             }
-            for (int x = -25; x<25; x++){
+            for (int x = -25; x < 25; x++)
+            {
                 for (int z = -25; z < 25; z++)
                 {
-                    for (int y = -2; y < 2; y++)
+                    for (int y = 0; y < 2; y++)
                     {
-                        set(new IntLoc(x,y,z), new Block(1, new Color(Globals.random.Next(0, 256), Globals.random.Next(0, 256), Globals.random.Next(0, 256))));
+                        set(new IntLoc(x, y, z), new Block(1, new Color(Globals.random.Next(0, 256), Globals.random.Next(0, 256), Globals.random.Next(0, 256))));
                     }
                 }
 
@@ -35,7 +42,7 @@ namespace dungeon_monogame
             remeshAll();
         }
 
-        void remeshAll()
+        public void remeshAll()
         {
             foreach (Chunk c in chunks.Values)
             {
@@ -79,7 +86,7 @@ namespace dungeon_monogame
             return chunks.ContainsKey(locToChunkLoc(loc));
         }
 
-        public void draw(Effect effect)
+        public void draw(Effect effect, Matrix transform)
         {
             foreach (KeyValuePair<IntLoc, Chunk> p in chunks)
             {
@@ -94,7 +101,7 @@ namespace dungeon_monogame
                 Game1.graphics.GraphicsDevice.Indices = c.indexBuffer;
                 Game1.graphics.GraphicsDevice.SetVertexBuffer(c.vertexBuffer);
                 Game1.graphics.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
-                effect.Parameters["xWorld"].SetValue(Matrix.Multiply(oldWorldMat, Matrix.CreateTranslation(loc.toVector3())));
+                effect.Parameters["xWorld"].SetValue(Matrix.Multiply(oldWorldMat, Matrix.CreateTranslation(loc.toVector3()) * transform));
                 foreach (var pass in effect.CurrentTechnique.Passes)
                 {
                     pass.Apply();

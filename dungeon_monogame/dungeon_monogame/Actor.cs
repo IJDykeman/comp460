@@ -1,22 +1,25 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace dungeon_monogame
 {
-    class Actor
+    class Actor : GameObject
     {
         private AABB aabb;
         private Vector3 velocity;
         private Vector3 instantaneuousMovement;
         private bool currentlyOnGround = false;
+        
 
         public Actor(AABB aabb)
         {
             this.aabb = aabb;
+
         }
 
         public void physicsUpdate(float deltaTime, ChunkManager space)
@@ -24,10 +27,16 @@ namespace dungeon_monogame
             currentlyOnGround = false;
             this.velocity.Y -= Globals.G * deltaTime;
             Vector3 desiredMovement = deltaTime * this.velocity +instantaneuousMovement * deltaTime;
-            
 
-            Vector3 currentLocation = aabb.getCenter();
-            Vector3 desiredFinalLocation = aabb.getCenter() + desiredMovement;
+            setLocation(collide(space, desiredMovement));
+            
+        }
+
+        private Vector3 collide(ChunkManager space, Vector3 desiredMovement)
+        {
+
+            Vector3 currentLocation = getLocation();
+            Vector3 desiredFinalLocation = getLocation() + desiredMovement;
             Vector3 finalLocation = new Vector3();
             foreach (Globals.axes axis in Globals.allAxes)
             {
@@ -50,7 +59,7 @@ namespace dungeon_monogame
                                                     prospectiveLocation;
                             if (space.solid(new IntLoc(queryLocation)))
                             {
-                                Vector3 move = Globals.unit(axis) * (1-(Globals.along(queryLocation, axis) - (float)Math.Floor(Globals.along(queryLocation, axis)))) + Globals.unit(axis) * .001f;
+                                Vector3 move = Globals.unit(axis) * (1 - (Globals.along(queryLocation, axis) - (float)Math.Floor(Globals.along(queryLocation, axis)))) + Globals.unit(axis) * .001f;
                                 prospectiveLocation += move;
                                 desiredMovement -= Globals.along(desiredMovement, axis) * Globals.unit(axis);
                                 if (axis == Globals.axes.y)
@@ -58,7 +67,7 @@ namespace dungeon_monogame
                                     currentlyOnGround = true;
                                 }
                                 velocity -= Globals.unit(axis) * Globals.along(velocity, axis);
-                                
+
                             }
                         }
                         else if (Globals.along(desiredMovement, axis) > 0)
@@ -73,26 +82,18 @@ namespace dungeon_monogame
                                 prospectiveLocation -= Globals.unit(axis) * moveAmount;
                                 desiredMovement -= Globals.along(desiredMovement, axis) * Globals.unit(axis);
                                 velocity -= Globals.unit(axis) * Globals.along(velocity, axis);
-
-
                             }
                         }
                     }
                 }
                 finalLocation += prospectiveLocation * Globals.unit(axis);
             }
-            aabb.setCenter(finalLocation);
-            
+            return finalLocation;
         }
 
         public void setVelocity(Vector3 v)
         {
             velocity = v;
-        }
-
-        internal Vector3 getCenterLocation()
-        {
-            return aabb.getCenter();
         }
 
         internal Vector3 getVelocity()

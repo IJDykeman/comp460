@@ -46,8 +46,11 @@
     <Compile Include="Actor.cs" />
     <Compile Include="Chunk.cs" />
     <Compile Include="ChunkManager.cs" />
+    <Compile Include="GameObject.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="MagicaVoxelReading.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="Rendering.cs" />
     <Compile Include="structs.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
