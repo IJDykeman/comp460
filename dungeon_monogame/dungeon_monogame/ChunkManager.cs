@@ -44,9 +44,10 @@ namespace dungeon_monogame
 
         public void remeshAll()
         {
-            foreach (Chunk c in chunks.Values)
+            
+            foreach (IntLoc v in chunks.Keys)
             {
-                c.remesh();
+                chunks[v].remesh(this, v.toVector3());
             }
         }
 

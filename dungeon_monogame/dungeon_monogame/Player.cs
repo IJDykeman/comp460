@@ -23,19 +23,28 @@ namespace dungeon_monogame
         private float leftRightRot = 0;
         float speed = 5f;
         private bool flying = false;
+        Light torchLight;
 
         public Player()
         {
-            Vector3 cameraPosition = new Vector3(0, 10, 0);
+            Vector3 cameraPosition = new Vector3(15, 20, 15);
             playerActor = new Actor(new AABB(1.6f, .8f, .8f));
             playerActor.setLocation(cameraPosition);
             Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
-            GameObject sword = new GameObject(MagicaVoxel.Read(@"C:\Users\Isaac\Desktop\comp460\voxel_models\simple_sword.vox"), new Vector3(1,20,0), Vector3.One * .1f);
-            playerActor.addChild(sword);
+            //GameObject sword = new GameObject(MagicaVoxel.Read(@"simple_sword.vox"), new Vector3(1,20,0), Vector3.One * .1f);
+            //playerActor.addChild(sword);
+            var torch = new GameObject(MagicaVoxel.Read(@"torch.vox"), new Vector3(.2f, .4f, -.3f), Vector3.One * .03f);
+            torchLight = new Light(1f, Color.LightGoldenrodYellow);
+            torchLight.setLocation(new Vector3(3, 8, 3));
+            torch.addChild(torchLight);
+            //torch.addChild(new GameObject(MagicaVoxel.Read(@"torch.vox"), new Vector3(-3, 0, 0), Vector3.One * .5f));
+            playerActor.addChild(torch);
+            //playerActor.addChild(new Light());
         }
 
-        public void handleInput()
+        public List<Action> handleInput()
         {
+            List<Action> result = new List<Action>();
             KeyboardState newState = Keyboard.GetState();
             // cameraLookAtVector = Vector3.Transform(cameraLookAtVector, Matrix.CreateRotationX(.01f));
             // Is the SPACE key down?
@@ -83,11 +92,21 @@ namespace dungeon_monogame
                 velocity.Y = 0;
                 velocity.Normalize();
                 velocity *= speed;
+            
             }
+
+            
 
             playerActor.setInstantaneousMovement(velocity);
 
             MouseState newMouseState = Mouse.GetState();
+
+            if (newMouseState.LeftButton == ButtonState.Pressed )//&& oldMouseState.LeftButton == ButtonState.Released)
+            {
+                Spell spell = new Spell(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 35f);
+                result.Add(new SpawnAction(spell));
+            }
+
             if (mouseEngaged)
             {
                 leftRightRot += -(newMouseState.X - oldMouseState.X) * .005f;
@@ -97,6 +116,12 @@ namespace dungeon_monogame
             }
             oldMouseState = Mouse.GetState();
             oldKeyboardState = Keyboard.GetState();
+
+            torchLight.setIntensity(torchLight.getIntensity() +(float) (Globals.random.NextDouble()-.5f) * .06f);
+            torchLight.setIntensity(MathHelper.Min(torchLight.getIntensity(), 1.3f));
+            torchLight.setIntensity(MathHelper.Max(torchLight.getIntensity(), .5f));
+            playerActor.setRotation(Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY(leftRightRot)));
+            return result;
         }
 
         private bool justHit(Keys key, KeyboardState newState)
@@ -104,19 +129,15 @@ namespace dungeon_monogame
             return oldKeyboardState.IsKeyDown(key) && !newState.IsKeyDown(key);
         }
 
-        public void update(float dt, ChunkManager chunkManager) {
-            playerActor.physicsUpdate(dt, chunkManager);
-        }
-
         public Matrix getViewMatrix()
         {
             return Matrix.CreateLookAt(
-              getCameraLocation(), playerActor.getLocation() + getFacingVector(), cameraUpVector);
+              getCameraLocation(), getCameraLocation() + getFacingVector(), cameraUpVector);
         }
 
         public Vector3 getCameraLocation()
         {
-            return playerActor.getLocation() +Vector3.UnitY * .4f;
+            return playerActor.getAabb().axisMax(Globals.axes.y) * Vector3.UnitY - Vector3.UnitY * .2f + playerActor.getLocation();
         }
 
         private Vector3 getFacingVector()
@@ -127,7 +148,12 @@ namespace dungeon_monogame
 
         internal void draw(Effect effect)
         {
-            playerActor.draw(effect, Matrix.Identity);
+            playerActor.drawFirstPass(effect, Matrix.Identity);
+        }
+
+        internal GameObject getActor()
+        {
+            return playerActor;
         }
     }
 }

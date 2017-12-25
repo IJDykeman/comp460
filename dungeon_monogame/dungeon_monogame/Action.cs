@@ -1,0 +1,66 @@
+﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace dungeon_monogame
+{
+    interface Action
+    {
+
+
+        void act(GameObject world, GameTime dt);
+    }
+    
+    class RequestPhysicsUpdate : Action
+    {
+        private Actor actor;
+
+        public RequestPhysicsUpdate(Actor a)
+        {
+            actor = a;
+        }
+        
+
+        public void act(GameObject world, GameTime dt)
+        {
+            actor.physicsUpdate(dt, world.getChunkSpace());
+        }
+    }
+
+    class SpawnAction : Action
+    {
+        private Actor actor;
+
+        public SpawnAction(Actor toSpawn)
+        {
+            actor = toSpawn;
+        }
+
+
+        public void act(GameObject world, GameTime dt)
+        {
+            world.addChild(actor);
+        }
+    }
+    
+    class DissapearAction : Action
+    {
+        private Actor actor;
+
+        public DissapearAction(Actor toRemove)
+        {
+            actor = toRemove;
+        }
+
+
+        public void act(GameObject world, GameTime dt)
+        {
+            world.recursiveRemove(actor);
+        }
+    }
+}
+
+

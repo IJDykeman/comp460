@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -49,11 +50,13 @@ namespace dungeon_monogame
         public static ChunkManager Read(string path)
         {
 
-            Stream stream = File.Open(path, FileMode.Open);
+            Stream stream = File.Open(@"C:\Users\Isaac\Desktop\comp460\voxel_models\" + path, FileMode.Open);
             BinaryReader reader = new BinaryReader(stream);
             var magic = reader.ReadUInt32();
             var version = reader.ReadInt32();
             ChunkManager manager = new ChunkManager();
+            List<IntLoc> blockLocs = new List<IntLoc>();
+            List<int> colorIndices= new List<int>();
 
             if (magic != VOX_)
             {
@@ -90,9 +93,8 @@ namespace dungeon_monogame
                             var y = reader.ReadByte();
                             var z = reader.ReadByte();
                             var c = reader.ReadByte();
-                            //Console.WriteLine(x);
-                            manager.set(new IntLoc(x, z, y), new Block(1, colors[c]));
-                            //voxelData[new XYZ(x, y, z)] = new Voxel() { Index = c };
+                            blockLocs.Add(new IntLoc(x, z, y));
+                            colorIndices.Add(c);
                         }
                         break;
                     case RGBA:
@@ -122,13 +124,18 @@ namespace dungeon_monogame
             {
                 for (var i = 0; i < DefaultColors.Length; ++i)
                 {
-                    //voxelData.Colors[i] = new Color(DefaultColors[i]);
+                    colors[i] = new Color(DefaultColors[i]);
                 }
             }
 
-            //return voxelData;
+            for (int i = 0; i < blockLocs.Count; i++)
+            {
+                manager.set(blockLocs[i], new Block(1, colors[colorIndices[i]]));
+            }
+                //return voxelData;
+                stream.Close();
             manager.remeshAll();
-
+            
             return manager;
         }
 

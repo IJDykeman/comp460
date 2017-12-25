@@ -1,6 +1,7 @@
-﻿using Microsoft.Xna.Framework; 
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using System.IO;
 
 namespace dungeon_monogame
@@ -15,21 +16,19 @@ namespace dungeon_monogame
         SpriteBatch spriteBatch;
 
         ChunkManager landscapeChunks;
+        GameObject landscape;
         Player player;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = 1200;
+            graphics.PreferredBackBufferHeight = 600;
+            graphics.ApplyChanges();
             Content.RootDirectory = "Content";
 
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -50,9 +49,13 @@ namespace dungeon_monogame
 
             // TODO: use this.Content to load your game content here
             Rendering.LoadContent(Content, graphics);
-            landscapeChunks = new ChunkManager();
-            landscapeChunks.makeColorfulFloor();
+            landscapeChunks = MagicaVoxel.Read(@"castleOnHill.vox");
+            landscape = new GameObject(landscapeChunks, new Vector3(), Vector3.One);
+            
+            //landscapeChunks.makeColorfulFloor();
+            
             player = new Player();
+            landscape.addChild(player.getActor());
         }
 
         /// <summary>
@@ -69,16 +72,18 @@ namespace dungeon_monogame
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            handleInput();
-            player.update(gameTime.ElapsedGameTime.Milliseconds / 1000f, landscapeChunks);
+            
+            //player.update(gameTime.ElapsedGameTime.Milliseconds / 1000f, landscapeChunks);
             //player.update(0, chunkManager);
+            List<Action> actions = landscape.updateWithChildren();
+            actions.AddRange(player.handleInput());
+            foreach (Action action in actions){
+                action.act(landscape, gameTime);
+            }
+
             base.Update(gameTime);
         }
 
-        void handleInput()
-        {
-            player.handleInput();
-        }
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -86,10 +91,10 @@ namespace dungeon_monogame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
-            Rendering.renderWorld(graphics, player, landscapeChunks);
+            Rendering.renderWorld(graphics, landscape, player);
 
             base.Draw(gameTime);
         }

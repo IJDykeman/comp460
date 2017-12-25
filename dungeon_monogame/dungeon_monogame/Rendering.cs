@@ -27,16 +27,17 @@ namespace dungeon_monogame
             backBufferWidth  = graphics.PreferredBackBufferWidth;
             createGBufferEffect = Content.Load<Effect>("DeferredRender");
             renderSceneEffect = Content.Load<Effect>("RenderSceneFromGBuffer");
-            colorRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth, backBufferHeight, false, SurfaceFormat.Color, DepthFormat.Depth24);
-            normalRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth, backBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
-            depthRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth, backBufferHeight, false, SurfaceFormat.Single, DepthFormat.None);
-            positionRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth, backBufferHeight, false, SurfaceFormat.Vector4, DepthFormat.None);
+            int scale_factor = 1;
+            colorRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Color, DepthFormat.Depth24);
+            normalRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Color, DepthFormat.None);
+            depthRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Single, DepthFormat.None);
+            positionRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Vector4, DepthFormat.None);
             halfPixel.X = 0.5f / (float)graphics.GraphicsDevice.PresentationParameters.BackBufferWidth;
             halfPixel.Y = 0.5f / (float)graphics.GraphicsDevice.PresentationParameters.BackBufferHeight;
 
         }
 
-         public static void renderWorld(GraphicsDeviceManager graphics, Player player, ChunkManager worldChunkManager)
+         public static void renderWorld(GraphicsDeviceManager graphics, GameObject landscape, Player player)
         {
             GraphicsDevice GraphicsDevice = graphics.GraphicsDevice;
             //BasicEffect effect = new BasicEffect(graphics.GraphicsDevice);
@@ -57,8 +58,9 @@ namespace dungeon_monogame
             createGBufferEffect.Parameters["xProjection"].SetValue(projection(graphics));
             createGBufferEffect.Parameters["xView"].SetValue(player.getViewMatrix());
             createGBufferEffect.Parameters["xWorld"].SetValue(Matrix.Identity);
-            worldChunkManager.draw(createGBufferEffect, Matrix.Identity);
-            player.draw(createGBufferEffect);
+           // worldChunkManager.draw(createGBufferEffect, Matrix.Identity);
+            landscape.drawFirstPass(createGBufferEffect, Matrix.Identity);
+            //player.draw(createGBufferEffect);
 
             Texture2D diffuseTex = (Texture2D)colorRT;
             Texture2D norm = (Texture2D)normalRT;
@@ -88,7 +90,7 @@ namespace dungeon_monogame
             renderSceneEffect.Parameters["lightDirection"].SetValue(new Vector3(1, -2, 3));
             // renderSceneEffect.Parameters["Color"].SetValue(new Vector3(0,.5f, .5f));
             //renderSceneEffect.Parameters["lightDirection"].SetValue(new Vector3(1, -2, 3));
-            renderSceneEffect.Parameters["lightRadius"].SetValue(20f);
+            renderSceneEffect.Parameters["lightRadius"].SetValue(0f);
             renderSceneEffect.Parameters["lightPosition"].SetValue(player.getCameraLocation());
             //renderSceneEffect.Parameters["cameraPosition"].SetValue(player.getCameraLocation());
             renderSceneEffect.Parameters["InvertViewProjection"].SetValue(Matrix.Invert(player.getViewMatrix() * projection(graphics)));
@@ -97,20 +99,16 @@ namespace dungeon_monogame
 
             new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
             GraphicsDevice.BlendState = BlendState.Additive;
-            renderSceneEffect.Parameters["lightPosition"].SetValue(player.getCameraLocation() + Vector3.UnitX * 5);
-            new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-            renderSceneEffect.Parameters["lightPosition"].SetValue(player.getCameraLocation() + Vector3.UnitX * 10);
-            new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-            renderSceneEffect.Parameters["lightPosition"].SetValue(player.getCameraLocation() + Vector3.UnitX * 40);
-            renderSceneEffect.Parameters["lightRadius"].SetValue(30f);
+            landscape.drawDeferredPass(renderSceneEffect, Matrix.Identity, GraphicsDevice);
+
 
             new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
             renderSceneEffect.Parameters["lightIntensity"].SetValue(.1f);
             renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["DirectionalLightTechnique"];
+            //GraphicsDevice.BlendState = BlendState.Opaque;
 
             new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
 
-            //render("Diffuse");
 
 
         }
@@ -120,9 +118,9 @@ namespace dungeon_monogame
         {
             float aspectRatio =
                 graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight;
-            float fieldOfView = Microsoft.Xna.Framework.MathHelper.PiOver4;
+            float fieldOfView = MathHelper.ToRadians(70f) ;
             float nearClipPlane = .1f;
-            float farClipPlane = 100;
+            float farClipPlane = 200;
 
             return Matrix.CreatePerspectiveFieldOfView(
                 fieldOfView, aspectRatio, nearClipPlane, farClipPlane);

@@ -13,8 +13,8 @@ namespace dungeon_monogame
         ChunkManager chunkManager;
         private Vector3 location = new Vector3();
         Vector3 scale = Vector3.One;
-        Quaternion rotation;
-        List<GameObject> children;
+        Quaternion rotation = Quaternion.Identity;
+        protected List<GameObject> children;
 
         public GameObject()
         {
@@ -28,6 +28,11 @@ namespace dungeon_monogame
             scale = _scale;
             chunkManager = _chunkManager;
             children = new List<GameObject>();
+        }
+
+        public GameObject(ChunkManager _chunkManager, Vector3 _location, Vector3 _scale, Quaternion _rotation) : this(_chunkManager, _location, _scale)
+        {
+            rotation = _rotation;
         }
 
         public void addChild(GameObject child)
@@ -45,30 +50,73 @@ namespace dungeon_monogame
             location = v;
         }
 
-        public void draw(Effect effect, Matrix transform)
+        public void drawFirstPass(Effect effect, Matrix transform)
         {
-            transform = transform * Matrix.CreateTranslation(location) * Matrix.CreateScale(scale);
+            transform = getTransform(ref transform);
             chunkManager.draw(effect, transform);
+
             foreach (GameObject child in children)
             {
-                child.draw(effect, transform);
+                child.drawFirstPass(effect, transform);
             }
         }
 
-
-        public void update(GameTime time)
-        {
-            updateChildren(time);
-        }
-
-        public void updateChildren(GameTime time)
+        public virtual void drawDeferredPass(Effect effect, Matrix transform, GraphicsDevice device)
         {
             foreach (GameObject child in children)
             {
-                child.update(time);
+                child.drawDeferredPass(effect, getTransform(ref transform), device);
             }
         }
 
+        protected Matrix getTransform(ref Matrix transform)
+        {
+            return (Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(rotation) * Matrix.CreateTranslation(location)) * transform;
+        }
+
+
+        protected virtual List<Action> update()
+        {
+            return new List<Action>();
+        }
+
+        public List<Action> updateWithChildren()
+        {
+            List<Action> result = new List<Action>();
+            result.AddRange(update());
+            foreach (GameObject child in children)
+            {
+                result.AddRange(child.update());
+            }
+            return result;
+        }
+
+
+
+        internal ChunkManager getChunkSpace()
+        {
+            return chunkManager;
+        }
+
+        internal void recursiveRemove(GameObject obj)
+        {
+            if (children.Contains(obj))
+            {
+                children.Remove(obj);
+            }
+            else
+            {
+                foreach (GameObject c in children)
+                {
+                    c.recursiveRemove(obj);
+                }
+            }
+        }
+
+        public void setRotation(Quaternion quaternion)
+        {
+            rotation = quaternion;
+        }
 
     }
 }

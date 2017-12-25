@@ -1,7 +1,7 @@
 ﻿//direction of the light
 float3 lightDirection;
 //color of the light 
-float3 Color;
+float4 lightColor;
 //position of the camera, for specular light
 float3 cameraPosition;
 //this is used to compute the world-position
@@ -178,7 +178,7 @@ float4 PointLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 	//take into account attenuation and lightIntensity.
 	float3 finalColor = attenuation * lightIntensity * diffuseLight.rgb;
 	//return float4(diffuseLight.rgb * 0 + position.xyz / 10,1);
-	return float4(finalColor.rgb, 1);
+	return float4(finalColor.rgb * lightColor, 1);
 }
 
 

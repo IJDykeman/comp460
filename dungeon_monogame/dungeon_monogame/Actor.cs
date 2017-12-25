@@ -14,6 +14,7 @@ namespace dungeon_monogame
         private Vector3 velocity;
         private Vector3 instantaneuousMovement;
         private bool currentlyOnGround = false;
+        protected float gravityFactor = 1.0f;
         
 
         public Actor(AABB aabb)
@@ -22,10 +23,11 @@ namespace dungeon_monogame
 
         }
 
-        public void physicsUpdate(float deltaTime, ChunkManager space)
+        public void physicsUpdate(GameTime time, ChunkManager space)
         {
+            float deltaTime = time.ElapsedGameTime.Milliseconds / 1000f;
             currentlyOnGround = false;
-            this.velocity.Y -= Globals.G * deltaTime;
+            this.velocity.Y -= Globals.G * deltaTime * gravityFactor;
             Vector3 desiredMovement = deltaTime * this.velocity +instantaneuousMovement * deltaTime;
 
             setLocation(collide(space, desiredMovement));
@@ -46,6 +48,7 @@ namespace dungeon_monogame
                 Globals.axes otherAxis2 = otherAxes.Item2;
                 prospectiveLocation += currentLocation * Globals.unit(otherAxis1);
                 prospectiveLocation += currentLocation * Globals.unit(otherAxis2);
+                bool collided = false;
                 for (float a1 = aabb.axisMin(otherAxis1); a1 <= aabb.axisMax(otherAxis1); a1 += .5f)
                 {
                     for (float a2 = aabb.axisMin(otherAxis2); a2 <= aabb.axisMax(otherAxis2); a2 += .5f)
@@ -67,6 +70,7 @@ namespace dungeon_monogame
                                     currentlyOnGround = true;
                                 }
                                 velocity -= Globals.unit(axis) * Globals.along(velocity, axis);
+                                collided = true;
 
                             }
                         }
@@ -82,9 +86,14 @@ namespace dungeon_monogame
                                 prospectiveLocation -= Globals.unit(axis) * moveAmount;
                                 desiredMovement -= Globals.along(desiredMovement, axis) * Globals.unit(axis);
                                 velocity -= Globals.unit(axis) * Globals.along(velocity, axis);
+                                collided = true;
                             }
                         }
                     }
+                }
+                if (collided)
+                {
+                    onCollision();
                 }
                 finalLocation += prospectiveLocation * Globals.unit(axis);
             }
@@ -115,5 +124,24 @@ namespace dungeon_monogame
         {
             return currentlyOnGround;
         }
+
+        protected override List<Action> update()
+        {
+            List<Action> result = new List<Action>();
+            result.Add(new RequestPhysicsUpdate(this));
+            return result;
+        }
+
+        protected virtual void onCollision() 
+        {
+        }
+
+        public AABB getAabb()
+        {
+            return aabb;
+        }
+
+
+
     }
 }

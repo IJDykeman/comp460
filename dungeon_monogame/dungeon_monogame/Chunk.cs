@@ -34,7 +34,7 @@ namespace dungeon_monogame
         {
             
             blocks = new Block[chunkWidth, chunkWidth, chunkWidth];
-            remesh();
+            //remesh();
             for (int i=0; i<chunkWidth; i++)
             {
                 for (int j = 0; j < chunkWidth; j++)
@@ -72,9 +72,9 @@ namespace dungeon_monogame
             return getBlock(loc).type != 0;
         }
 
-        public void remesh()
+        public void remesh(ChunkManager space, Vector3 chunkLoc)
         {
-            vertices = getChunkMesh();
+            vertices = getChunkMesh(space, chunkLoc);
             if (vertices.Length == 0){
                 return;
             }
@@ -90,43 +90,43 @@ namespace dungeon_monogame
             meshValid = true;
         }
 
-        VertexPostitionColorPaintNormal[] getVertices(Vector3 offset, Color c)
+        VertexPostitionColorPaintNormal[] getVertices(Vector3 offset, Vector3 chunkLoc, Color c, ChunkManager space)
         {
             IEnumerable< VertexPostitionColorPaintNormal> list = new VertexPostitionColorPaintNormal[0];
             //Color c =;
             //Color c = Color.LightGray;
-            if (!solid(new IntLoc(offset - Vector3.UnitZ))){
+            if (!space.solid(new IntLoc(offset + chunkLoc - Vector3.UnitZ))){
                 VertexPostitionColorPaintNormal[] back = getTransformedXYFace(Matrix.CreateRotationY((float)(-Math.PI)), Vector3.UnitX,
-                    Matrix.CreateRotationY((float)Math.PI / 2f), offset, c);
+                    Matrix.CreateRotationY((float)Math.PI / 2f), offset, c, space, chunkLoc);
                 list = list.Concat(back); 
             }
-            if (!solid(new IntLoc(offset + Vector3.UnitZ)))
+            if (!space.solid(new IntLoc(offset + chunkLoc + Vector3.UnitZ)))
             {
                 VertexPostitionColorPaintNormal[] front = getTransformedXYFace(Matrix.Identity, Vector3.UnitZ,
-                    Matrix.CreateRotationY(-(float)Math.PI / 2f), offset, c);
+                    Matrix.CreateRotationY(-(float)Math.PI / 2f), offset, c, space, chunkLoc);
                 list = list.Concat(front);
             }
-            if (!solid(new IntLoc(offset - Vector3.UnitX))){
+            if (!space.solid(new IntLoc(offset + chunkLoc - Vector3.UnitX))){
                 VertexPostitionColorPaintNormal[] left = getTransformedXYFace(Matrix.CreateRotationY((float)(-Math.PI / 2.0)), Vector3.Zero,
-                    Matrix.CreateRotationY((float)Math.PI), offset, c);
+                    Matrix.CreateRotationY((float)Math.PI), offset, c, space, chunkLoc);
                 list = list.Concat(left);
             }
-            if (!solid(new IntLoc(offset + Vector3.UnitX)))
+            if (!space.solid(new IntLoc(offset + chunkLoc + Vector3.UnitX)))
             {
                 VertexPostitionColorPaintNormal[] right = getTransformedXYFace(Matrix.CreateRotationY((float)(Math.PI / 2.0)), Vector3.UnitX + Vector3.UnitZ,
-                    Matrix.Identity, offset, c);
+                    Matrix.Identity, offset, c, space, chunkLoc);
                 list = list.Concat(right);
             }
-            if (!solid(new IntLoc(offset - Vector3.UnitY)))
+            if (!space.solid(new IntLoc(offset + chunkLoc - Vector3.UnitY)))
             {
                 VertexPostitionColorPaintNormal[] bottom = getTransformedXYFace(Matrix.CreateRotationX((float)(Math.PI / 2.0)), Vector3.Zero,
-                    Matrix.CreateRotationZ(-(float)Math.PI/2f), offset, c);
+                    Matrix.CreateRotationZ(-(float)Math.PI / 2f), offset, c, space, chunkLoc);
                 list = list.Concat(bottom);
             }
-            if (!solid(new IntLoc(offset + Vector3.UnitY)))
+            if (!space.solid(new IntLoc(offset + chunkLoc + Vector3.UnitY)))
             {
                 VertexPostitionColorPaintNormal[] top = getTransformedXYFace(Matrix.CreateRotationX((float)(-Math.PI / 2.0)), Vector3.UnitY + Vector3.UnitZ,
-                    Matrix.CreateRotationZ((float)Math.PI/2f), offset, c);
+                    Matrix.CreateRotationZ((float)Math.PI / 2f), offset, c, space, chunkLoc);
                 list = list.Concat(top);
             }
             VertexPostitionColorPaintNormal[] result = list.ToArray();
@@ -144,7 +144,7 @@ namespace dungeon_monogame
             vertices[5].Position = vertices[2].Position;
         }
 
-        VertexPostitionColorPaintNormal[] getTransformedXYFace(Matrix m, Vector3 b, Matrix unitXToNormal, Vector3 offset, Color c)
+        VertexPostitionColorPaintNormal[] getTransformedXYFace(Matrix m, Vector3 b, Matrix unitXToNormal, Vector3 offset, Color c, ChunkManager space, Vector3 chunkLoc)
         {
             Vector3 normal = Vector3.Transform(Vector3.UnitX, unitXToNormal);
 
@@ -160,12 +160,12 @@ namespace dungeon_monogame
                 foreach (Vector3 p in probes)
                 {
                     Vector3 probe = Vector3.Transform(p, unitXToNormal);
-                    IntLoc loc = new IntLoc(result[i].Position + probe);
-                    if (solid(loc))
+                    IntLoc loc = new IntLoc(result[i].Position + probe + chunkLoc);
+                    if (space.solid(loc))
                     {
-                        float colorTransmissionFactor = .5f;
-                        indirectLighting *=  colorTransmissionFactor * getBlock(loc).color.ToVector3()
-                                                + (1-colorTransmissionFactor) * Color.White.ToVector3();
+                        float colorTransmissionFactor = 0f;
+                        indirectLighting *=  colorTransmissionFactor * space.getBlock(loc).color.ToVector3()
+                                                + (1-colorTransmissionFactor) * Color.LightGray.ToVector3();
                     }
                 }
                 result[i].IndirectLightColor = new Color(indirectLighting);
@@ -175,7 +175,7 @@ namespace dungeon_monogame
         }
 
 
-        VertexPostitionColorPaintNormal[] getChunkMesh()
+        VertexPostitionColorPaintNormal[] getChunkMesh(ChunkManager space, Vector3 chunkLoc)
         {
             List< VertexPostitionColorPaintNormal> result = new List<VertexPostitionColorPaintNormal>();
             for (int i = 0; i < chunkWidth; i++)
@@ -185,7 +185,7 @@ namespace dungeon_monogame
                     for (int k = 0; k < chunkWidth; k++)
                     {
                         if (blocks[i, j, k].type == 1){
-                            var verts = getVertices(new Vector3(i, j, k), blocks[i,j,k].color);
+                            var verts = getVertices(new Vector3(i, j, k), chunkLoc, blocks[i,j,k].color, space);
                             result.AddRange(verts);
                         }
                     }
