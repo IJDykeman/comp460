@@ -49,7 +49,12 @@ namespace dungeon_monogame
 
         public static ChunkManager Read(string path)
         {
-
+            int xmin = 90000;
+            int ymin = 90000;
+            int zmin = 90000;
+            int xmax = -90000;
+            int ymax = -90000;
+            int zmax = -90000;
             Stream stream = File.Open(@"C:\Users\Isaac\Desktop\comp460\voxel_models\" + path, FileMode.Open);
             BinaryReader reader = new BinaryReader(stream);
             var magic = reader.ReadUInt32();
@@ -92,6 +97,12 @@ namespace dungeon_monogame
                             var x = reader.ReadByte();
                             var y = reader.ReadByte();
                             var z = reader.ReadByte();
+                            xmin = MathHelper.Min(x, xmin);
+                            xmax = MathHelper.Max(x, xmax);
+                            ymin = MathHelper.Min(y, ymin);
+                            ymax = MathHelper.Max(y, ymax);
+                            zmin = MathHelper.Min(z, zmin);
+                            zmax = MathHelper.Max(z, zmax);
                             var c = reader.ReadByte();
                             blockLocs.Add(new IntLoc(x, z, y));
                             colorIndices.Add(c);
@@ -135,7 +146,7 @@ namespace dungeon_monogame
                 //return voxelData;
                 stream.Close();
             manager.remeshAll();
-            
+            manager.setExtents(xmin, xmax, ymin, ymax, zmin, zmax);
             return manager;
         }
 

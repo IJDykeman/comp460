@@ -12,14 +12,14 @@ namespace dungeon_monogame
         bool dead = false;
 
         public Spell(Vector3 _location, Vector3 velocity)
-            : base(new AABB(.4f, .4f, .4f))
+            : base(new AABB(.1f, .1f, .1f))
         {
             setLocation(_location);
             this.addVelocity(velocity);
             gravityFactor = 0f;
-            addChild(new Light(.9f, Color.LightGreen));
+            addChild(new Light(.9f, Color.White));
 
-            GameObject model = new GameObject(MagicaVoxel.Read(@"spell.vox"), new Vector3(-.5f-.5f-.5f) * .1f, Vector3.One * .1f);
+            GameObject model = new GameObject(MagicaVoxel.Read(@"spell.vox"), new Vector3(-.5f-.5f-.5f) * -.0f, Vector3.One * .1f);
             addChild(model);
         }
 
@@ -35,7 +35,54 @@ namespace dungeon_monogame
             if (dead)
             {
                 result.Add(new DissapearAction(this));
-                result.Add(new SpawnAction(new Flash(getLocation() - .5f * Vector3.Normalize(getVelocity()))));
+                result.Add(new SpawnAction(new Flash(getLocation() - .1f * Vector3.Normalize(getVelocity()))));
+                for (int i = 0; i < 25; i++)
+                {
+                    result.Add(new SpawnAction(new Spark(getLocation() - .1f * Vector3.Normalize(getVelocity()),
+                        new Vector3((float)Globals.random.NextDouble() - .5f, (float)Globals.random.NextDouble() - .5f, (float)Globals.random.NextDouble() - .5f) * 10f)));
+
+                }
+
+            }
+            return result;
+        }
+    }
+
+    class Spark : Actor
+    {
+        bool dead = false;
+
+        public Spark(Vector3 _location, Vector3 velocity)
+           
+        {
+            setLocation(_location);
+            this.addVelocity(velocity);
+            bounciness = .8f;
+            gravityFactor = .6f;
+            addChild(new Light(.3f, Color.LightGreen));
+            ChunkManager model = MagicaVoxel.Read(@"spell.vox");
+            Vector3 offset = model.getCenter();
+            this.scale = Vector3.One * .1f;
+            GameObject obj = new GameObject(model, -offset, Vector3.One);
+            this.aabb = model.getAaabbFromModelExtents();
+            addChild(obj);
+        }
+
+        protected override void onCollision()
+        {
+            if (Globals.random.NextDouble() < 0)
+            {
+                dead = true;
+            }
+        }
+
+        protected override List<Action> update()
+        {
+            List<Action> result = new List<Action>();
+            result.Add(new RequestPhysicsUpdate(this));
+            if (dead)
+            {
+                 result.Add(new DissapearAction(this));
             }
             return result;
         }

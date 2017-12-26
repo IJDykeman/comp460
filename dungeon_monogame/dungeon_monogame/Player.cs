@@ -101,7 +101,7 @@ namespace dungeon_monogame
 
             MouseState newMouseState = Mouse.GetState();
 
-            if (newMouseState.LeftButton == ButtonState.Pressed )//&& oldMouseState.LeftButton == ButtonState.Released)
+            if (newMouseState.LeftButton == ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Released)
             {
                 Spell spell = new Spell(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 35f);
                 result.Add(new SpawnAction(spell));
@@ -117,9 +117,10 @@ namespace dungeon_monogame
             oldMouseState = Mouse.GetState();
             oldKeyboardState = Keyboard.GetState();
 
-            torchLight.setIntensity(torchLight.getIntensity() +(float) (Globals.random.NextDouble()-.5f) * .06f);
             torchLight.setIntensity(MathHelper.Min(torchLight.getIntensity(), 1.3f));
             torchLight.setIntensity(MathHelper.Max(torchLight.getIntensity(), .5f));
+            torchLight.setIntensity(torchLight.getIntensity() +(float) (Globals.random.NextDouble()-.5f) * .06f);
+
             playerActor.setRotation(Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY(leftRightRot)));
             return result;
         }
@@ -137,7 +138,7 @@ namespace dungeon_monogame
 
         public Vector3 getCameraLocation()
         {
-            return playerActor.getAabb().axisMax(Globals.axes.y) * Vector3.UnitY - Vector3.UnitY * .2f + playerActor.getLocation();
+            return playerActor.getAabb().axisMax(Globals.axes.y, Vector3.One) * Vector3.UnitY - Vector3.UnitY * .2f + playerActor.getLocation();
         }
 
         private Vector3 getFacingVector()

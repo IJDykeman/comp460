@@ -21,27 +21,27 @@ namespace dungeon_monogame
 
 
 
-        public float axisMin(Globals.axes axis){
+        public float axisMin(Globals.axes axis, Vector3 scale){
             switch (axis){
                 case Globals.axes.x:
-                    return -xWidth / 2f;
+                    return -xWidth / 2f * Globals.along(scale, axis);
                 case Globals.axes.y:
-                    return -height / 2f;
+                    return -height / 2f * Globals.along(scale, axis);
                 default:
-                    return -zWidth / 2f;
+                    return -zWidth / 2f * Globals.along(scale, axis);
             }
         }
 
-        public float axisMax(Globals.axes axis)
+        public float axisMax(Globals.axes axis, Vector3 scale)
         {
             switch (axis)
             {
                 case Globals.axes.x:
-                    return xWidth / 2f;
+                    return xWidth / 2f * Globals.along(scale, axis);
                 case Globals.axes.y:
-                    return height / 2f;
+                    return height / 2f * Globals.along(scale, axis);
                 default:
-                    return zWidth / 2f;
+                    return zWidth / 2f * Globals.along(scale, axis);
             }
         }
 

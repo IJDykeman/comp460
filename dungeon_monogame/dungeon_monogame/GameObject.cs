@@ -12,7 +12,7 @@ namespace dungeon_monogame
     {
         ChunkManager chunkManager;
         private Vector3 location = new Vector3();
-        Vector3 scale = Vector3.One;
+        protected Vector3 scale = Vector3.One;
         Quaternion rotation = Quaternion.Identity;
         protected List<GameObject> children;
 
@@ -25,7 +25,9 @@ namespace dungeon_monogame
         public GameObject(ChunkManager _chunkManager, Vector3 _location, Vector3 _scale)
         {
             location = _location;
+
             scale = _scale;
+
             chunkManager = _chunkManager;
             children = new List<GameObject>();
         }

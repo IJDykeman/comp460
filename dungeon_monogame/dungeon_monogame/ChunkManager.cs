@@ -11,6 +11,8 @@ namespace dungeon_monogame
     class ChunkManager
     {
         Dictionary<IntLoc, Chunk> chunks;
+        public float ambient_light { get; set; }
+        private int xmin, xmax, ymin, ymax, zmin, zmax;
         
 
         public ChunkManager()
@@ -77,6 +79,30 @@ namespace dungeon_monogame
             c.setBlock(setLoc, val);
         }
 
+        public void setExtents(int _xmin, int _xmax, int _ymin, int _ymax, int _zmin, int _zmax)
+        {
+            xmin = _xmin; xmax = _xmax;
+            ymin = _ymin; ymax = _ymax;
+            zmin = _zmin; zmax = _zmax;
+        }
+
+        public Vector3 getCenter()
+        {
+            return new Vector3(
+                (xmax - xmin) / 2f + .5f,
+                (ymax - ymin) / 2f + .5f,
+                (zmax - zmin) / 2f + .5f
+                );
+        }
+
+        public AABB getAaabbFromModelExtents()
+        {
+            return new AABB(
+                (xmax - xmin) + 1,
+                (ymax - ymin) + 1,
+                (zmax - zmin) + 1);
+        }
+
         private IntLoc locToChunkLoc(IntLoc l)
         {
             return l - (l % Chunk.chunkWidth);
@@ -102,7 +128,10 @@ namespace dungeon_monogame
                 Game1.graphics.GraphicsDevice.Indices = c.indexBuffer;
                 Game1.graphics.GraphicsDevice.SetVertexBuffer(c.vertexBuffer);
                 Game1.graphics.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+                
                 effect.Parameters["xWorld"].SetValue(Matrix.Multiply(oldWorldMat, Matrix.CreateTranslation(loc.toVector3()) * transform));
+                //effect.Parameters["xAmbient"].SetValue(ambient_light);
+
                 foreach (var pass in effect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
@@ -112,5 +141,6 @@ namespace dungeon_monogame
                 effect.Parameters["xWorld"].SetValue(oldWorldMat);
             }
         }
+
     }
 }

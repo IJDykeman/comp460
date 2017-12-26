@@ -10,12 +10,15 @@ namespace dungeon_monogame
 {
     class Actor : GameObject
     {
-        private AABB aabb;
-        private Vector3 velocity;
+        protected AABB aabb;
+        protected Vector3 velocity;
         private Vector3 instantaneuousMovement;
         private bool currentlyOnGround = false;
         protected float gravityFactor = 1.0f;
-        
+        public float bounciness { get; set; }
+
+
+        public Actor() { }
 
         public Actor(AABB aabb)
         {
@@ -34,12 +37,14 @@ namespace dungeon_monogame
             
         }
 
+
         private Vector3 collide(ChunkManager space, Vector3 desiredMovement)
         {
 
             Vector3 currentLocation = getLocation();
             Vector3 desiredFinalLocation = getLocation() + desiredMovement;
             Vector3 finalLocation = new Vector3();
+            currentlyOnGround = false;
             foreach (Globals.axes axis in Globals.allAxes)
             {
                 Vector3 prospectiveLocation = desiredFinalLocation * Globals.unit(axis);
@@ -49,17 +54,23 @@ namespace dungeon_monogame
                 prospectiveLocation += currentLocation * Globals.unit(otherAxis1);
                 prospectiveLocation += currentLocation * Globals.unit(otherAxis2);
                 bool collided = false;
-                for (float a1 = aabb.axisMin(otherAxis1); a1 <= aabb.axisMax(otherAxis1); a1 += .5f)
+                if (scale.X < 1)
                 {
-                    for (float a2 = aabb.axisMin(otherAxis2); a2 <= aabb.axisMax(otherAxis2); a2 += .5f)
+
+                }
+                for (float a1 = aabb.axisMin(otherAxis1, scale); a1 <= aabb.axisMax(otherAxis1, scale); a1 += .5f)
+                {
+                    for (float a2 = aabb.axisMin(otherAxis2, scale); a2 <= aabb.axisMax(otherAxis2, scale); a2 += .5f)
                     {
 
                         if (Globals.along(desiredMovement, axis) < 0)
                         {
-                            Vector3 queryLocation = Globals.unit(axis) * aabb.axisMin(axis) +
+                            
+                            Vector3 queryLocation = Globals.unit(axis) * aabb.axisMin(axis, scale) +
                                                     Globals.unit(otherAxis1) * a1 +
-                                                    Globals.unit(otherAxis2) * a2 +
-                                                    prospectiveLocation;
+                                                    Globals.unit(otherAxis2) * a2;
+
+                            queryLocation += prospectiveLocation;
                             if (space.solid(new IntLoc(queryLocation)))
                             {
                                 Vector3 move = Globals.unit(axis) * (1 - (Globals.along(queryLocation, axis) - (float)Math.Floor(Globals.along(queryLocation, axis)))) + Globals.unit(axis) * .001f;
@@ -69,14 +80,15 @@ namespace dungeon_monogame
                                 {
                                     currentlyOnGround = true;
                                 }
-                                velocity -= Globals.unit(axis) * Globals.along(velocity, axis);
+                                velocity -= (1 + bounciness) * Globals.unit(axis) * Globals.along(velocity, axis);
+
                                 collided = true;
 
                             }
                         }
                         else if (Globals.along(desiredMovement, axis) > 0)
                         {
-                            Vector3 queryLocation = Globals.unit(axis) * aabb.axisMax(axis) +
+                            Vector3 queryLocation = Globals.unit(axis) * aabb.axisMax(axis, scale) +
                                                     Globals.unit(otherAxis1) * a1 +
                                                     Globals.unit(otherAxis2) * a2 +
                                                     prospectiveLocation;
@@ -85,7 +97,7 @@ namespace dungeon_monogame
                                 float moveAmount = (Globals.along(queryLocation, axis) - (float)Math.Floor(Globals.along(queryLocation, axis))) + .001f;
                                 prospectiveLocation -= Globals.unit(axis) * moveAmount;
                                 desiredMovement -= Globals.along(desiredMovement, axis) * Globals.unit(axis);
-                                velocity -= Globals.unit(axis) * Globals.along(velocity, axis);
+                                velocity -= (1 + bounciness) * Globals.unit(axis) * Globals.along(velocity, axis);
                                 collided = true;
                             }
                         }
@@ -138,8 +150,10 @@ namespace dungeon_monogame
 
         public AABB getAabb()
         {
-            return aabb;
+            // to be truly correct, this method would have to take the scale of the parent into account
+            return new AABB(aabb.height * scale.Y, aabb.xWidth * scale.X, aabb.zWidth * scale.Z);
         }
+
 
 
 
