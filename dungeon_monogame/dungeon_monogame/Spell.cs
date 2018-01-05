@@ -35,11 +35,12 @@ namespace dungeon_monogame
             if (dead)
             {
                 result.Add(new DissapearAction(this));
-                result.Add(new SpawnAction(new Flash(getLocation() - .1f * Vector3.Normalize(getVelocity()))));
-                for (int i = 0; i < 25; i++)
+                result.Add(new SpawnAction(new Flash(getLocation() - .1f * Vector3.Normalize(previousVelocity))));
+                for (int i = 0; i < Globals.random.Next(15,30); i++)
                 {
-                    result.Add(new SpawnAction(new Spark(getLocation() - .1f * Vector3.Normalize(getVelocity()),
-                        new Vector3((float)Globals.random.NextDouble() - .5f, (float)Globals.random.NextDouble() - .5f, (float)Globals.random.NextDouble() - .5f) * 10f)));
+                    result.Add(new SpawnAction(new Spark(getLocation() - .2f * Vector3.Normalize(previousVelocity)
+                        ,
+                        Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 10f + previousVelocity / 5f)));
 
                 }
 
@@ -51,6 +52,9 @@ namespace dungeon_monogame
     class Spark : Actor
     {
         bool dead = false;
+        float dissapear_on_collide_probability = .2f;
+        Light light;
+        float scaleFactor = .99f;
 
         public Spark(Vector3 _location, Vector3 velocity)
            
@@ -59,7 +63,8 @@ namespace dungeon_monogame
             this.addVelocity(velocity);
             bounciness = .8f;
             gravityFactor = .6f;
-            addChild(new Light(.3f, Color.LightGreen));
+            light = new Light(.3f, Color.LightGreen);
+            addChild(light);
             ChunkManager model = MagicaVoxel.Read(@"spell.vox");
             Vector3 offset = model.getCenter();
             this.scale = Vector3.One * .1f;
@@ -70,7 +75,7 @@ namespace dungeon_monogame
 
         protected override void onCollision()
         {
-            if (Globals.random.NextDouble() < 0)
+            if (Globals.random.NextDouble() < dissapear_on_collide_probability)
             {
                 dead = true;
             }
@@ -82,7 +87,14 @@ namespace dungeon_monogame
             result.Add(new RequestPhysicsUpdate(this));
             if (dead)
             {
-                 result.Add(new DissapearAction(this));
+                scaleFactor = .90f;
+
+            }
+            this.scale *= scaleFactor;
+            light.setIntensity(light.getIntensity() * scaleFactor);
+            if (this.scale.Length() < .005f)
+            {
+                result.Add(new DissapearAction(this));
             }
             return result;
         }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SourceFile>C:/Users/Isaac/Desktop/comp460/dungeon_monogame/dungeon_monogame/Content/dfg.png</SourceFile>
-  <SourceTime>2017-12-12T17:55:16.0672886-06:00</SourceTime>
+  <SourceTime>2017-12-12T18:55:16.0672886-05:00</SourceTime>
   <DestFile>C:/Users/Isaac/Desktop/comp460/dungeon_monogame/dungeon_monogame/Content/bin/DesktopGL/dfg.xnb</DestFile>
-  <DestTime>2017-12-12T18:11:20.9662837-06:00</DestTime>
+  <DestTime>2018-01-04T18:02:05.3977826-05:00</DestTime>
   <Importer>TextureImporter</Importer>
-  <ImporterTime>2017-03-01T09:05:36-06:00</ImporterTime>
+  <ImporterTime>2017-03-01T10:05:36-05:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
-  <ProcessorTime>2017-03-01T09:05:36-06:00</ProcessorTime>
+  <ProcessorTime>2017-03-01T10:05:36-05:00</ProcessorTime>
   <Parameters>
     <Key>ColorKeyColor</Key>
     <Value>255,0,255,255</Value>

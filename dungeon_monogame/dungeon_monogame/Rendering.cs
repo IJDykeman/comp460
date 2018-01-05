@@ -15,6 +15,7 @@ namespace dungeon_monogame
         private static RenderTarget2D colorRT;
         private static RenderTarget2D normalRT;
         private static RenderTarget2D depthRT, positionRT;
+        public static Texture2D vignette;
         static int backBufferWidth, backBufferHeight;
 
 
@@ -27,6 +28,8 @@ namespace dungeon_monogame
             backBufferWidth  = graphics.PreferredBackBufferWidth;
             createGBufferEffect = Content.Load<Effect>("DeferredRender");
             renderSceneEffect = Content.Load<Effect>("RenderSceneFromGBuffer");
+            vignette = Content.Load<Texture2D>("vignette");
+
             int scale_factor = 1;
             colorRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Color, DepthFormat.Depth24);
             normalRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Color, DepthFormat.None);
@@ -37,8 +40,13 @@ namespace dungeon_monogame
 
         }
 
-         public static void renderWorld(GraphicsDeviceManager graphics, GameObject landscape, Player player)
+        public static void renderWorld(GraphicsDeviceManager graphics, GameObject landscape, Player player)
         {
+            using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
+            {
+                sprite.Begin(depthStencilState: DepthStencilState.Default);
+                sprite.End();
+            }
             GraphicsDevice GraphicsDevice = graphics.GraphicsDevice;
             //BasicEffect effect = new BasicEffect(graphics.GraphicsDevice);
 
@@ -58,7 +66,7 @@ namespace dungeon_monogame
             createGBufferEffect.Parameters["xProjection"].SetValue(projection(graphics));
             createGBufferEffect.Parameters["xView"].SetValue(player.getViewMatrix());
             createGBufferEffect.Parameters["xWorld"].SetValue(Matrix.Identity);
-           // worldChunkManager.draw(createGBufferEffect, Matrix.Identity);
+            // worldChunkManager.draw(createGBufferEffect, Matrix.Identity);
             landscape.drawFirstPass(createGBufferEffect, Matrix.Identity);
             //player.draw(createGBufferEffect);
 
@@ -108,7 +116,12 @@ namespace dungeon_monogame
             //GraphicsDevice.BlendState = BlendState.Opaque;
 
             new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-
+            using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
+            {
+                sprite.Begin(depthStencilState: DepthStencilState.None);
+                sprite.Draw(vignette, new Vector2(0, 0), null, Color.White * .4f, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+                sprite.End();
+            }
 
 
         }

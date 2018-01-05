@@ -105,7 +105,7 @@ namespace dungeon_monogame
             {
                 Spell spell = new Spell(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 35f);
                 result.Add(new SpawnAction(spell));
-            }
+            } 
 
             if (mouseEngaged)
             {
@@ -118,7 +118,7 @@ namespace dungeon_monogame
             oldKeyboardState = Keyboard.GetState();
 
             torchLight.setIntensity(MathHelper.Min(torchLight.getIntensity(), 1.3f));
-            torchLight.setIntensity(MathHelper.Max(torchLight.getIntensity(), .5f));
+            torchLight.setIntensity(MathHelper.Max(torchLight.getIntensity(), .7f));
             torchLight.setIntensity(torchLight.getIntensity() +(float) (Globals.random.NextDouble()-.5f) * .06f);
 
             playerActor.setRotation(Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY(leftRightRot)));

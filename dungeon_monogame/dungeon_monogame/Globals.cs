@@ -60,6 +60,27 @@ namespace dungeon_monogame
                     return new Tuple<axes, axes>(axes.x, axes.y);
             }
         }
+
+        public static Vector3 randomVectorOnUnitSphere()
+        {
+            // based on http://corysimon.github.io/articles/uniformdistn-on-sphere/
+            double theta = 2 * Math.PI * random.NextDouble();
+            double phi = Math.PI * random.NextDouble();
+            double x = Math.Sin(phi) * Math.Cos(theta);
+            double y = Math.Sin(phi) * Math.Sin(theta);
+            double z = Math.Cos(phi);
+            return new Vector3((float)x, (float)y, (float)z);
+        }
+
+        public static float standardGaussianSample() {
+            // from https://stackoverflow.com/questions/218060/random-gaussian-variables
+            double u1 = 1.0 - random.NextDouble(); //uniform(0,1] random doubles
+            double u2 = 1.0 - random.NextDouble();
+            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *
+                         Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+            double randNormal = randStdNormal; //random normal(mean,stdDev^2)
+            return (float)randNormal;
+        }
     }
 
 

@@ -12,6 +12,7 @@ namespace dungeon_monogame
     {
         protected AABB aabb;
         protected Vector3 velocity;
+        protected Vector3 previousVelocity;
         private Vector3 instantaneuousMovement;
         private bool currentlyOnGround = false;
         protected float gravityFactor = 1.0f;
@@ -28,6 +29,7 @@ namespace dungeon_monogame
 
         public void physicsUpdate(GameTime time, ChunkManager space)
         {
+            previousVelocity = velocity;
             float deltaTime = time.ElapsedGameTime.Milliseconds / 1000f;
             currentlyOnGround = false;
             this.velocity.Y -= Globals.G * deltaTime * gravityFactor;
