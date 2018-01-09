@@ -51,4 +51,20 @@ namespace dungeon_monogame
         }
 
     }
+
+    class FireLight : Light
+    {
+        float level = 0f;
+        float luminanceTendency = 0;
+        protected override List<Action> update()
+        {
+            luminanceTendency += .2f * (.26f*Globals.standardGaussianSample() - (float)Math.Tanh(luminanceTendency));
+
+            level += luminanceTendency;
+            level = MathHelper.Clamp(level, -2, 2);
+
+            setIntensity((level + 2) / 4f /2f + 1);
+            return new List<Action>();
+        }
+    }
 }

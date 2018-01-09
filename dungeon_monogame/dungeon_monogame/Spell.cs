@@ -10,17 +10,23 @@ namespace dungeon_monogame
     class Spell : Actor
     {
         bool dead = false;
+        Color lightColor;
 
         public Spell(Vector3 _location, Vector3 velocity)
             : base(new AABB(.1f, .1f, .1f))
         {
+            lightColor = Color.Lime;
             setLocation(_location);
             this.addVelocity(velocity);
             gravityFactor = 0f;
-            addChild(new Light(.9f, Color.White));
+
+            lightColor = Globals.ColorFromHSV(Globals.random.NextDouble() * 255, 1, 1);
+
+            addChild(new Light(.6f, lightColor));
 
             GameObject model = new GameObject(MagicaVoxel.Read(@"spell.vox"), new Vector3(-.5f-.5f-.5f) * -.0f, Vector3.One * .1f);
             addChild(model);
+            model.setEmissiveness(lightColor);
         }
 
         protected override void onCollision()
@@ -40,7 +46,10 @@ namespace dungeon_monogame
                 {
                     result.Add(new SpawnAction(new Spark(getLocation() - .2f * Vector3.Normalize(previousVelocity)
                         ,
-                        Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 10f + previousVelocity / 5f)));
+                        Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 8f,
+                        lightColor
+
+                        )));
 
                 }
 
@@ -56,19 +65,20 @@ namespace dungeon_monogame
         Light light;
         float scaleFactor = .99f;
 
-        public Spark(Vector3 _location, Vector3 velocity)
+        public Spark(Vector3 _location, Vector3 velocity, Color color)
            
         {
             setLocation(_location);
             this.addVelocity(velocity);
             bounciness = .8f;
-            gravityFactor = .6f;
-            light = new Light(.3f, Color.LightGreen);
+            gravityFactor = .7f;
+            light = new Light(.4f, color);
             addChild(light);
             ChunkManager model = MagicaVoxel.Read(@"spell.vox");
             Vector3 offset = model.getCenter();
             this.scale = Vector3.One * .1f;
             GameObject obj = new GameObject(model, -offset, Vector3.One);
+            obj.setEmissiveness(color);
             this.aabb = model.getAaabbFromModelExtents();
             addChild(obj);
         }
@@ -91,7 +101,12 @@ namespace dungeon_monogame
 
             }
             this.scale *= scaleFactor;
-            light.setIntensity(light.getIntensity() * scaleFactor);
+            light.setIntensity(light.getIntensity() * .999f);
+            if (this.scale.Length() < .05f)
+            {
+                light.setIntensity(light.getIntensity() * .99f);
+
+            }
             if (this.scale.Length() < .005f)
             {
                 result.Add(new DissapearAction(this));

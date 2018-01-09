@@ -16,6 +16,7 @@ namespace dungeon_monogame
 
     class MagicaVoxel
     {
+        static string root = System.Reflection.Assembly.GetEntryAssembly().Location;
         public static Color GetDefaultColor(int i)
         {
             return new Color(DefaultColors[i]);
@@ -55,7 +56,7 @@ namespace dungeon_monogame
             int xmax = -90000;
             int ymax = -90000;
             int zmax = -90000;
-            Stream stream = File.Open(@"C:\Users\Isaac\Desktop\comp460\voxel_models\" + path, FileMode.Open);
+            Stream stream = File.Open(root + @"..\..\..\..\..\..\..\..\voxel_models\" + path, FileMode.Open);
             BinaryReader reader = new BinaryReader(stream);
             var magic = reader.ReadUInt32();
             var version = reader.ReadInt32();

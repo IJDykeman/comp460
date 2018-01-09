@@ -15,6 +15,7 @@ namespace dungeon_monogame
         protected Vector3 scale = Vector3.One;
         Quaternion rotation = Quaternion.Identity;
         protected List<GameObject> children;
+        protected Color emissiveness = Color.Black;
 
         public GameObject()
         {
@@ -52,10 +53,15 @@ namespace dungeon_monogame
             location = v;
         }
 
+        public void setEmissiveness(Color e)
+        {
+            emissiveness = e;
+        }
+
         public void drawFirstPass(Effect effect, Matrix transform)
         {
             transform = getTransform(ref transform);
-            chunkManager.draw(effect, transform);
+            chunkManager.draw(effect, transform, this.emissiveness);
 
             foreach (GameObject child in children)
             {
@@ -88,7 +94,7 @@ namespace dungeon_monogame
             result.AddRange(update());
             foreach (GameObject child in children)
             {
-                result.AddRange(child.update());
+                result.AddRange(child.updateWithChildren());
             }
             return result;
         }

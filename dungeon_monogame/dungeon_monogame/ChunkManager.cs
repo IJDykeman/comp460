@@ -113,7 +113,7 @@ namespace dungeon_monogame
             return chunks.ContainsKey(locToChunkLoc(loc));
         }
 
-        public void draw(Effect effect, Matrix transform)
+        public void draw(Effect effect, Matrix transform, Color emission)
         {
             foreach (KeyValuePair<IntLoc, Chunk> p in chunks)
             {
@@ -131,6 +131,8 @@ namespace dungeon_monogame
                 
                 effect.Parameters["xWorld"].SetValue(Matrix.Multiply(oldWorldMat, Matrix.CreateTranslation(loc.toVector3()) * transform));
                 //effect.Parameters["xAmbient"].SetValue(ambient_light);
+                //effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
+                effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
 
                 foreach (var pass in effect.CurrentTechnique.Passes)
                 {

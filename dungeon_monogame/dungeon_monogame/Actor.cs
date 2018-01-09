@@ -19,6 +19,8 @@ namespace dungeon_monogame
         public float bounciness { get; set; }
 
 
+
+
         public Actor() { }
 
         public Actor(AABB aabb)

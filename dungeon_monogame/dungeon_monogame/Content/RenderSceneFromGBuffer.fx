@@ -13,6 +13,7 @@ texture normalMap;
 //depth
 texture depthMap;
 texture positionMap;
+texture emissiveMap;
 float lightIntensity;
 float3 lightPosition;
 
@@ -61,6 +62,17 @@ sampler positionSampler = sampler_state
 	Mipfilter = POINT;
 };
 
+
+sampler emissiveSampler = sampler_state
+{
+	Texture = (emissiveMap);
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	MagFilter = POINT;
+	MinFilter = POINT;
+	Mipfilter = POINT;
+};
+
 struct VertexShaderInput
 {
 	float3 Position : POSITION0;
@@ -87,6 +99,8 @@ float4 DirectionalLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 	//get normal data from the normalMap
 	float4 normalData = tex2D(normalSampler, input.TexCoord);
 	float4 colorData = tex2D(colorSampler, input.TexCoord);
+	float4 emissiveData = tex2D(emissiveSampler, input.TexCoord);
+	emissiveData = emissiveData;
 	float3 lightVector = -normalize(lightDirection);
 	//compute diffuse light
 	float3 normal = 2.0f * normalData.xyz - 1.0f;
@@ -122,7 +136,7 @@ float4 DirectionalLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 	//compute specular light
 	float specularLight = specularIntensity * pow(saturate(dot(reflectionVector, directionToCamera)), specularPower);
 	//output the two lights
-	return float4(diffuseLight.rgb * lightIntensity, 1);
+	return float4(diffuseLight.rgb * lightIntensity + (emissiveData.rgb * 2), 1);
 }
 
 float4x4 InvertView;
@@ -168,6 +182,7 @@ float4 PointLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 	lightVector = normalize(lightVector);
 	//compute diffuse light
 	float NdL = max(0, dot(normal, lightVector));
+	NdL = sqrt(-1 / (NdL + 1) + 1);
 	float3 diffuseLight = NdL * colorData.rgb;
 		//reflection vector
 		float3 reflectionVector = normalize(reflect(-lightVector, normal));

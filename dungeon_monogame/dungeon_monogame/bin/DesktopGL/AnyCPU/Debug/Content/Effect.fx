@@ -5,6 +5,7 @@ struct VertexToPixel
 	float4 Normal   : TEXCOORD2;
 	float4 Color		: COLOR0;
 	float4 Paint		: COLOR1;
+	float4 emissive		: COLOR2;
 	float LightingFactor : TEXCOORD0;
 	float2 TextureCoords: TEXCOORD1;
 };
@@ -111,6 +112,8 @@ VertexToPixel DiffuseVS(float4 inPos : POSITION, float3 inNormal : NORMAL, float
 	return Output;
 }
 
+
+
 PixelToFrame DirectOutputPS(VertexToPixel PSIn)
 {
 	PixelToFrame Output = (PixelToFrame)0;
@@ -128,7 +131,36 @@ technique Diffuse
 	}
 }
 
+//------- Technique: Emissive --------
 
+VertexToPixel EmissiveVS(float4 inPos : POSITION, float3 inNormal : NORMAL, float4 inColor : COLOR, float4 inPaint : COLOR1, float4 emissive : COLOR2)
+{
+	VertexToPixel Output = (VertexToPixel)0;
+	float4x4 preViewProjection = mul(xView, xProjection);
+		float4x4 preWorldViewProjection = mul(xWorld, preViewProjection);
+		Output.Position = mul(inPos, preWorldViewProjection);
+	Output.Color = emissive;
+	return Output;
+}
+
+
+
+PixelToFrame EmissivePS(VertexToPixel PSIn)
+{
+	PixelToFrame Output = (PixelToFrame)0;
+	Output.Color = PSIn.Color;
+	return Output;
+
+}
+
+technique Emissive
+{
+	pass Pass0
+	{
+		VertexShader = compile vs_3_0 EmissiveVS();
+		PixelShader = compile  ps_3_0 EmissivePS();
+	}
+}
 
 //------- Technique: Normal --------
 

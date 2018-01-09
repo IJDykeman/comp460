@@ -15,6 +15,7 @@ namespace dungeon_monogame
         public Color Color;
         public Color IndirectLightColor;
         public Vector3 Normal;
+        public Color emissive;
 
         public VertexPostitionColorPaintNormal(Vector3 nPosition, Color nColor, Color nPaintColor, Vector3 nNormal)
         {
@@ -22,6 +23,16 @@ namespace dungeon_monogame
             Color = nColor;
             IndirectLightColor = nPaintColor;
             Normal = nNormal;
+            emissive = Color.Black;
+        }
+
+        public VertexPostitionColorPaintNormal(Vector3 nPosition, Color nColor, Color nPaintColor, Vector3 nNormal, Color nEmissive)
+        {
+            Position = nPosition;
+            Color = nColor;
+            IndirectLightColor = nPaintColor;
+            Normal = nNormal;
+            emissive = nEmissive;
         }
 
 
@@ -30,7 +41,8 @@ namespace dungeon_monogame
             new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
             new VertexElement(sizeof(float) * 3, VertexElementFormat.Color, VertexElementUsage.Color, 0),
             new VertexElement(sizeof(float) * 3 + 4, VertexElementFormat.Color, VertexElementUsage.Color, 1),
-            new VertexElement(sizeof(float) * 3 + 8, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0)
+            new VertexElement(sizeof(float) * 3 + 8, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+            new VertexElement(sizeof(float) * 3 * 2 + 8, VertexElementFormat.Color, VertexElementUsage.Color, 2)
         );
 
         VertexDeclaration IVertexType.VertexDeclaration

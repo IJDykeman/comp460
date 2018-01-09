@@ -34,7 +34,8 @@ namespace dungeon_monogame
             //GameObject sword = new GameObject(MagicaVoxel.Read(@"simple_sword.vox"), new Vector3(1,20,0), Vector3.One * .1f);
             //playerActor.addChild(sword);
             var torch = new GameObject(MagicaVoxel.Read(@"torch.vox"), new Vector3(.2f, .4f, -.3f), Vector3.One * .03f);
-            torchLight = new Light(1f, Color.LightGoldenrodYellow);
+            //torchLight = new Light(1f, Color.LightGoldenrodYellow);
+            torchLight = new FireLight();
             torchLight.setLocation(new Vector3(3, 8, 3));
             torch.addChild(torchLight);
             //torch.addChild(new GameObject(MagicaVoxel.Read(@"torch.vox"), new Vector3(-3, 0, 0), Vector3.One * .5f));
@@ -117,9 +118,9 @@ namespace dungeon_monogame
             oldMouseState = Mouse.GetState();
             oldKeyboardState = Keyboard.GetState();
 
-            torchLight.setIntensity(MathHelper.Min(torchLight.getIntensity(), 1.3f));
-            torchLight.setIntensity(MathHelper.Max(torchLight.getIntensity(), .7f));
-            torchLight.setIntensity(torchLight.getIntensity() +(float) (Globals.random.NextDouble()-.5f) * .06f);
+            //torchLight.setIntensity(MathHelper.Min(torchLight.getIntensity(), 1.3f));
+            //torchLight.setIntensity(MathHelper.Max(torchLight.getIntensity(), .7f));
+            //torchLight.setIntensity(torchLight.getIntensity() +(float) (Globals.random.NextDouble()-.5f) * .06f);
 
             playerActor.setRotation(Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY(leftRightRot)));
             return result;

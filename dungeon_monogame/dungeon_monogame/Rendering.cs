@@ -13,7 +13,7 @@ namespace dungeon_monogame
     {
 
         private static RenderTarget2D colorRT;
-        private static RenderTarget2D normalRT;
+        private static RenderTarget2D normalRT, emissiveRT;
         private static RenderTarget2D depthRT, positionRT;
         public static Texture2D vignette;
         static int backBufferWidth, backBufferHeight;
@@ -35,6 +35,8 @@ namespace dungeon_monogame
             normalRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Color, DepthFormat.None);
             depthRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Single, DepthFormat.None);
             positionRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Vector4, DepthFormat.None);
+            emissiveRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Color, DepthFormat.None);
+
             halfPixel.X = 0.5f / (float)graphics.GraphicsDevice.PresentationParameters.BackBufferWidth;
             halfPixel.Y = 0.5f / (float)graphics.GraphicsDevice.PresentationParameters.BackBufferHeight;
 
@@ -54,12 +56,12 @@ namespace dungeon_monogame
             //    cameraPosition, cameraPosition + cameraLookAlongVector, cameraUpVector);
 
             //graphics.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
-            GraphicsDevice.SetRenderTargets(colorRT, normalRT, depthRT);
+            GraphicsDevice.SetRenderTargets(colorRT, normalRT, depthRT, emissiveRT);
             // render options
             //graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
 
 
             createGBufferEffect.CurrentTechnique = createGBufferEffect.Techniques["RenderGBuffer"];
@@ -74,6 +76,7 @@ namespace dungeon_monogame
             Texture2D norm = (Texture2D)normalRT;
             Texture2D depth = (Texture2D)depthRT;
             Texture2D position = (Texture2D)positionRT;
+            Texture2D emissive = (Texture2D)emissiveRT;
             GraphicsDevice.SetRenderTargets(null);
 
 
@@ -83,44 +86,49 @@ namespace dungeon_monogame
                 sprite.Begin(depthStencilState: DepthStencilState.Default);
                 //sprite.Begin(0, BlendState.Opaque, null, null, null, effect);
                 sprite.Draw(diffuseTex, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 0.4f, SpriteEffects.None, 1);
-                sprite.Draw(norm, new Vector2(400, 0), null, Color.White, 0, new Vector2(0, 0), 0.4f, SpriteEffects.None, 1);
-                sprite.Draw(depth, new Vector2(0, 200), null, Color.White, 0, new Vector2(0, 0), 0.4f, SpriteEffects.None, 1);
+                sprite.Draw(norm, new Vector2(500, 0), null, Color.White, 0, new Vector2(0, 0), 0.4f, SpriteEffects.None, 1);
+                sprite.Draw(depth, new Vector2(0, 300), null, Color.White, 0, new Vector2(0, 0), 0.4f, SpriteEffects.None, 1);
+                sprite.Draw(emissive, new Vector2(500, 300), null, Color.White, 0, new Vector2(0, 0), 0.4f, SpriteEffects.None, 1);
                 sprite.End();
             }
-            renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["PointLightTechnique"];
-
-            //set all parameters
-            renderSceneEffect.Parameters["lightIntensity"].SetValue(1f);
-            renderSceneEffect.Parameters["colorMap"].SetValue(diffuseTex);
-            renderSceneEffect.Parameters["normalMap"].SetValue(norm);
-            renderSceneEffect.Parameters["depthMap"].SetValue(depth);
-            //renderSceneEffect.Parameters["positionMap"].SetValue(position);
-            renderSceneEffect.Parameters["lightDirection"].SetValue(new Vector3(1, -2, 3));
-            // renderSceneEffect.Parameters["Color"].SetValue(new Vector3(0,.5f, .5f));
-            //renderSceneEffect.Parameters["lightDirection"].SetValue(new Vector3(1, -2, 3));
-            renderSceneEffect.Parameters["lightRadius"].SetValue(0f);
-            renderSceneEffect.Parameters["lightPosition"].SetValue(player.getCameraLocation());
-            //renderSceneEffect.Parameters["cameraPosition"].SetValue(player.getCameraLocation());
-            renderSceneEffect.Parameters["InvertViewProjection"].SetValue(Matrix.Invert(player.getViewMatrix() * projection(graphics)));
-            renderSceneEffect.Parameters["halfPixel"].SetValue(halfPixel);
-            GraphicsDevice.BlendState = BlendState.Opaque;
-
-            new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-            GraphicsDevice.BlendState = BlendState.Additive;
-            landscape.drawDeferredPass(renderSceneEffect, Matrix.Identity, GraphicsDevice);
-
-
-            new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-            renderSceneEffect.Parameters["lightIntensity"].SetValue(.1f);
-            renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["DirectionalLightTechnique"];
-            //GraphicsDevice.BlendState = BlendState.Opaque;
-
-            new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-            using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
+            if (true)
             {
-                sprite.Begin(depthStencilState: DepthStencilState.None);
-                sprite.Draw(vignette, new Vector2(0, 0), null, Color.White * .4f, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
-                sprite.End();
+                renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["PointLightTechnique"];
+
+                //set all parameters
+                renderSceneEffect.Parameters["lightIntensity"].SetValue(1f);
+                renderSceneEffect.Parameters["colorMap"].SetValue(diffuseTex);
+                renderSceneEffect.Parameters["normalMap"].SetValue(norm);
+                renderSceneEffect.Parameters["depthMap"].SetValue(depth);
+                renderSceneEffect.Parameters["emissiveMap"].SetValue(emissive);
+                //renderSceneEffect.Parameters["positionMap"].SetValue(position);
+                renderSceneEffect.Parameters["lightDirection"].SetValue(new Vector3(1, -2, 3));
+                // renderSceneEffect.Parameters["Color"].SetValue(new Vector3(0,.5f, .5f));
+                //renderSceneEffect.Parameters["lightDirection"].SetValue(new Vector3(1, -2, 3));
+                renderSceneEffect.Parameters["lightRadius"].SetValue(0f);
+                renderSceneEffect.Parameters["lightPosition"].SetValue(player.getCameraLocation());
+                //renderSceneEffect.Parameters["cameraPosition"].SetValue(player.getCameraLocation());
+                renderSceneEffect.Parameters["InvertViewProjection"].SetValue(Matrix.Invert(player.getViewMatrix() * projection(graphics)));
+                renderSceneEffect.Parameters["halfPixel"].SetValue(halfPixel);
+                GraphicsDevice.BlendState = BlendState.Opaque;
+
+                new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
+                GraphicsDevice.BlendState = BlendState.Additive;
+                landscape.drawDeferredPass(renderSceneEffect, Matrix.Identity, GraphicsDevice);
+
+
+                new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
+                renderSceneEffect.Parameters["lightIntensity"].SetValue(.1f);
+                renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["DirectionalLightTechnique"];
+                //GraphicsDevice.BlendState = BlendState.Opaque;
+
+                new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
+                using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
+                {
+                    sprite.Begin(depthStencilState: DepthStencilState.None);
+                    sprite.Draw(vignette, new Vector2(0, 0), null, Color.White * .6f, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+                    sprite.End();
+                }
             }
 
 

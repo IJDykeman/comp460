@@ -2,11 +2,11 @@
 struct VertexToPixel
 {
 	float4 Position   	: POSITION;
-	float4 Position2   	: TEXCOORD0;
+	//float4 Position2   	: TEXCOORD0;
 	float4 Normal   : TEXCOORD2;
 	float4 Color		: COLOR0;
 	float4 Paint		: COLOR1;
-	//float LightingFactor : TEXCOORD0;
+	//float4 Emissive		: TEXCOORD0;
 	float2 TextureCoords: TEXCOORD1;
 	float2 Depth: TEXCOORD3;
 };
@@ -16,6 +16,7 @@ struct PixelToFrame
 	float4 Color : COLOR0;
 	float4 Normal : COLOR1;
 	float4 Depth : COLOR2;
+	float4 Emissive : COLOR3;
 };
 
 
@@ -35,6 +36,7 @@ float4x4 xWorld;
 //float2 ShadowMapSize;
 
 float3 xLightDirection;
+float4 xEmissive;
 float xAmbient;
 //float xOpacity;
 //bool xEnableLighting;
@@ -55,7 +57,7 @@ sampler TextureSampler = sampler_state { texture = <xTexture>; magfilter = POINT
 
 //------- Technique: RenderGBuffer --------
 
-VertexToPixel ColoredVS(float4 inPos : POSITION, float3 inNormal : NORMAL, float4 inColor : COLOR, float4 inPaint : COLOR1)
+VertexToPixel ColoredVS(float4 inPos : POSITION, float3 inNormal : NORMAL, float4 inColor : COLOR, float4 inPaint : COLOR1, float4 Emissive : TEXCOORD0)
 {
 	VertexToPixel Output = (VertexToPixel)0;
 	float4x4 preViewProjection = mul(xView, xProjection);
@@ -63,7 +65,8 @@ VertexToPixel ColoredVS(float4 inPos : POSITION, float3 inNormal : NORMAL, float
 	inPos = float4(inPos.xyz,1);
 	float4 pos = mul(inPos, preWorldViewProjection);
 	Output.Position = pos;
-	Output.Position2 = pos;
+	//Output.Position2 = pos;
+	//Output.Emissive = xEmissive;
 	//Output.Position3D = mul(inPos, xWorld);
 	Output.TextureCoords = inPos;
 	Output.Color = inColor;
@@ -86,6 +89,7 @@ VertexToPixel ColoredVS(float4 inPos : POSITION, float3 inNormal : NORMAL, float
 PixelToFrame GBufferPS(VertexToPixel PSIn)
 {
 	PixelToFrame Output = (PixelToFrame)0;
+	Output.Emissive = xEmissive;
 	Output.Color = PSIn.Color;
 	//Output.Color = Output.Color * PSIn.LightingFactor;
 	Output.Color = Output.Color * PSIn.Paint;
