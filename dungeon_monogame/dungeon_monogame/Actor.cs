@@ -16,7 +16,7 @@ namespace dungeon_monogame
         private Vector3 instantaneuousMovement;
         private bool currentlyOnGround = false;
         protected float gravityFactor = 1.0f;
-        public float bounciness { get; set; }
+        public float bounciness = 0;
 
 
 

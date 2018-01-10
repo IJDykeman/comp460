@@ -20,7 +20,7 @@ namespace dungeon_monogame
         public enum axes {x,y,z}
 
         public static readonly axes[] allAxes = new axes[]{axes.x, axes.y, axes.z};
-        public static readonly float G = 9.8f;
+        public static readonly float G = 32f;
 
         public static Vector3 unit(Globals.axes axis)
         {

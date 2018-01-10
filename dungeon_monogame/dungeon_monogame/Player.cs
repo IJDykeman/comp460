@@ -29,6 +29,7 @@ namespace dungeon_monogame
         {
             Vector3 cameraPosition = new Vector3(15, 20, 15);
             playerActor = new Actor(new AABB(1.6f, .8f, .8f));
+
             playerActor.setLocation(cameraPosition);
             Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
             //GameObject sword = new GameObject(MagicaVoxel.Read(@"simple_sword.vox"), new Vector3(1,20,0), Vector3.One * .1f);
@@ -76,25 +77,30 @@ namespace dungeon_monogame
                 }
                 else if (playerActor.isOnGround())
                 {
-                    playerActor.addVelocity(Vector3.UnitY * 4);
+                    playerActor.addVelocity(Vector3.UnitY * 8);
+                    //Console.WriteLine("jump");
+                    //Console.WriteLine(playerActor.getVelocity().Y);
+                    
                 }
             }
             if (newState.IsKeyDown(Keys.LeftShift))
             {
-                velocity -= Vector3.UnitY * speed;
+                if (flying)
+                {
+                    velocity -= Vector3.UnitY * speed;
+                }
             }
             if (justHit(Keys.Tab, newState))
             {
                 mouseEngaged = !mouseEngaged;
             }
 
-            if (!flying && (velocity * new Vector3(1,0,1)).Length() !=0)
-            {
-                velocity.Y = 0;
-                velocity.Normalize();
-                velocity *= speed;
-            
-            }
+            //if (!flying && (velocity * new Vector3(1,0,1)).Length() !=0)
+            //{
+                //velocity.Y = 0;
+                //velocity.Normalize();
+                //velocity *= speed;
+            //}
 
             
 

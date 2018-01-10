@@ -51,6 +51,7 @@
     <Compile Include="Globals.cs" />
     <Compile Include="light.cs" />
     <Compile Include="MagicaVoxelReading.cs" />
+    <Compile Include="Monster.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Rendering.cs" />
     <Compile Include="Spell.cs" />

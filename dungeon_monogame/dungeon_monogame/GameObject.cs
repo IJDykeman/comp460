@@ -126,5 +126,7 @@ namespace dungeon_monogame
             rotation = quaternion;
         }
 
+        public virtual void takeDamage(int damage) { }
+
     }
 }

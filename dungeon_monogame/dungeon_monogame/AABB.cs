@@ -19,8 +19,6 @@ namespace dungeon_monogame
             zWidth = _zWidth;
         }
 
-
-
         public float axisMin(Globals.axes axis, Vector3 scale){
             switch (axis){
                 case Globals.axes.x:
