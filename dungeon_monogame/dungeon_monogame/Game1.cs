@@ -56,7 +56,7 @@ namespace dungeon_monogame
             
             player = new Player();
             landscape.addChild(player.getActor());
-            //landscape.addChild(new Monster(new Vector3(12, 20, 12)));
+            landscape.addChild(new Monster(new Vector3(12, 20, 12)));
         }
 
         /// <summary>
