@@ -54,11 +54,15 @@ namespace dungeon_monogame
             Vector3 movement = playerActor.getVelocity();
             if (newState.IsKeyDown(Keys.W))
             {
-                movement += getFacingVector() * speed;
+                movement -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.Pi)) * speed;
+
+               // movement += getFacingVector() * speed;
             }
             if (newState.IsKeyDown(Keys.S))
             {
-                movement -= getFacingVector() * speed;
+                //movement -= getFacingVector() * speed;
+                movement -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(0)) * speed;
+
             }
             if (newState.IsKeyDown(Keys.A))
             {
@@ -78,7 +82,7 @@ namespace dungeon_monogame
                 }
                 else if (playerActor.isOnGround())
                 {
-                    playerActor.addVelocity(Vector3.UnitY * 6);
+                    playerActor.addVelocity(Vector3.UnitY * 5.5f);
                     //Console.WriteLine("jump");
                     //Console.WriteLine(playerActor.getVelocity().Y);
                     
@@ -98,9 +102,13 @@ namespace dungeon_monogame
 
             if (!flying && (movement * new Vector3(1,0,1)).Length() !=0)
             {
-                //velocity.Y = 0;
-                //velocity.Normalize();
-                //velocity *= speed;
+               // movement.Y = 0;
+               // movement.Normalize();
+               // movement *= speed;
+                if (movement.Y != 0)
+                {
+
+                }
             }
 
             
