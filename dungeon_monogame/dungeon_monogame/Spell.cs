@@ -72,7 +72,7 @@ namespace dungeon_monogame
             this.addVelocity(velocity);
             bounciness = .8f;
             gravityFactor = .7f;
-            light = new Light(.4f, color);
+            light = new Light(.3f, color);
             addChild(light);
             ChunkManager model = MagicaVoxel.Read(@"spell.vox");
             Vector3 offset = model.getCenter();

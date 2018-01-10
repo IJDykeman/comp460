@@ -51,33 +51,34 @@ namespace dungeon_monogame
             // cameraLookAtVector = Vector3.Transform(cameraLookAtVector, Matrix.CreateRotationX(.01f));
             // Is the SPACE key down?
             
-            Vector3 velocity = playerActor.getVelocity();
+            Vector3 movement = playerActor.getVelocity();
             if (newState.IsKeyDown(Keys.W))
             {
-                velocity += getFacingVector() * speed;
+                movement += getFacingVector() * speed;
             }
             if (newState.IsKeyDown(Keys.S))
             {
-                velocity -= getFacingVector() * speed;
+                movement -= getFacingVector() * speed;
             }
             if (newState.IsKeyDown(Keys.A))
             {
-                velocity += Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
+                movement += Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
             }
             if (newState.IsKeyDown(Keys.D))
             {
-                velocity -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
+                movement -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
             }
 
             if (newState.IsKeyDown(Keys.Space))
             {
                 if (flying)
                 {
-                    velocity += Vector3.UnitY * speed;
+                    playerActor.addVelocity(Vector3.UnitY * speed);
+                    //velocity += ;
                 }
                 else if (playerActor.isOnGround())
                 {
-                    playerActor.addVelocity(Vector3.UnitY * 8);
+                    playerActor.addVelocity(Vector3.UnitY * 6);
                     //Console.WriteLine("jump");
                     //Console.WriteLine(playerActor.getVelocity().Y);
                     
@@ -87,7 +88,7 @@ namespace dungeon_monogame
             {
                 if (flying)
                 {
-                    velocity -= Vector3.UnitY * speed;
+                    movement -= Vector3.UnitY * speed;
                 }
             }
             if (justHit(Keys.Tab, newState))
@@ -95,16 +96,16 @@ namespace dungeon_monogame
                 mouseEngaged = !mouseEngaged;
             }
 
-            //if (!flying && (velocity * new Vector3(1,0,1)).Length() !=0)
-            //{
+            if (!flying && (movement * new Vector3(1,0,1)).Length() !=0)
+            {
                 //velocity.Y = 0;
                 //velocity.Normalize();
                 //velocity *= speed;
-            //}
+            }
 
             
 
-            playerActor.setInstantaneousMovement(velocity);
+            playerActor.setInstantaneousMovement(movement);
 
             MouseState newMouseState = Mouse.GetState();
 
