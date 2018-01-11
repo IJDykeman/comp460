@@ -70,6 +70,14 @@ namespace dungeon_monogame
             type = t;
             color = c;
         }
+
+        public override bool Equals(object obj)
+        {
+            return (((Block)obj).type == type) && (((Block)obj).color == color);
+        }
+
+
+
     }
 
     struct IntLoc
@@ -107,6 +115,16 @@ namespace dungeon_monogame
         public static IntLoc operator -(IntLoc a, IntLoc b)
         {
             return new IntLoc(a.i - b.i, a.j - b.j, a.k - b.k);
+        }
+
+        public static IntLoc operator +(IntLoc a, IntLoc b)
+        {
+            return new IntLoc(a.i + b.i, a.j + b.j, a.k + b.k);
+        }
+
+        public static IntLoc operator *(IntLoc a, int b)
+        {
+            return new IntLoc(a.i * b, a.j * b, a.k * b);
         }
     }
 

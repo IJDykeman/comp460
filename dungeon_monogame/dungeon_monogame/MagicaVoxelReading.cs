@@ -16,7 +16,9 @@ namespace dungeon_monogame
 
     class MagicaVoxel
     {
-        static string root = System.Reflection.Assembly.GetEntryAssembly().Location;
+        public static string root = System.Reflection.Assembly.GetEntryAssembly().Location;
+        public static string modelsRoot = root+@"..\..\..\..\..\..\..\..\voxel_models\";
+        public static string tileRoot = root + @"..\..\..\..\..\..\..\..\tiles2\";
         public static Color GetDefaultColor(int i)
         {
             return new Color(DefaultColors[i]);
@@ -48,7 +50,7 @@ namespace dungeon_monogame
         const int XYZI = ('X') + ('Y' << 8) + ('Z' << 16) + ('I' << 24);
         const int RGBA = ('R') + ('G' << 8) + ('B' << 16) + ('A' << 24);
 
-        public static ChunkManager Read(string path)
+        public static Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> Read1(string path)
         {
             int xmin = 90000;
             int ymin = 90000;
@@ -56,11 +58,10 @@ namespace dungeon_monogame
             int xmax = -90000;
             int ymax = -90000;
             int zmax = -90000;
-            Stream stream = File.Open(root + @"..\..\..\..\..\..\..\..\voxel_models\" + path, FileMode.Open);
+            Stream stream = File.Open(path, FileMode.Open);
             BinaryReader reader = new BinaryReader(stream);
             var magic = reader.ReadUInt32();
             var version = reader.ReadInt32();
-            ChunkManager manager = new ChunkManager();
             List<IntLoc> blockLocs = new List<IntLoc>();
             List<int> colorIndices= new List<int>();
 
@@ -139,19 +140,44 @@ namespace dungeon_monogame
                     colors[i] = new Color(DefaultColors[i]);
                 }
             }
+            stream.Close();
 
+            return new Tuple<List<IntLoc>, Color[], List<int>, Tuple<int,int,int,int,int,int>>(blockLocs, colors, colorIndices, new Tuple<int,int,int,int,int,int>(xmin, xmax, ymin, ymax, zmin, zmax));
+
+        }
+
+        public static ChunkManager ChunkManagerFromVox(string path)
+        {
+            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(modelsRoot + path);
+            ChunkManager manager = new ChunkManager();
+            List<IntLoc> blockLocs = data.Item1;
+            List<int> colorIndices = data.Item3;
+            Color[] colors = data.Item2;
+            Tuple<int, int, int, int, int, int> extents = data.Item4;
             for (int i = 0; i < blockLocs.Count; i++)
             {
                 manager.set(blockLocs[i], new Block(1, colors[colorIndices[i]]));
             }
-                //return voxelData;
-                stream.Close();
+            //return voxelData;
             manager.remeshAll();
-            manager.setExtents(xmin, xmax, ymin, ymax, zmin, zmax);
+            manager.setExtents(extents.Item1, extents.Item2, extents.Item3, extents.Item4, extents.Item5, extents.Item6);
             return manager;
         }
 
-      
+        public static Block[,,] blocksFromVox(string path)
+        {
+            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(path);
+            List<IntLoc> blockLocs = data.Item1;
+            List<int> colorIndices = data.Item3;
+            Color[] colors = data.Item2;
+            Tuple<int, int, int, int, int, int> extents = data.Item4;
+            Block[,,] blocks= new Block[extents.Item2 - extents.Item1 + 1,extents.Item4-extents.Item3 + 1, extents.Item6-extents.Item5+1];
+            for (int i = 0; i < blockLocs.Count; i++)
+            {
+                blocks[blockLocs[i].i, blockLocs[i].j,blockLocs[i].k] = new Block(1, colors[colorIndices[i]]);
+            }
+            return blocks;
+        }
 
 
     }

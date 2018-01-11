@@ -118,7 +118,7 @@ namespace dungeon_monogame
 
 
                 new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-                renderSceneEffect.Parameters["lightIntensity"].SetValue(.4f);
+                renderSceneEffect.Parameters["lightIntensity"].SetValue(.2f);
                 renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["DirectionalLightTechnique"];
                 //GraphicsDevice.BlendState = BlendState.Opaque;
 

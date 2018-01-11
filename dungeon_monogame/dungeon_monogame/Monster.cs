@@ -13,7 +13,7 @@ namespace dungeon_monogame
         public Monster(Vector3 location)
         {
             setLocation(location);
-            ChunkManager model = MagicaVoxel.Read("goblin1.vox");
+            ChunkManager model = MagicaVoxel.ChunkManagerFromVox("goblin1.vox");
             scale = Vector3.One * .08f;
             Vector3 offset = model.getCenter();
             GameObject obj = new GameObject(model, -offset, Vector3.One);

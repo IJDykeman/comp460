@@ -59,6 +59,13 @@
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WorldGeneration\Matrix.cs" />
+    <Compile Include="WorldGeneration\ProbabilityDistribution.cs" />
+    <Compile Include="WorldGeneration\Sphere.cs" />
+    <Compile Include="WorldGeneration\Tile.cs" />
+    <Compile Include="WorldGeneration\TileMap.cs" />
+    <Compile Include="WorldGeneration\TileSet.cs" />
+    <Compile Include="WorldGeneration\WorldGenParamaters.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

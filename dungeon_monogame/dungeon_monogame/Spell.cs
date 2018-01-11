@@ -24,7 +24,7 @@ namespace dungeon_monogame
 
             addChild(new Light(.6f, lightColor));
 
-            GameObject model = new GameObject(MagicaVoxel.Read(@"spell.vox"), new Vector3(-.5f-.5f-.5f) * -.0f, Vector3.One * .1f);
+            GameObject model = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-.5f-.5f-.5f) * -.0f, Vector3.One * .1f);
             addChild(model);
             model.setEmissiveness(lightColor);
         }
@@ -74,7 +74,7 @@ namespace dungeon_monogame
             gravityFactor = .7f;
             light = new Light(.3f, color);
             addChild(light);
-            ChunkManager model = MagicaVoxel.Read(@"spell.vox");
+            ChunkManager model = MagicaVoxel.ChunkManagerFromVox(@"spell.vox");
             Vector3 offset = model.getCenter();
             this.scale = Vector3.One * .1f;
             GameObject obj = new GameObject(model, -offset, Vector3.One);
