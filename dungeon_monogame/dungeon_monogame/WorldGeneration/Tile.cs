@@ -35,14 +35,14 @@ namespace dungeon_monogame.WorldGeneration
                 {
                     if (di == 0 && dj == 1 && dl == 0)
                     {
-                        if (!(a.get(i, w - 1, j).Equals(a.get(i, 0, j))))
+                        if (!(a.get(i, w - 1, j).Equals(b.get(i, 0, j))))
                         {
                             return false;
                         }
                     }
                     else if (di == 0 && dj == -1 && dl == 0)
                     {
-                        if (!(a.get(i, 0, j).Equals(a.get(i, w-1, j))))
+                        if (!(a.get(i, 0, j).Equals(b.get(i, w-1, j))))
                         {
                             return false;
                         }
@@ -50,14 +50,14 @@ namespace dungeon_monogame.WorldGeneration
 
                     else if (di == 1 && dj == 0 && dl == 0)
                     {
-                        if (!(a.get(w-1, i, j).Equals(a.get(0, i, j))))
+                        if (!(a.get(w-1, i, j).Equals(b.get(0, i, j))))
                         {
                             return false;
                         }
                     }
                     else if (di == -1 && dj == 0 && dl == 0)
                     {
-                        if (!(a.get(0, i, j).Equals(a.get(w-1, i, j))))
+                        if (!(a.get(0, i, j).Equals(b.get(w-1, i, j))))
                         {
                             return false;
                         }
@@ -65,7 +65,7 @@ namespace dungeon_monogame.WorldGeneration
 
                     else if (di == 0 && dj == 0 && dl == 1)
                     {
-                        if (!(a.get(i, j, w - 1).Equals(a.get(i, j,0))))
+                        if (!(a.get(i, j, w - 1).Equals(b.get(i, j,0))))
                         {
                             return false;
                         }
@@ -73,7 +73,7 @@ namespace dungeon_monogame.WorldGeneration
 
                     else if (di == 0 && dj == 0 && dl == -1)
                     {
-                        if (!(a.get(i, j,0).Equals(a.get(i, j, w - 1))))
+                        if (!(a.get(i, j,0).Equals(b.get(i, j, w - 1))))
                         {
                             return false;
                         }
@@ -85,12 +85,19 @@ namespace dungeon_monogame.WorldGeneration
 
         public static MyMatrix buildTransitionMatrix(int di, int dj, int dl, TileSet tiles)
         {
+            /*
+            double p = Tile.potential(tiles.getTile(0), tiles.getTile(1), 0, 1, 0);
+            Console.Write("");
+            p = Tile.potential(tiles.getTile(0), tiles.getTile(1), 1, 0, 0);
+            Console.Write("");
+            p = Tile.potential(tiles.getTile(0), tiles.getTile(1), -1, 0, 0);
+            Console.Write("");
+            p = Tile.potential(tiles.getTile(0), tiles.getTile(1), 0, 0, 1);
+            Console.Write("");*/
             Double[,] result = new double[tiles.size(), tiles.size()];
-            int w = WorldGenParamaters.tileWidth;
-
-            for (int i = 0; i < WorldGenParamaters.tileWidth; i++)
+            for (int i = 0; i < tiles.size(); i++)
             {
-                for (int j = 0; j < WorldGenParamaters.tileWidth; j++)
+                for (int j = 0; j < tiles.size(); j++)
                 {
                     Tile a = tiles.getTile(i);
                     Tile b = tiles.getTile(j);

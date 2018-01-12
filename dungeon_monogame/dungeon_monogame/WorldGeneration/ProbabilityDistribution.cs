@@ -18,6 +18,7 @@ namespace dungeon_monogame.WorldGeneration
         public ProbabilityDistribution(double[] d)
         {
             distribution = d;
+            normalize();
         }
 
         public double get(int i){
@@ -27,7 +28,35 @@ namespace dungeon_monogame.WorldGeneration
         public void set(int i, double p)
         {
             distribution[i] = p;
+            //normalize();
+        }
+
+        public double entropy()
+        {
+            return distribution.Select(num => num * Math.Log(num + .0001)).Sum();
+        }
+
+        public int argmax()
+        {
+            return distribution.ToList().IndexOf(distribution.Max());
+        }
+
+        public int sample()
+        {
             normalize();
+
+            double r = Globals.random.NextDouble();
+            int i = 0;
+            while (r > 0)
+            {
+                r -= distribution[i];
+                if (r <= 0)
+                {
+                    return i;
+                }
+                i++;
+            }
+            return k() - 1;
         }
 
         public int k()
@@ -62,6 +91,13 @@ namespace dungeon_monogame.WorldGeneration
             return result;
         }
 
+        public static ProbabilityDistribution evenOdds(int length)
+        {
+            ProbabilityDistribution result = new ProbabilityDistribution(length);
+            result.setEvenOdds();
+            return result;
+        }
+
         public static ProbabilityDistribution operator +(ProbabilityDistribution a, ProbabilityDistribution b)
         {
             ProbabilityDistribution result = new ProbabilityDistribution(a.k());
@@ -69,6 +105,19 @@ namespace dungeon_monogame.WorldGeneration
             {
                 result.set(i, a.get(i) + b.get(i));
             }
+            result.normalize();
+            return result;
+        }
+
+
+        public static ProbabilityDistribution operator *(ProbabilityDistribution a, ProbabilityDistribution b)
+        {
+            ProbabilityDistribution result = new ProbabilityDistribution(a.k());
+            for (int i = 0; i < result.k(); i++)
+            {
+                result.set(i, a.get(i) * b.get(i));
+            }
+            //result.normalize();
             return result;
         }
 

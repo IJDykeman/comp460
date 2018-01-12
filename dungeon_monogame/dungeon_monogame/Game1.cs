@@ -59,7 +59,7 @@ namespace dungeon_monogame
             landscape.addChild(player.getActor());
             landscape.addChild(new Monster(new Vector3(12, 20, 12)));
             WorldGeneration.TileMap map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
-            landscape.addChild(new GameObject(map.getManager(), new Vector3(1,2,1), Vector3.One));
+            landscape.addChild(new GameObject(map.getManager(), new Vector3(1,2,1), Vector3.One * .2f));
             
         }
 

@@ -18,7 +18,7 @@ namespace dungeon_monogame
     {
         public static string root = System.Reflection.Assembly.GetEntryAssembly().Location;
         public static string modelsRoot = root+@"..\..\..\..\..\..\..\..\voxel_models\";
-        public static string tileRoot = root + @"..\..\..\..\..\..\..\..\tiles2\";
+        public static string tileRoot = root + @"..\..\..\..\..\..\..\..\tiles3\";
         public static Color GetDefaultColor(int i)
         {
             return new Color(DefaultColors[i]);

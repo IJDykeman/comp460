@@ -58,5 +58,10 @@ namespace dungeon_monogame.WorldGeneration
             }
             return resultMatrix;
         }
+
+        internal double[,] toDoubleArray()
+        {
+            return (double[,])_matrix.Clone();
+        }
     }
 }

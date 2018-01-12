@@ -107,7 +107,49 @@ namespace dungeon_monogame
             else
                 return new Color(v, p, q);
         }
+
+        public static List<IntLoc> neighbors(IntLoc center, int width)
+        {
+            IntLoc[] neighbors = new IntLoc[] { new IntLoc(-1, 0, 0), new IntLoc(1, 0, 0), new IntLoc(0, -1, 0), new IntLoc(0, 1, 0), new IntLoc(0, 0, -1), new IntLoc(0, 0, 1) };
+            List<IntLoc> result = new List<IntLoc>();
+            for (int iter = 0; iter < neighbors.Length; iter++)
+            {
+                neighbors[iter] += center;
+                if (neighbors[iter].i >= 0 && neighbors[iter].i < width
+                    && neighbors[iter].j >= 0 && neighbors[iter].j < width
+                    && neighbors[iter].k >= 0 && neighbors[iter].k < width)
+                {
+                    result.Add(neighbors[iter]);
+                }
+            }
+            return result;
+        }
+
+
+        public static List<IntLoc> gridBFS(int starti, int startj, int startl, int width)
+        {
+            List<IntLoc> result = new List<IntLoc>();
+            Queue<IntLoc> queue = new Queue<IntLoc>();
+            queue.Enqueue(new IntLoc(starti, startj, startl));
+            while (queue.Count > 0)
+            {
+                IntLoc loc = queue.Dequeue();
+                result.Add(loc);
+                List<IntLoc> nextSteps = neighbors(loc, width);
+                foreach (IntLoc next in nextSteps)
+                {
+                    if (!queue.Contains(next) && !result.Contains(next))
+                    {
+                        queue.Enqueue(next);
+                    }
+                }
+            }
+            return result;
+        }
+
     }
+
+    
 
 
 }

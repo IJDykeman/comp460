@@ -90,6 +90,14 @@ namespace dungeon_monogame
             j = _j;
             k = _k;
         }
+
+        public IntLoc(int _i)
+        {
+            i = _i;
+            j = _i;
+            k = _i;
+        }
+
         public IntLoc(Vector3 v)
         {
             i = (int)Math.Floor(v.X);
