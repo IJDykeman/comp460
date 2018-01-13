@@ -37,10 +37,10 @@ namespace dungeon_monogame.WorldGeneration
                     ProbabilityDistribution probFrom = sphere[neighbor.i, neighbor.j, neighbor.k];
                     IntLoc delta = neighbor - queryLoc;
                     MyMatrix trans = set.getTransitionMatrix(delta);
-                    if (trans.toDoubleArray()[1,0] == 1 && queryLoc.j==2)
-                    {
+                    //if (trans.toDoubleArray()[1,0] == 1 && queryLoc.j==2)
+                    //{
 
-                    }
+                    //}
                     Double[] probTo = MyMatrix.dot(trans, probFrom.toDoubleArray());
                     //sphere[queryLoc.i, queryLoc.j, queryLoc.k] += new ProbabilityDistribution(probTo);
 

@@ -50,16 +50,17 @@ namespace dungeon_monogame
 
             // TODO: use this.Content to load your game content here
             Rendering.LoadContent(Content, graphics);
-            landscapeChunks = MagicaVoxel.ChunkManagerFromVox(@"castleOnHill.vox");
-            landscape = new GameObject(landscapeChunks, new Vector3(), Vector3.One);
+            //landscapeChunks = MagicaVoxel.ChunkManagerFromVox(@"castleOnHill.vox");
+            WorldGeneration.TileMap map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
+
+            landscape = new GameObject(map.getManager(), new Vector3(), Vector3.One);
             
             //landscapeChunks.makeColorfulFloor();
             
             player = new Player();
             landscape.addChild(player.getActor());
             landscape.addChild(new Monster(new Vector3(12, 20, 12)));
-            WorldGeneration.TileMap map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
-            landscape.addChild(new GameObject(map.getManager(), new Vector3(1,2,1), Vector3.One * .2f));
+            //landscape.addChild(new GameObject(map.getManager(), new Vector3(1,2,1), Vector3.One * .2f));
             
         }
 

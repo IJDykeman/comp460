@@ -27,7 +27,7 @@ namespace dungeon_monogame
 
         public Player()
         {
-            Vector3 cameraPosition = new Vector3(15, 20, 15);
+            Vector3 cameraPosition = new Vector3(15, 19, 15);
             playerActor = new Actor(new AABB(1.6f, .8f, .8f));
 
             playerActor.setLocation(cameraPosition);

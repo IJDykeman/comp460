@@ -70,13 +70,13 @@ namespace dungeon_monogame
         {
             setLocation(_location);
             this.addVelocity(velocity);
-            bounciness = .8f;
-            gravityFactor = .7f;
-            light = new Light(.3f, color);
+            bounciness = .7f + (float)(Globals.random.NextDouble() -.5) *.2f;
+            gravityFactor = .6f + (float)(Globals.random.NextDouble() -.5) *.1f;
+            light = new Light(.3f + (float)(Globals.random.NextDouble() - .5) * .1f, color);
             addChild(light);
             ChunkManager model = MagicaVoxel.ChunkManagerFromVox(@"spell.vox");
             Vector3 offset = model.getCenter();
-            this.scale = Vector3.One * .1f;
+            this.scale = Vector3.One * (.08f + (float)(Globals.random.NextDouble() -.5) *.03f);
             GameObject obj = new GameObject(model, -offset, Vector3.One);
             obj.setEmissiveness(color);
             this.aabb = model.getAaabbFromModelExtents();

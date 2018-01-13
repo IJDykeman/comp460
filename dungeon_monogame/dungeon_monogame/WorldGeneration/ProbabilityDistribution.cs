@@ -45,6 +45,11 @@ namespace dungeon_monogame.WorldGeneration
         {
             normalize();
 
+            if (distribution.Sum() == 0)
+            {
+                setEvenOdds();
+            }
+
             double r = Globals.random.NextDouble();
             int i = 0;
             while (r > 0)

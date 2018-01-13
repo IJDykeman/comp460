@@ -26,7 +26,7 @@ namespace dungeon_monogame
             transform = getTransform(ref transform);
             effect.CurrentTechnique = effect.Techniques["PointLightTechnique"];
             effect.Parameters["lightIntensity"].SetValue(lightIntesity);
-            effect.Parameters["lightRadius"].SetValue(40f * lightIntesity);
+            effect.Parameters["lightRadius"].SetValue(20f * lightIntesity);
             effect.Parameters["lightColor"].SetValue(color.ToVector4());
             Vector3 position = Vector3.Transform(getLocation(), transform);
             effect.Parameters["lightPosition"].SetValue(position);
@@ -58,7 +58,7 @@ namespace dungeon_monogame
         float luminanceTendency = 0;
         protected override List<Action> update()
         {
-            luminanceTendency += .2f * (.26f*Globals.standardGaussianSample() - (float)Math.Tanh(luminanceTendency));
+            luminanceTendency += .2f * (.5f*((float)Globals.random.NextDouble() - .5f) - (float)Math.Tanh(luminanceTendency));
 
             level += luminanceTendency;
             level = MathHelper.Clamp(level, -2, 2);

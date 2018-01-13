@@ -30,13 +30,17 @@ namespace dungeon_monogame.WorldGeneration
 
         private static IntLoc placeBlocksFromTile(IntLoc tileSpacePos, ChunkManager m, Tile tile)
         {
-            for (int i = 0; i < WorldGenParamaters.tileWidth; i++)
+            for (int i = 0; i < WorldGenParamaters.tileWidth-1; i++)
             {
-                for (int j = 0; j < WorldGenParamaters.tileWidth; j++)
+                for (int j = 0; j < WorldGenParamaters.tileWidth-1; j++)
                 {
-                    for (int k = 0; k < WorldGenParamaters.tileWidth; k++)
+                    for (int k = 0; k < WorldGenParamaters.tileWidth-1; k++)
                     {
-                        m.set((tileSpacePos * WorldGenParamaters.tileWidth) + new IntLoc(i, j, k), tile.get(i, j, k));
+                        Block b = tile.get(i, j, k);
+                        b.color.R -= (byte)Globals.random.Next(10);
+                        b.color.G -= (byte)Globals.random.Next(10);
+                        b.color.B -= (byte)Globals.random.Next(5);
+                        m.set((tileSpacePos * (WorldGenParamaters.tileWidth-1)) + new IntLoc(i, j, k), b);
                     }
                 }
             }
