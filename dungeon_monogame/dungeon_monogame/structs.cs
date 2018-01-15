@@ -112,7 +112,13 @@ namespace dungeon_monogame
 
         public override int GetHashCode()
         {
-            return (i.ToString() + "_" + j.ToString() + "_" + k.ToString()).GetHashCode();
+            return i.GetHashCode() ^ j.GetHashCode() << 2 ^ k.GetHashCode() >> 2;
+        }
+
+        public override bool Equals(object obj)
+        {
+           IntLoc other = (IntLoc)obj;
+            return other.i == i && other.j == j && other.k == k;
         }
 
         public static IntLoc operator %(IntLoc l, int n)
@@ -138,3 +144,4 @@ namespace dungeon_monogame
 
 
 }
+

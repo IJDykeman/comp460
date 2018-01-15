@@ -18,7 +18,7 @@ namespace dungeon_monogame
     {
         public static string root = System.Reflection.Assembly.GetEntryAssembly().Location;
         public static string modelsRoot = root+@"..\..\..\..\..\..\..\..\voxel_models\";
-        public static string tileRoot = root + @"..\..\..\..\..\..\..\..\tiles3\";
+        public static string tileRoot = root + WorldGeneration.WorldGenParamaters.tileRelativePath;
         public static Color GetDefaultColor(int i)
         {
             return new Color(DefaultColors[i]);
@@ -159,7 +159,7 @@ namespace dungeon_monogame
                 manager.set(blockLocs[i], new Block(1, colors[colorIndices[i]]));
             }
             //return voxelData;
-            manager.remeshAll();
+            manager.remeshAllSerial();
             manager.setExtents(extents.Item1, extents.Item2, extents.Item3, extents.Item4, extents.Item5, extents.Item6);
             return manager;
         }

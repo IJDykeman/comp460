@@ -39,3 +39,4 @@ C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\A
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\RenderSceneFromGBuffer.xnb
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csprojResolveAssemblyReference.cache
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\vignette.xnb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csproj.CoreCompileInputs.cache

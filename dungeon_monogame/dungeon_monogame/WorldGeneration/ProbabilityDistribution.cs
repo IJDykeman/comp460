@@ -118,9 +118,9 @@ namespace dungeon_monogame.WorldGeneration
         public static ProbabilityDistribution operator *(ProbabilityDistribution a, ProbabilityDistribution b)
         {
             ProbabilityDistribution result = new ProbabilityDistribution(a.k());
-            for (int i = 0; i < result.k(); i++)
+            for (int i = 0; i < result.distribution.Length; i++)
             {
-                result.set(i, a.get(i) * b.get(i));
+                result.distribution[i] = a.distribution[i] * b.distribution[i];
             }
             //result.normalize();
             return result;

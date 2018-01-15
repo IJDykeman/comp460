@@ -21,6 +21,7 @@ namespace dungeon_monogame
 
         static Effect createGBufferEffect, renderSceneEffect;
         static Vector2 halfPixel;
+        private static float ambientLightLevel = .3f;
 
         public static void LoadContent(ContentManager Content, GraphicsDeviceManager graphics)
         {
@@ -118,7 +119,7 @@ namespace dungeon_monogame
 
 
                 new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-                renderSceneEffect.Parameters["lightIntensity"].SetValue(0f);
+                renderSceneEffect.Parameters["lightIntensity"].SetValue(ambientLightLevel);
                 renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["DirectionalLightTechnique"];
                 //GraphicsDevice.BlendState = BlendState.Opaque;
 

@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using dungeon_monogame.WorldGeneration;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,56 +12,76 @@ namespace dungeon_monogame
 {
     class ChunkManager
     {
-        Dictionary<IntLoc, Chunk> chunks;
+        ConcurrentDictionary<IntLoc, Chunk> chunks;
+        ConcurrentHashSet<IntLoc> chunkLocationsNeedingRemesh;
+        ConcurrentHashSet<IntLoc> chunkLocationsNeedingBuffersSet;
         public float ambient_light { get; set; }
         private int xmin, xmax, ymin, ymax, zmin, zmax;
         
 
         public ChunkManager()
         {
-            chunks = new Dictionary<IntLoc, Chunk>();
+            chunks = new ConcurrentDictionary<IntLoc, Chunk>();
+            chunkLocationsNeedingRemesh = new ConcurrentHashSet<IntLoc>();
+            chunkLocationsNeedingBuffersSet = new ConcurrentHashSet<IntLoc>();
 
         }
 
-        public void makeColorfulFloor()
+
+
+        public void remeshAllSerial(int centeri = 0, int centerj = 0, int centerk = 0)
         {
-            for (int i = 0; i < 1000; i++)
-            {
-                int s = 25;
-                //var loc = new IntLoc(Globals.random.Next(-s, s), Globals.random.Next(-s, s), Globals.random.Next(-s, s));
-                //var loc = new IntLoc(Globals.random.Next(0, s), Globals.random.Next(0, s), Globals.random.Next(0, s));
-                //set(loc , new Block(1, new Color(Globals.random.Next(0, 256), Globals.random.Next(0, 256), Globals.random.Next(0, 256))));
-            }
-            for (int x = -25; x < 25; x++)
-            {
-                for (int z = -25; z < 25; z++)
-                {
-                    for (int y = 0; y < 2; y++)
-                    {
-                        set(new IntLoc(x, y, z), new Block(1, new Color(Globals.random.Next(0, 256), Globals.random.Next(0, 256), Globals.random.Next(0, 256))));
-                    }
-                }
 
+            IntLoc l;
+            while (chunkLocationsNeedingRemesh.TakeMinInLinearTime(a => (Math.Abs(a.i - centeri) + Math.Abs(a.j - centerj) * 4 + Math.Abs(a.k - centerk)), out l))
+            {
+
+                chunks[l].remeshParallelStep(this, l.toVector3());
+                chunks[l].remeshSerialStep();
             }
-            remeshAll();
         }
 
-        public void remeshAll()
+
+
+        public void remeshAllParallelizeableStep(IntLoc center)
         {
-            
-            foreach (IntLoc v in chunks.Keys)
+            center = new IntLoc(TileMap.playerPerspectiveLoc);
+            IntLoc l;
+
+            while (chunkLocationsNeedingRemesh.TakeMinInLinearTime(a => (Math.Abs(a.i - center.i) + Math.Abs(a.j - center.j) + Math.Abs(a.k - center.k)), out l))
             {
-                chunks[v].remesh(this, v.toVector3());
+                chunks[l].remeshParallelStep(this, l.toVector3());
+                chunkLocationsNeedingBuffersSet.Add(l);
+                center = new IntLoc(TileMap.playerPerspectiveLoc);
             }
         }
+
+        public void remeshAllSerialStep(IntLoc center)
+        {
+            center = new IntLoc(TileMap.playerPerspectiveLoc);
+            IntLoc l;
+            while (chunkLocationsNeedingBuffersSet.TakeMinInLinearTime(a => (Math.Abs(a.i - center.i) + Math.Abs(a.j - center.j) + Math.Abs(a.k - center.k)), out l))
+            {
+                chunks[l].remeshSerialStep();
+                center = new IntLoc(TileMap.playerPerspectiveLoc);
+            }
+        }
+
+
 
         public bool solid(IntLoc l)
         {
-            if (!withinChunk(l))
+            Chunk c;
+            if(chunks.TryGetValue(locToChunkLoc(l), out c))
             {
-                return false;
+                return c.solid(l % Chunk.chunkWidth);
             }
-            return chunks[locToChunkLoc(l)].solid(l % Chunk.chunkWidth);
+            return false;
+            //if (!withinChunk(l))
+            // {
+            //    return false;
+            //}
+            //return chunks[locToChunkLoc(l)].solid(l % Chunk.chunkWidth);
         }
 
         public Block getBlock(IntLoc l)
@@ -69,14 +91,19 @@ namespace dungeon_monogame
 
         public void set(IntLoc loc, Block val)
         {
+            IntLoc chunkLoc = locToChunkLoc(loc);
+
             if (!withinChunk(loc))
             {
-                chunks[locToChunkLoc(loc)] = new Chunk();
+                chunks[chunkLoc] = new Chunk();
             }
-            IntLoc chunkLoc = locToChunkLoc(loc);
             Chunk c = chunks[chunkLoc];
             IntLoc setLoc = loc % Chunk.chunkWidth;
             c.setBlock(setLoc, val);
+            if (!chunkLocationsNeedingRemesh.Contains(chunkLoc))
+            {
+                chunkLocationsNeedingRemesh.Add(chunkLoc);
+            }
         }
 
         public void setExtents(int _xmin, int _xmax, int _ymin, int _ymax, int _zmin, int _zmax)
@@ -120,7 +147,7 @@ namespace dungeon_monogame
                 
                 Matrix oldWorldMat = effect.Parameters["xWorld"].GetValueMatrix();
                 Chunk c = p.Value;
-                if (c.empty())
+                if (c.empty() || !c.readyToDisplay())
                 {
                     continue;
                 }

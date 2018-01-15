@@ -21,20 +21,22 @@ namespace dungeon_monogame
         private KeyboardState oldKeyboardState;
         private float upDownRot = -2;
         private float leftRightRot = 0;
-        float speed = 5f;
+        float speed = 10f;
+        float height = 3.2f;
+        float width = 1.5f;
         private bool flying = false;
         Light torchLight;
 
         public Player()
         {
-            Vector3 cameraPosition = new Vector3(15, 19, 15);
-            playerActor = new Actor(new AABB(1.6f, .8f, .8f));
+            Vector3 cameraPosition = new Vector3(7,5,7);
+            playerActor = new Actor(new AABB(height, width, width));
 
             playerActor.setLocation(cameraPosition);
             Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
             //GameObject sword = new GameObject(MagicaVoxel.Read(@"simple_sword.vox"), new Vector3(1,20,0), Vector3.One * .1f);
             //playerActor.addChild(sword);
-            var torch = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"torch.vox"), new Vector3(.2f, .4f, -.3f), Vector3.One * .03f);
+            var torch = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"torch.vox"), new Vector3(.2f, 1.4f, -.3f), Vector3.One * .03f);
             //torchLight = new Light(1f, Color.LightGoldenrodYellow);
             torchLight = new FireLight();
             torchLight.setLocation(new Vector3(3, 8, 3));

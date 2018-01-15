@@ -27,13 +27,15 @@ namespace dungeon_monogame.WorldGeneration
             }
             tiles = tilesList.ToArray();
             buildTransitionMatrices();
+            Console.WriteLine("transition matrices built");
             spheres = new Sphere[tiles.Length];
-            for (int i = 0; i < tiles.Length; i++)
+            //for (int i = 0; i < tiles.Length; i++)
+            //{
+            Parallel.For(0, tiles.Length, i=>
             {
                 spheres[i] = new Sphere(this, i);
-            }
-            Sphere one = spheres[0];
-            Sphere two = spheres[1];
+            });
+            //}
 
         }
 

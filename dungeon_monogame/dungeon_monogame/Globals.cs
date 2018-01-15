@@ -130,15 +130,17 @@ namespace dungeon_monogame
         {
             List<IntLoc> result = new List<IntLoc>();
             Queue<IntLoc> queue = new Queue<IntLoc>();
+            HashSet<IntLoc> visited = new HashSet<IntLoc>();
             queue.Enqueue(new IntLoc(starti, startj, startl));
             while (queue.Count > 0)
             {
                 IntLoc loc = queue.Dequeue();
                 result.Add(loc);
+                visited.Add(loc);
                 List<IntLoc> nextSteps = neighbors(loc, width);
                 foreach (IntLoc next in nextSteps)
                 {
-                    if (!queue.Contains(next) && !result.Contains(next))
+                    if (!queue.Contains(next) && !visited.Contains(next))
                     {
                         queue.Enqueue(next);
                     }

@@ -8,24 +8,43 @@ namespace dungeon_monogame.WorldGeneration
 {
     class MyMatrix
     {
-        private readonly double[,] _matrix;
+        //private double[,] _matrix;
+        private double[][] _matrix;
+
         public MyMatrix(int dim1, int dim2)
         {
-            _matrix = new double[dim1, dim2];
+            //_matrix = new double[dim1, dim2];
+            _matrix = new double[dim1][];
+            for (int i = 0; i < dim2; i++)
+            {
+                _matrix[i] = new double[dim2];
+            }
         }
 
         public MyMatrix(double[,] m)
         {
-            _matrix = m;
+            _matrix = new double[m.GetLength(0)][];
+            for (int i = 0; i < m.GetLength(1); i++)
+            {
+                _matrix[i] = new double[m.GetLength(1)];
+            }
+
+            for (int i = 0; i < m.GetLength(0); i++)
+            {
+                for (int j = 0; j < m.GetLength(1); j++)
+                {
+                    _matrix[i][j] = m[i, j];
+                }
+            }
         }
 
         public int Height { get { return _matrix.GetLength(0); } }
-        public int Width { get { return _matrix.GetLength(1); } }
+        public int Width { get { return _matrix[0].GetLength(0); } }
 
         public double this[int x, int y]
         {
-            get { return _matrix[x, y]; }
-            set { _matrix[x, y] = value; }
+            get { return _matrix[x][y]; }
+            set { _matrix[x][y] = value; }
         }
 
         public static MyMatrix Multiply(MyMatrix m1, MyMatrix m2)
@@ -47,14 +66,19 @@ namespace dungeon_monogame.WorldGeneration
 
         public static Double[] dot(MyMatrix m1, Double[] v)
         {
+            double[] mRow;
             Double[] resultMatrix = new Double[v.Length];
-            for (int i = 0; i < m1.Height; i++)
+            for (int i = 0; i < m1._matrix.Length; i++)
             {
-                resultMatrix[i] = 0;
-                for (int j = 0; j < m1.Width; j++)
-                {
-                    resultMatrix[i] += m1[i, j] * v[j];
-                }
+            //Parallel.For(0, m1._matrix.Length, i =>
+             //{
+                 mRow = m1._matrix[i];
+                 resultMatrix[i] = 0;
+                 for (int j = 0; j < mRow.Length; j++)
+                 {
+                     resultMatrix[i] += mRow[j] * v[j];
+                 }
+             //});
             }
             return resultMatrix;
         }

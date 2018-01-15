@@ -21,3 +21,5 @@ C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\A
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\MonoGame.Framework.dll
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Release\dungeon_monogame.exe
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Release\dungeon_monogame.pdb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Release\dungeon_monogame.csprojResolveAssemblyReference.cache
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Release\dungeon_monogame.csproj.CoreCompileInputs.cache
