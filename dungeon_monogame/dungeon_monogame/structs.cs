@@ -140,6 +140,12 @@ namespace dungeon_monogame
         {
             return new IntLoc(a.i * b, a.j * b, a.k * b);
         }
+
+        public static float EuclideanDistance(IntLoc a, IntLoc b)
+        {
+            return (float)Math.Sqrt(Math.Pow((a.i - b.i),2) + Math.Pow((a.j - b.j),2) + Math.Pow((a.k - b.k), 2));
+        }
+
     }
 
 

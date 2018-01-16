@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace dungeon_monogame
     static class Globals
     {
         public static Random random = new Random();
+        static ConcurrentDictionary<int, List<IntLoc>> BFScache= new ConcurrentDictionary<int, List<IntLoc>>();
 
         public static int mod(int x, int m)
         {
@@ -126,27 +128,42 @@ namespace dungeon_monogame
         }
 
 
-        public static List<IntLoc> gridBFS(int starti, int startj, int startl, int width)
+        public static List<IntLoc> gridBFS(int width)
         {
-            List<IntLoc> result = new List<IntLoc>();
-            Queue<IntLoc> queue = new Queue<IntLoc>();
-            HashSet<IntLoc> visited = new HashSet<IntLoc>();
-            queue.Enqueue(new IntLoc(starti, startj, startl));
-            while (queue.Count > 0)
+            int starti = width / 2;
+            int startj = width / 2;
+            int startl = width / 2;
+
+            if (!BFScache.ContainsKey(width))
             {
-                IntLoc loc = queue.Dequeue();
-                result.Add(loc);
-                visited.Add(loc);
-                List<IntLoc> nextSteps = neighbors(loc, width);
-                foreach (IntLoc next in nextSteps)
+                List<IntLoc> result = new List<IntLoc>();
+                Queue<IntLoc> queue = new Queue<IntLoc>();
+                HashSet<IntLoc> visited = new HashSet<IntLoc>();
+                HashSet<IntLoc> inQueue = new HashSet<IntLoc>();
+                IntLoc start = new IntLoc(starti, startj, startl);
+                queue.Enqueue(start);
+                inQueue.Add(start);
+                while (queue.Count > 0)
                 {
-                    if (!queue.Contains(next) && !visited.Contains(next))
+                    IntLoc loc = queue.Dequeue();
+                    inQueue.Remove(loc);
+                    result.Add(loc);
+                    visited.Add(loc);
+                    List<IntLoc> nextSteps = neighbors(loc, width);
+                    foreach (IntLoc next in nextSteps)
                     {
-                        queue.Enqueue(next);
+                        if (!inQueue.Contains(next) && !visited.Contains(next))
+                        {
+                            inQueue.Add(next);
+                            queue.Enqueue(next);
+                        }
                     }
                 }
+                BFScache[width] = result;
+                return result;
             }
-            return result;
+            return BFScache[width];
+
         }
 
     }

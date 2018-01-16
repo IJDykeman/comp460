@@ -13,13 +13,11 @@ namespace dungeon_monogame
 
     class Chunk
     {
-        public static readonly int chunkWidth = 14;
+        public static readonly int chunkWidth = 28;
         private Block[,,] blocks;
         //public short[] indices; //having this be a short could be causing the chunk complexity limit issue
-        private VertexPostitionColorPaintNormal[] vertices;
-        private short[] indices;
-        public VertexBuffer vertexBuffer;
-        public IndexBuffer indexBuffer;
+        public VertexPostitionColorPaintNormal[] vertices;
+        public int[] indices;
         bool meshValid = false;
 
         private static readonly Vector3[] probes = new Vector3[]{
@@ -55,7 +53,7 @@ namespace dungeon_monogame
         public void setBlock(IntLoc loc, Block val)
         {
             blocks[loc.i, loc.j, loc.k] = val;
-            //meshValid = false;
+            meshValid = false;
         }
 
         public bool withinBounds(IntLoc loc)
@@ -94,38 +92,31 @@ namespace dungeon_monogame
 
         public void remeshParallelStep(ChunkManager space, Vector3 chunkLoc)
         {
-            if (readyToDisplay())
+            lock (this)
             {
-                return;
-            }
-            vertices = getChunkMesh(space, chunkLoc);
-            if (vertices.Length == 0){
-                return;
-            }
-            indices = new short[vertices.Length];
-            for (short i = 0; i < vertices.Length; i++)
-            {
-                indices[i] = i;
-            }
+                if (readyToDisplay())
+                {
+                    return;
+                }
+                vertices = getChunkMesh(space, chunkLoc);
+                if (vertices.Length == 0)
+                {
+                    return;
+                }
 
-        }
-
-        public void remeshSerialStep()
-        {
-            if (vertices.Length == 0 || readyToDisplay())
-            {
-                return;
-            }
-            //lock (typeof(Chunk))
-            //{
-                vertexBuffer = new VertexBuffer(Game1.graphics.GraphicsDevice, VertexPostitionColorPaintNormal.VertexDeclaration, vertices.Length, BufferUsage.WriteOnly);
-                vertexBuffer.SetData<VertexPostitionColorPaintNormal>(vertices);
-                indexBuffer = new IndexBuffer(Game1.graphics.GraphicsDevice, typeof(short), indices.Length, BufferUsage.WriteOnly);
-                indexBuffer.SetData(indices);
+                indices = new int[vertices.Length / 4 * 6];
+                for (int i = 0; i < vertices.Length; i += 4)
+                {
+                    indices[i / 4 * 6 + 0] = i;
+                    indices[i / 4 * 6 + 1] = (int)(i + 1);
+                    indices[i / 4 * 6 + 2] = (int)(i + 2);
+                    indices[i / 4 * 6 + 3] = (int)(i + 1);
+                    indices[i / 4 * 6 + 4] = (int)(i + 3);
+                    indices[i / 4 * 6 + 5] = (int)(i + 2);
+                }
                 meshValid = true;
-                //vertices = null;
-                //indices = null;
-            //}
+            }
+
         }
 
         VertexPostitionColorPaintNormal[] getVertices(Vector3 offset, Vector3 chunkLoc, Color c, ChunkManager space)
@@ -183,18 +174,18 @@ namespace dungeon_monogame
             vertices[0].Position = new Vector3(0, 0, 0);
             vertices[1].Position = new Vector3(0, 1, 0);
             vertices[2].Position = new Vector3(1, 0, 0);
-            vertices[3].Position = vertices[1].Position;
-            vertices[4].Position = new Vector3(1, 1, 0);
-            vertices[5].Position = vertices[2].Position;
+            //vertices[3].Position = vertices[1].Position;
+            vertices[3].Position = new Vector3(1, 1, 0);
+            //vertices[5].Position = vertices[2].Position;
         }
 
         VertexPostitionColorPaintNormal[] getTransformedXYFace(Matrix m, Vector3 b, Matrix unitXToNormal, Vector3 offset, Color c, ChunkManager space, IntLoc chunkLoc)
         {
             Vector3 normal = Vector3.Transform(Vector3.UnitX, unitXToNormal);
 
-            VertexPostitionColorPaintNormal[] result = new VertexPostitionColorPaintNormal[6];
+            VertexPostitionColorPaintNormal[] result = new VertexPostitionColorPaintNormal[4];
             populateXYFace(result);
-            foreach (int i in Enumerable.Range(0, 6))
+            foreach (int i in Enumerable.Range(0, result.Length))
             {
 
                 result[i].Position = Vector3.Transform(result[i].Position, m) + b + offset;
@@ -241,6 +232,16 @@ namespace dungeon_monogame
         internal bool empty()
         {
             return vertices == null || vertices.Length == 0;
+        }
+
+        public void forgetMesh()
+        {
+            lock (this)
+            {
+                vertices = null;
+                indices = null;
+                meshValid = false;
+            }
         }
     }
 }

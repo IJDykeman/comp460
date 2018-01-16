@@ -74,6 +74,30 @@ namespace dungeon_monogame.WorldGeneration
             }
         }
 
+
+        public bool TakeLeastKInLinearTime(Func<T, double> value, int k, out List<T> v)
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                if (_hashSet.Count > 0)
+                {
+                    List<T> e = _hashSet.OrderBy(value).Take(k).ToList();
+                    foreach (T element in e) {
+                        _hashSet.Remove(element);
+                            }
+                    v = e;
+                    return true;
+                }
+                v = default(List<T>);
+                return false;
+            }
+            finally
+            {
+                if (_lock.IsWriteLockHeld) _lock.ExitWriteLock();
+            }
+        }
+
         public bool Remove(T item)
         {
             _lock.EnterWriteLock();

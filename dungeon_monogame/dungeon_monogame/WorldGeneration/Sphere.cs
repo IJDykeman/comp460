@@ -29,7 +29,7 @@ namespace dungeon_monogame.WorldGeneration
             }
 
             sphere[WorldGenParamaters.sphereWidth / 2, WorldGenParamaters.sphereWidth / 2, WorldGenParamaters.sphereWidth / 2] = ProbabilityDistribution.oneHot(set.size(), tileIndex);
-            List<IntLoc> bfsOrder = Globals.gridBFS(WorldGenParamaters.sphereWidth / 2, WorldGenParamaters.sphereWidth / 2, WorldGenParamaters.sphereWidth / 2, WorldGenParamaters.sphereWidth);
+            List<IntLoc> bfsOrder = Globals.gridBFS(WorldGenParamaters.sphereWidth);
             foreach (IntLoc queryLoc in bfsOrder)
             {
                 foreach (IntLoc neighbor in Globals.neighbors(queryLoc, WorldGenParamaters.sphereWidth))

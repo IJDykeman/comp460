@@ -88,6 +88,7 @@ namespace dungeon_monogame
                 action.act(landscape, gameTime);
             }
             map.notifyOfPlayerLocation(player.getCameraLocation());
+            map.report();
             base.Update(gameTime);
         }
 

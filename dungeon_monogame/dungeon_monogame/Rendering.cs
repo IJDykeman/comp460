@@ -70,7 +70,7 @@ namespace dungeon_monogame
             createGBufferEffect.Parameters["xView"].SetValue(player.getViewMatrix());
             createGBufferEffect.Parameters["xWorld"].SetValue(Matrix.Identity);
             // worldChunkManager.draw(createGBufferEffect, Matrix.Identity);
-            landscape.drawFirstPass(createGBufferEffect, Matrix.Identity);
+            landscape.drawFirstPass(createGBufferEffect, Matrix.Identity, new BoundingFrustum(player.getViewMatrix() * projection(graphics)));
             //player.draw(createGBufferEffect);
 
             Texture2D diffuseTex = (Texture2D)colorRT;
@@ -136,7 +136,7 @@ namespace dungeon_monogame
         }
 
 
-        static Matrix projection(GraphicsDeviceManager graphics)
+        public static Matrix projection(GraphicsDeviceManager graphics)
         {
             float aspectRatio =
                 graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight;

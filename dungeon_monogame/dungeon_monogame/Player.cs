@@ -167,7 +167,7 @@ namespace dungeon_monogame
 
         internal void draw(Effect effect)
         {
-            playerActor.drawFirstPass(effect, Matrix.Identity);
+            //playerActor.drawFirstPass(effect, Matrix.Identity);
         }
 
         internal GameObject getActor()

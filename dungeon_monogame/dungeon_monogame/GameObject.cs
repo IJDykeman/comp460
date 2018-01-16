@@ -58,14 +58,14 @@ namespace dungeon_monogame
             emissiveness = e;
         }
 
-        public void drawFirstPass(Effect effect, Matrix transform)
+        public void drawFirstPass(Effect effect, Matrix transform, BoundingFrustum frustum)
         {
             transform = getTransform(ref transform);
-            chunkManager.draw(effect, transform, this.emissiveness);
+            chunkManager.draw(effect, transform, this.emissiveness, frustum);
 
             foreach (GameObject child in children)
             {
-                child.drawFirstPass(effect, transform);
+                child.drawFirstPass(effect, transform, frustum);
             }
         }
 

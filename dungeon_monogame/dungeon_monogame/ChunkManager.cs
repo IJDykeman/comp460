@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace dungeon_monogame
@@ -13,61 +14,79 @@ namespace dungeon_monogame
     class ChunkManager
     {
         ConcurrentDictionary<IntLoc, Chunk> chunks;
-        ConcurrentHashSet<IntLoc> chunkLocationsNeedingRemesh;
-        ConcurrentHashSet<IntLoc> chunkLocationsNeedingBuffersSet;
         public float ambient_light { get; set; }
         private int xmin, xmax, ymin, ymax, zmin, zmax;
-        
 
         public ChunkManager()
         {
             chunks = new ConcurrentDictionary<IntLoc, Chunk>();
-            chunkLocationsNeedingRemesh = new ConcurrentHashSet<IntLoc>();
-            chunkLocationsNeedingBuffersSet = new ConcurrentHashSet<IntLoc>();
 
         }
 
 
+        public bool chunkNeedsMesh(IntLoc chunksLoc)
+        {
+            Chunk c;
+            if(chunks.TryGetValue(chunksLoc, out c))
+            {
+                return !c.readyToDisplay();
+            }
+            return false;
+        }
 
         public void remeshAllSerial(int centeri = 0, int centerj = 0, int centerk = 0)
         {
 
-            IntLoc l;
-            while (chunkLocationsNeedingRemesh.TakeMinInLinearTime(a => (Math.Abs(a.i - centeri) + Math.Abs(a.j - centerj) * 4 + Math.Abs(a.k - centerk)), out l))
-            {
-
-                chunks[l].remeshParallelStep(this, l.toVector3());
-                chunks[l].remeshSerialStep();
-            }
+                foreach (IntLoc l in chunks.Keys)
+                {
+                    chunks[l].remeshParallelStep(this, l.toVector3());
+                }
+            
         }
 
-
-
-        public void remeshAllParallelizeableStep(IntLoc center)
+        public string getReport()
         {
-            center = new IntLoc(TileMap.playerPerspectiveLoc);
-            IntLoc l;
-
-            while (chunkLocationsNeedingRemesh.TakeMinInLinearTime(a => (Math.Abs(a.i - center.i) + Math.Abs(a.j - center.j) + Math.Abs(a.k - center.k)), out l))
-            {
-                chunks[l].remeshParallelStep(this, l.toVector3());
-                chunkLocationsNeedingBuffersSet.Add(l);
-                center = new IntLoc(TileMap.playerPerspectiveLoc);
-            }
+            return "Number of chunks: " + chunks.Count;
         }
 
-        public void remeshAllSerialStep(IntLoc center)
+        public void remeshAllParallelizeableStep(Func<IntLoc, bool> decided)
         {
-            center = new IntLoc(TileMap.playerPerspectiveLoc);
-            IntLoc l;
-            while (chunkLocationsNeedingBuffersSet.TakeMinInLinearTime(a => (Math.Abs(a.i - center.i) + Math.Abs(a.j - center.j) + Math.Abs(a.k - center.k)), out l))
+            /*IntLoc l;
+            while (chunkLocationsNeedingRemesh.TakeMinInLinearTime(a => (Math.Abs(a.i - TileMap.playerPerspectiveLoc.X) 
+                                                                                + Math.Abs(a.j - TileMap.playerPerspectiveLoc.Y) * 5 
+                                                                                + Math.Abs(a.k - TileMap.playerPerspectiveLoc.Z)), out l))
             {
-                chunks[l].remeshSerialStep();
-                center = new IntLoc(TileMap.playerPerspectiveLoc);
+                float d = IntLoc.EuclideanDistance(l, new IntLoc(TileMap.playerPerspectiveLoc));
+                if (d < TileMap.alwaysMeshWithinRange)
+                {
+                    chunks[l].remeshParallelStep(this, l.toVector3());
+                }
+                else
+                {
+                    chunkLocationsNeedingRemesh.Add(l);
+                }
+            }*/
+            IntLoc centerTilePos = new IntLoc(TileMap.playerPerspectiveLoc);
+            IntLoc toMeshTileLoc;
+            foreach (IntLoc BFSloc in Globals.gridBFS(TileMap.decideTilesWithinWidth))
+            {
+                toMeshTileLoc = new IntLoc(-TileMap.decideTilesWithinWidth / 2) + BFSloc + centerTilePos;
+                if (decided(toMeshTileLoc))
+                {
+                    IntLoc ToMeshChunkLoc = locToChunkLoc(toMeshTileLoc * WorldGenParamaters.tileWidth);
+                    chunks[ToMeshChunkLoc].remeshParallelStep(this, ToMeshChunkLoc.toVector3());
+                    break;
+
+                }
+
             }
         }
 
-
+        public void remesh(ChunkManager m, IntLoc chunksLoc)
+        {
+            chunks[chunksLoc].remeshParallelStep(m, chunksLoc.toVector3());
+        }
+        
 
         public bool solid(IntLoc l)
         {
@@ -100,10 +119,7 @@ namespace dungeon_monogame
             Chunk c = chunks[chunkLoc];
             IntLoc setLoc = loc % Chunk.chunkWidth;
             c.setBlock(setLoc, val);
-            if (!chunkLocationsNeedingRemesh.Contains(chunkLoc))
-            {
-                chunkLocationsNeedingRemesh.Add(chunkLoc);
-            }
+
         }
 
         public void setExtents(int _xmin, int _xmax, int _ymin, int _ymax, int _zmin, int _zmax)
@@ -130,7 +146,7 @@ namespace dungeon_monogame
                 (zmax - zmin) + 1);
         }
 
-        private IntLoc locToChunkLoc(IntLoc l)
+        public static IntLoc locToChunkLoc(IntLoc l)
         {
             return l - (l % Chunk.chunkWidth);
         }
@@ -140,10 +156,13 @@ namespace dungeon_monogame
             return chunks.ContainsKey(locToChunkLoc(loc));
         }
 
-        public void draw(Effect effect, Matrix transform, Color emission)
+        public void draw(Effect effect, Matrix transform, Color emission, BoundingFrustum frustum)
         {
             foreach (KeyValuePair<IntLoc, Chunk> p in chunks)
             {
+                IntLoc loc = p.Key;
+
+
                 
                 Matrix oldWorldMat = effect.Parameters["xWorld"].GetValueMatrix();
                 Chunk c = p.Value;
@@ -151,25 +170,47 @@ namespace dungeon_monogame
                 {
                     continue;
                 }
-                IntLoc loc = p.Key;
-                Game1.graphics.GraphicsDevice.Indices = c.indexBuffer;
-                Game1.graphics.GraphicsDevice.SetVertexBuffer(c.vertexBuffer);
+                //Game1.graphics.GraphicsDevice.Indices = c.indexBuffer;
+                //Game1.graphics.GraphicsDevice.SetVertexBuffer(c.vertexBuffer);
                 Game1.graphics.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
-                
-                effect.Parameters["xWorld"].SetValue(Matrix.Multiply(oldWorldMat, Matrix.CreateTranslation(loc.toVector3()) * transform));
-                //effect.Parameters["xAmbient"].SetValue(ambient_light);
-                //effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
-                effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
 
-                foreach (var pass in effect.CurrentTechnique.Passes)
+                Matrix worldMatrix = Matrix.Multiply(oldWorldMat, Matrix.CreateTranslation(loc.toVector3()) * transform);
+                effect.Parameters["xWorld"].SetValue(worldMatrix);
+
+                BoundingBox box = new BoundingBox(Vector3.Transform(new Vector3(), worldMatrix), 
+                                                    Vector3.Transform( Vector3.One * Chunk.chunkWidth, worldMatrix));
+
+                if (frustum.Intersects(box))
                 {
-                    pass.Apply();
-                    Game1.graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
-                        c.indexBuffer.IndexCount / 3);
+
+
+                    //effect.Parameters["xAmbient"].SetValue(ambient_light);
+                    //effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
+                    effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
+
+                    foreach (var pass in effect.CurrentTechnique.Passes)
+                    {
+                        pass.Apply();
+                        //Game1.graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
+                        //    c.indexBuffer.IndexCount / 3);
+                        Game1.graphics.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, c.vertices, 0,
+                            c.vertices.Length, c.indices, 0, c.indices.Length / 3);
+
+                    }
                 }
                 effect.Parameters["xWorld"].SetValue(oldWorldMat);
             }
         }
 
+        public void unmeshOutsideRange()
+        {
+            foreach (IntLoc l in chunks.Keys)
+            {
+                if(IntLoc.EuclideanDistance(l, new IntLoc(TileMap.playerPerspectiveLoc)) > TileMap.alwaysUnmeshOutsideRange)
+                {
+                    chunks[l].forgetMesh();
+                }
+            }
+        }
     }
 }
