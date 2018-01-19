@@ -171,7 +171,15 @@ namespace dungeon_monogame
             List<int> colorIndices = data.Item3;
             Color[] colors = data.Item2;
             Tuple<int, int, int, int, int, int> extents = data.Item4;
-            Block[,,] blocks= new Block[extents.Item2 - extents.Item1 + 1,extents.Item4-extents.Item3 + 1, extents.Item6-extents.Item5+1];
+            Block[,,] blocks;
+            if (path.Contains("\\tiles"))
+            {
+                blocks = new Block[WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth];
+            }
+            else
+            {
+                blocks = new Block[extents.Item2 - extents.Item1 + 1, extents.Item4 - extents.Item3 + 1, extents.Item6 - extents.Item5 + 1];
+            }
             for (int i = 0; i < blockLocs.Count; i++)
             {
                 blocks[blockLocs[i].i, blockLocs[i].j,blockLocs[i].k] = new Block(1, colors[colorIndices[i]]);

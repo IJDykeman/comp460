@@ -47,13 +47,17 @@ namespace dungeon_monogame
 
         public Block getBlock(IntLoc loc)
         {
+
             return blocks[loc.i, loc.j, loc.k];
         }
 
         public void setBlock(IntLoc loc, Block val)
         {
-            blocks[loc.i, loc.j, loc.k] = val;
-            meshValid = false;
+            lock (this)
+            {
+                blocks[loc.i, loc.j, loc.k] = val;
+                meshValid = false;
+            }
         }
 
         public bool withinBounds(IntLoc loc)
