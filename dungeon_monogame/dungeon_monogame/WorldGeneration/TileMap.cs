@@ -10,6 +10,9 @@ namespace dungeon_monogame.WorldGeneration
 {
     class TileMap
     {
+        public static int decideTilesWithinWidth = 12;
+        public static int alwaysMeshWithinRange = decideTilesWithinWidth * WorldGenParamaters.tileWidth / 2;
+        public static int alwaysUnmeshOutsideRange = (int)(alwaysMeshWithinRange * 1.5);
         System.Collections.Concurrent.ConcurrentDictionary<IntLoc, ProbabilityDistribution> distributions;
         Dictionary<IntLoc, int> tilesDecided;
 
@@ -193,9 +196,7 @@ namespace dungeon_monogame.WorldGeneration
         {
                 decideAround();
         }
-        public static int decideTilesWithinWidth = 12;
-        public static int alwaysMeshWithinRange = decideTilesWithinWidth * WorldGenParamaters.tileWidth / 2;
-        public static int alwaysUnmeshOutsideRange = (int)(alwaysMeshWithinRange * 1.5);
+
 
         public void unmeshFarawayTiles()
         {
