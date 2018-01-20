@@ -62,7 +62,7 @@ namespace dungeon_monogame
             //graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
 
             createGBufferEffect.CurrentTechnique = createGBufferEffect.Techniques["RenderGBuffer"];
