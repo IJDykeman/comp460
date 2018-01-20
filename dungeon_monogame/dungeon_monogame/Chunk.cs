@@ -18,7 +18,7 @@ namespace dungeon_monogame
         //public short[] indices; //having this be a short could be causing the chunk complexity limit issue
         public VertexPostitionColorPaintNormal[] vertices;
         public int[] indices;
-        bool meshValid = false;
+        bool meshReflectsBlocks = false;
 
         private static readonly Vector3[] probes = new Vector3[]{
                 new Vector3(.5f, .5f, .5f),
@@ -27,6 +27,10 @@ namespace dungeon_monogame
                 new Vector3(.5f, -.5f, -.5f)
             };
 
+        public bool needsRemesh()
+        {
+            return !meshReflectsBlocks;
+        }
 
         public Chunk()
         {
@@ -56,7 +60,7 @@ namespace dungeon_monogame
             lock (this)
             {
                 blocks[loc.i, loc.j, loc.k] = val;
-                meshValid = false;
+                meshReflectsBlocks = false;
             }
         }
 
@@ -98,7 +102,7 @@ namespace dungeon_monogame
         {
             lock (this)
             {
-                if (readyToDisplay())
+                if (!needsRemesh())
                 {
                     return;
                 }
@@ -118,7 +122,7 @@ namespace dungeon_monogame
                     indices[i / 4 * 6 + 4] = (int)(i + 3);
                     indices[i / 4 * 6 + 5] = (int)(i + 2);
                 }
-                meshValid = true;
+                meshReflectsBlocks = true;
             }
 
         }
@@ -168,9 +172,9 @@ namespace dungeon_monogame
             return result;
         }
 
-        public bool readyToDisplay()
+        public bool readyToDraw()
         {
-            return meshValid;
+            return vertices != null;
         }
 
         void populateXYFace(VertexPostitionColorPaintNormal[] vertices)
@@ -244,7 +248,7 @@ namespace dungeon_monogame
             {
                 vertices = null;
                 indices = null;
-                meshValid = false;
+                meshReflectsBlocks = false;
             }
         }
     }
