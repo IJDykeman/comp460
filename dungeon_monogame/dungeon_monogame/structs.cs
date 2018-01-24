@@ -146,6 +146,10 @@ namespace dungeon_monogame
             return (float)Math.Sqrt(Math.Pow((a.i - b.i),2) + Math.Pow((a.j - b.j),2) + Math.Pow((a.k - b.k), 2));
         }
 
+        public static int ManhattanDistance(IntLoc l, IntLoc intLoc)
+        {
+            return Math.Abs(l.i - intLoc.i) + Math.Abs(l.j - intLoc.j) + Math.Abs(l.k - intLoc.k);
+        }
     }
 
 

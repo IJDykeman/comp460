@@ -13,7 +13,7 @@ namespace dungeon_monogame
 
     class Chunk
     {
-        public static readonly int chunkWidth = 28;
+        public static readonly int chunkWidth = 14;
         private Block[,,] blocks;
         //public short[] indices; //having this be a short could be causing the chunk complexity limit issue
         public VertexPostitionColorPaintNormal[] vertices;
@@ -109,6 +109,7 @@ namespace dungeon_monogame
                 vertices = getChunkMesh(space, chunkLoc);
                 if (vertices.Length == 0)
                 {
+                    meshReflectsBlocks = true;
                     return;
                 }
 

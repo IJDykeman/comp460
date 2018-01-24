@@ -111,10 +111,12 @@ namespace dungeon_monogame
         public void set(IntLoc loc, Block val)
         {
             IntLoc chunkLoc = locToChunkLoc(loc);
-
-            if (!withinChunk(loc))
+            lock (this)
             {
-                chunks[chunkLoc] = new Chunk();
+                if (!withinChunk(loc))
+                {
+                    chunks[chunkLoc] = new Chunk();
+                }
             }
             Chunk c = chunks[chunkLoc];
             IntLoc setLoc = loc % Chunk.chunkWidth;
@@ -216,7 +218,7 @@ namespace dungeon_monogame
         {
             foreach (IntLoc l in chunks.Keys)
             {
-                if(IntLoc.EuclideanDistance(l, new IntLoc(TileMap.playerPerspectiveLoc)) > TileMap.alwaysUnmeshOutsideRange)
+                if(IntLoc.ManhattanDistance(l, new IntLoc(TileMap.playerPerspectiveLoc)) > TileMap.alwaysUnmeshOutsideRange)
                 {
                     chunks[l].forgetMesh();
                 }

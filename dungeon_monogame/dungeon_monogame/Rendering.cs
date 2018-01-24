@@ -21,7 +21,7 @@ namespace dungeon_monogame
 
         static Effect createGBufferEffect, renderSceneEffect;
         static Vector2 halfPixel;
-        private static float ambientLightLevel = .3f;
+        private static float ambientLightLevel = .7f;
 
         public static void LoadContent(ContentManager Content, GraphicsDeviceManager graphics)
         {
@@ -127,7 +127,7 @@ namespace dungeon_monogame
                 using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
                 {
                     sprite.Begin(depthStencilState: DepthStencilState.None);
-                    sprite.Draw(vignette, new Vector2(0, 0), null, Color.White * .6f, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+                    sprite.Draw(vignette, new Vector2(0, 0), null, Color.Black * .6f, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
                     sprite.End();
                 }
             }

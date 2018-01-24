@@ -47,14 +47,22 @@ namespace dungeon_monogame.WorldGeneration
 
             if (distribution.Sum() == 0)
             {
-                setEvenOdds();
+                ProbabilityDistribution p = new ProbabilityDistribution(k());
+                p.setEvenOdds();
+                return p.sample();
             }
 
-            double r = Globals.random.NextDouble();
+            double power = 27.0 / (Math.Pow(WorldGenParamaters.tileWidth, 3));
+            power = 1.0 / 2;
+            var newVals = distribution.Select(x => Math.Pow(x, power));
+            double[] tempAdjustedDistribution = newVals.ToArray();
+            double sum = newVals.Sum();
+
+            double r = Globals.random.NextDouble() * sum;
             int i = 0;
             while (r > 0)
             {
-                r -= distribution[i];
+                r -= tempAdjustedDistribution[i];
                 if (r <= 0)
                 {
                     return i;
@@ -62,6 +70,11 @@ namespace dungeon_monogame.WorldGeneration
                 i++;
             }
             return k() - 1;
+        }
+
+        internal bool isZero()
+        {
+            return distribution.Sum() == 0;
         }
 
         public int k()
