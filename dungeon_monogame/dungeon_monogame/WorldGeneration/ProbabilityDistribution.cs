@@ -9,6 +9,7 @@ namespace dungeon_monogame.WorldGeneration
     class ProbabilityDistribution
     {
         double[] distribution;
+        double entropyCached;
 
         public ProbabilityDistribution(int k)
         {
@@ -31,9 +32,21 @@ namespace dungeon_monogame.WorldGeneration
             //normalize();
         }
 
+        void updateEntropy()
+        {
+            if (distribution.Sum() == 0)
+            {
+                entropyCached = 1000000;
+            }
+            else
+            {
+                entropyCached = distribution.Select(num => -num * Math.Log(num + .0001)).Sum();
+            }
+        }
+
         public double entropy()
         {
-            return distribution.Select(num => num * Math.Log(num + .0001)).Sum();
+            return entropyCached;
         }
 
         public int argmax()
@@ -53,7 +66,7 @@ namespace dungeon_monogame.WorldGeneration
             }
 
             double power = 27.0 / (Math.Pow(WorldGenParamaters.tileWidth, 3));
-            power = 1.0 / 2;
+            //power = 1.0 / 10;
             var newVals = distribution.Select(x => Math.Pow(x, power));
             double[] tempAdjustedDistribution = newVals.ToArray();
             double sum = newVals.Sum();
@@ -92,6 +105,14 @@ namespace dungeon_monogame.WorldGeneration
 
         public void normalize()
         {
+            /*
+            for (int i = 0; i < distribution.Length; i++)
+            {
+                if (distribution[i] > 0)
+                {
+                    distribution[i] = 1;
+                }
+            }*/
             double s = distribution.Sum();
             if (s != 0)
             {
@@ -100,12 +121,14 @@ namespace dungeon_monogame.WorldGeneration
                     distribution[i] /= s;
                 }
             }
+            updateEntropy();
         }
 
         public static ProbabilityDistribution oneHot(int length, int hot)
         {
             ProbabilityDistribution result = new ProbabilityDistribution(length);
             result.set(hot, 1.0);
+            result.normalize();
             return result;
         }
 
@@ -113,6 +136,7 @@ namespace dungeon_monogame.WorldGeneration
         {
             ProbabilityDistribution result = new ProbabilityDistribution(length);
             result.setEvenOdds();
+            result.normalize();
             return result;
         }
 
@@ -135,7 +159,24 @@ namespace dungeon_monogame.WorldGeneration
             {
                 result.distribution[i] = a.distribution[i] * b.distribution[i];
             }
-            //result.normalize();
+            result.normalize();
+            return result;
+        }
+
+        public static ProbabilityDistribution operator /(ProbabilityDistribution a, ProbabilityDistribution b)
+        {
+            ProbabilityDistribution result = new ProbabilityDistribution(a.k());
+            for (int i = 0; i < result.distribution.Length; i++)
+            {
+                if (b.distribution[i] != 0){
+                    result.distribution[i] = a.distribution[i] / b.distribution[i];
+                }
+                else
+                {
+                    result.distribution[i] = 0;
+                }
+            }
+            result.normalize();
             return result;
         }
 

@@ -16,6 +16,7 @@ namespace dungeon_monogame.WorldGeneration
         public static int alwaysUnmeshOutsideRange = (int)(decideTilesWithinWidth * 1.2 / WorldGenParamaters.tileWidth * Chunk.chunkWidth * Chunk.chunkWidth);
         System.Collections.Concurrent.ConcurrentDictionary<IntLoc, ProbabilityDistribution> distributions;
         Dictionary<IntLoc, int> tilesDecided;
+        static double undecidedEntropy;
 
         ConcurrentQueue<IntLoc> meshingQueue;
 
@@ -29,6 +30,10 @@ namespace dungeon_monogame.WorldGeneration
             tilesDecided = new Dictionary<IntLoc, int>();
             meshingQueue = new ConcurrentQueue<IntLoc>();
             tileSet = _tiles;
+            undecidedEntropy = ProbabilityDistribution.evenOdds(tileSet.size()).entropy();
+
+            double a = ProbabilityDistribution.evenOdds(tileSet.size()).entropy();
+            double b = ProbabilityDistribution.oneHot(tileSet.size(),1).entropy();
         }
 
         public void placeTile(IntLoc tileSpacePos, int tileIndex, ChunkManager m)
@@ -40,10 +45,7 @@ namespace dungeon_monogame.WorldGeneration
             {
                 multiplyInSphere(sphere, tileSpacePos);
             }
-            else
-            {
 
-            }
 
             tileSpacePos = placeBlocksFromTile(tileSpacePos, m, tile);
         }
@@ -72,7 +74,39 @@ namespace dungeon_monogame.WorldGeneration
             ProbabilityDistribution d = getDistributionAt(tileSpaceLoc);
             int tileIndex = d.sample();
             tilesDecided[tileSpaceLoc] = tileIndex;
+
             placeTile(tileSpaceLoc, tileIndex, m);
+
+            ProbabilityDistribution _;
+            distributions.TryRemove(tileSpaceLoc, out _);
+        }
+
+
+        private void undecideAround(IntLoc center, int width)
+        {
+            List<IntLoc> locs = Globals.gridBFS(width);
+            foreach (IntLoc l in locs)
+            {
+                IntLoc tileSpaceLoc = center + l - new IntLoc(width / 2);
+                if (decided(tileSpaceLoc))
+                {
+                    tilesDecided.Remove(tileSpaceLoc);
+                }
+
+            }
+
+            int recalcWidth = width + WorldGenParamaters.sphereWidth;
+            List<IntLoc> recalcDisLocs = Globals.gridBFS(recalcWidth);
+            foreach (IntLoc l in recalcDisLocs)
+            {
+                IntLoc tileSpaceLoc = center + l - new IntLoc(recalcWidth / 2);
+                if (!decided(tileSpaceLoc))
+                {
+                    distributions[tileSpaceLoc] = calculateDistributionAt(tileSpaceLoc);
+                }
+            }
+
+
         }
 
         private bool decided(IntLoc loc)
@@ -99,8 +133,6 @@ namespace dungeon_monogame.WorldGeneration
 
         public void multiplyInSphere(Sphere sphere, IntLoc center)
         {
-            //Parallel.For(0, WorldGenParamaters.sphereWidth, i =>
-            //{
             for (int i = 0; i < WorldGenParamaters.sphereWidth; i++)
             {
                 for (int j = 0; j < WorldGenParamaters.sphereWidth; j++)
@@ -108,13 +140,38 @@ namespace dungeon_monogame.WorldGeneration
                     for (int k = 0; k < WorldGenParamaters.sphereWidth; k++)
                     {
                         IntLoc location = new IntLoc(i, j, k) + center - new IntLoc(WorldGenParamaters.sphereWidth / 2);
-                        ProbabilityDistribution d = getDistributionAt(location) * sphere.get(i, j, k);
-                        setDistributionAt(location, d);
+                        if (!decided(location))
+                        {
+                            ProbabilityDistribution d = getDistributionAt(location) * sphere.get(i, j, k);
+                            setDistributionAt(location, d);
+                        }
                     }
                 }
-                //});
             }
         }
+
+        public ProbabilityDistribution calculateDistributionAt(IntLoc center)
+        {
+            ProbabilityDistribution result = ProbabilityDistribution.evenOdds(tileSet.size());
+            for (int i = 0; i < WorldGenParamaters.sphereWidth; i++)
+            {
+                for (int j = 0; j < WorldGenParamaters.sphereWidth; j++)
+                {
+                    for (int k = 0; k < WorldGenParamaters.sphereWidth; k++)
+                    {
+                        IntLoc locationOfOtherSphereCenter = new IntLoc(i, j, k) + center - new IntLoc(WorldGenParamaters.sphereWidth / 2);
+                        if (decided(locationOfOtherSphereCenter))
+                        {
+
+                            IntLoc otherSphereIndex = (center - locationOfOtherSphereCenter) + new IntLoc(WorldGenParamaters.sphereWidth / 2);
+                            result = tileSet.getSphere(tilesDecided[locationOfOtherSphereCenter]).get(otherSphereIndex.i, otherSphereIndex.j, otherSphereIndex.k) * result;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
 
         private IntLoc lowestEntropyUndecidedLocation()
         {
@@ -138,21 +195,6 @@ namespace dungeon_monogame.WorldGeneration
             decide(toPlace);
         }
 
-        public void update()
-        {
-            /*IntLoc i;
-            while (meshingQueue.TryDequeue(out i))
-            {
-                //clear queue
-            }
-            foreach (IntLoc BFSloc in Globals.gridBFS(TileMap.decideTilesWithinWidth))//.OrderBy(a=>Globals.random.Next()))
-            {
-                meshingQueue.Enqueue(BFSloc);
-            }*/
-            //meshingQueue
-            
-
-        }
 
         public ConcurrentQueue<IntLoc> getQueueFromBFS(int width)
         {
@@ -168,7 +210,7 @@ namespace dungeon_monogame.WorldGeneration
         {
             m = new ChunkManager();
             decide(new IntLoc(0));
-            int width = 3;
+            int width = 5;
             foreach (IntLoc l in Globals.gridBFS(width))
             {
                 IntLoc toDecide = new IntLoc(-width / 2) + l;
@@ -237,34 +279,44 @@ namespace dungeon_monogame.WorldGeneration
 
 
             }
-
         }
 
         public void decideAroundPlayer()
         {
-            ConcurrentQueue<IntLoc> decidingQueue = getQueueFromBFS(decideTilesWithinWidth);
 
+            ConcurrentQueue<IntLoc> decidingQueue = getQueueFromBFS(decideTilesWithinWidth);
+            List<IntLoc> tileLocsToDecide = new List<IntLoc>();
             IntLoc toDecideLoc;
             IntLoc tileSpacePos = new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth);
-            bool decidedOne = false;
             IntLoc l;
-            while(decidingQueue.TryDequeue(out l))
+            while (decidingQueue.TryDequeue(out l))
             {
                 toDecideLoc = new IntLoc(-decideTilesWithinWidth / 2) + l + tileSpacePos;
-                if (!decided(toDecideLoc))
+                if (!decided(toDecideLoc) && distributions.ContainsKey(toDecideLoc))
                 {
-                    //tileLocsToDecide.Add(toDecideLoc);
-                    decide(toDecideLoc);
-                    decidedOne = true;
+                    tileLocsToDecide.Add(toDecideLoc);
                 }
             }
-            if (!decidedOne)
+            //tileLocsToDecide = tileLocsToDecide.OrderBy(a => IntLoc.EuclideanDistance(a,new IntLoc(playerPerspectiveLoc))).ToList();
+            //tileLocsToDecide = tileLocsToDecide.OrderBy(a => distributions[a].entropy()).Take(10).ToList();
+            //tileLocsToDecide = tileLocsToDecide.Take(50).ToList();
+            while (tileLocsToDecide.Count > 0)
             {
-                //Thread.Sleep(1);
+                IntLoc toDecide = tileLocsToDecide[0];
+                //IntLoc toDecide = tileLocsToDecide.Find(b => distributions[b].entropy() == tileLocsToDecide.Min(a => distributions[a].entropy()));
+                //IntLoc toDecide = lowestEntropyUndecidedLocation();
+                if (distributions[toDecide].isZero())
+                {
+                    undecideAround(toDecide, 2);
+                }
+                else
+                {
+                    decide(toDecide);
+                }
+                tileLocsToDecide.Remove(toDecide);
+                //break;
+
             }
-
-
-
         }
 
         public void notifyOfPlayerLocation(Vector3 l)

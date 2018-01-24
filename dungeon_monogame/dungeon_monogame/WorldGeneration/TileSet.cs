@@ -21,9 +21,16 @@ namespace dungeon_monogame.WorldGeneration
             List<Tile> tilesList = new List<Tile>();
             for (int i=0;i<files.Length; i++){
                 tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])));
-                tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90());
-                tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90().getRotated90());
-                tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90().getRotated90().getRotated90());
+                if (!files[i].Contains("norotation"))
+                {
+                    tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90());
+                    tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90().getRotated90());
+                    tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90().getRotated90().getRotated90());
+                }
+                else
+                {
+
+                }
             }
             tiles = tilesList.ToArray();
             buildTransitionMatrices();

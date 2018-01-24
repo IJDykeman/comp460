@@ -68,18 +68,18 @@ namespace dungeon_monogame.WorldGeneration
         {
             double[] mRow;
             Double[] resultMatrix = new Double[v.Length];
-            for (int i = 0; i < m1._matrix.Length; i++)
-            {
-            //Parallel.For(0, m1._matrix.Length, i =>
-             //{
+            //for (int i = 0; i < m1._matrix.Length; i++)
+           // {
+            Parallel.For(0, m1._matrix.Length, i =>
+             {
                  mRow = m1._matrix[i];
                  resultMatrix[i] = 0;
                  for (int j = 0; j < mRow.Length; j++)
                  {
                      resultMatrix[i] += mRow[j] * v[j];
                  }
-             //});
-            }
+             });
+            //}
             return resultMatrix;
         }
 
