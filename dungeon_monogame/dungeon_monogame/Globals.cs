@@ -11,11 +11,19 @@ namespace dungeon_monogame
 {
     static class Globals
     {
-        public static Random random = new Random();
+        static int seed = new Random().Next();
+        public static Random random = new Random(seed);
+        
         static ConcurrentDictionary<int, List<IntLoc>> BFScache= new ConcurrentDictionary<int, List<IntLoc>>();
+
+        public static int getSeed()
+        {
+            return seed;
+        }
 
         public static int mod(int x, int m)
         {
+            
             return (x % m + m) % m;
         }
 

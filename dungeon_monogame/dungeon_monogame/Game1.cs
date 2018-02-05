@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -62,6 +63,7 @@ namespace dungeon_monogame
             landscape.addChild(player.getActor());
             landscape.addChild(new Monster(new Vector3(12, 20, 12)));
             //landscape.addChild(new GameObject(map.getManager(), new Vector3(1,2,1), Vector3.One * .2f));
+            Console.WriteLine("global seed is " + Globals.getSeed().ToString());
             
         }
 
