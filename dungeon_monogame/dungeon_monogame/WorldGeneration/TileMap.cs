@@ -196,12 +196,12 @@ namespace dungeon_monogame.WorldGeneration
             }
             double lowest = 10000000;
             IntLoc best = new IntLoc();
-            for (int i = 0;i<20;i++)
+            for (int i = 0;i<100;i++)
             {
                 IntLoc loc = toChooseFrom.ElementAt(Globals.random.Next(0, toChooseFrom.Count));
                 //double e = distributions[loc].entropy()
                 float distance = IntLoc.EuclideanDistance(loc, center / WorldGenParamaters.tileWidth);
-                double e = distributions[loc].entropy();//+ Math.Pow((IntLoc.EuclideanDistance(loc, center / WorldGenParamaters.tileWidth)) * .1f, 2);
+                double e = distributions[loc].entropy() + Math.Pow((IntLoc.EuclideanDistance(loc, center / WorldGenParamaters.tileWidth)) * .0001f, 1);
                 if (e < lowest)
                 {
                     lowest = e;
@@ -351,7 +351,7 @@ namespace dungeon_monogame.WorldGeneration
             HashSet<IntLoc> close = new HashSet<IntLoc>(distributions.Keys.Where(
                             x => IntLoc.EuclideanDistance(x, new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth)) < radius_in_tiles).ToList());
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 50; i++)
             {
                 if (close.Count > 0)
                 {
@@ -359,7 +359,7 @@ namespace dungeon_monogame.WorldGeneration
                     close.Remove(toDecide);
                     if (distributions[toDecide].isZero())
                     {
-                        undecideAround(toDecide, 2);
+                        undecideAround(toDecide, 3);
                     }
                     else
                     {
