@@ -16,6 +16,7 @@ namespace dungeon_monogame
         private Vector3 instantaneuousMovement;
         private bool currentlyOnGround = false;
         protected float gravityFactor = 1.0f;
+        protected bool collidesWithWorld = true;
         public float bounciness = 0;
 
 
@@ -26,8 +27,15 @@ namespace dungeon_monogame
         public Actor(AABB aabb)
         {
             this.aabb = aabb;
-
         }
+
+        public Actor(AABB aabb, bool collides, float _gravityFactor)
+        {
+            this.aabb = aabb;
+            collidesWithWorld = collides;
+            gravityFactor = _gravityFactor;
+        }
+
 
         public void physicsUpdate(GameTime time, ChunkManager space)
         {
@@ -37,7 +45,14 @@ namespace dungeon_monogame
             this.velocity.Y -= Globals.G * deltaTime * gravityFactor;
             Vector3 desiredMovement = deltaTime * this.velocity +instantaneuousMovement * deltaTime;
 
-            setLocation(collide(space, desiredMovement));
+            if (collidesWithWorld)
+            {
+                setLocation(collide(space, desiredMovement));
+            }
+            else
+            {
+                setLocation(desiredMovement + getLocation());
+            }
             
         }
 

@@ -21,7 +21,7 @@ namespace dungeon_monogame
 
         static Effect createGBufferEffect, renderSceneEffect;
         static Vector2 halfPixel;
-        private static float ambientLightLevel = .7f;
+        private static float ambientLightLevel = 1.7f;
 
         public static void LoadContent(ContentManager Content, GraphicsDeviceManager graphics)
         {

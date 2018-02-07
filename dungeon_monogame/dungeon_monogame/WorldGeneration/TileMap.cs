@@ -11,7 +11,7 @@ namespace dungeon_monogame.WorldGeneration
 {
     class TileMap
     {
-        public static int decideTilesWithinWidth = 10;
+        public static int decideTilesWithinWidth = 15;
         public static int alwaysMeshWithinRange = (int)(.8*decideTilesWithinWidth * WorldGenParamaters.tileWidth / Chunk.chunkWidth);
         public static int alwaysUnmeshOutsideRange = (int)(decideTilesWithinWidth * 1.2 / WorldGenParamaters.tileWidth * Chunk.chunkWidth * Chunk.chunkWidth);
         System.Collections.Concurrent.ConcurrentDictionary<IntLoc, ProbabilityDistribution> distributions;
@@ -190,13 +190,13 @@ namespace dungeon_monogame.WorldGeneration
         }
 
 
-        private IntLoc approximatelyBestUndecidedLocation(IntLoc center, HashSet<IntLoc> toChooseFrom)
+        private IntLoc approximatelyBestUndecidedLocation(IntLoc center, List<IntLoc> toChooseFrom)
         {
             if (toChooseFrom.Count == 0) {
             }
             double lowest = 10000000;
             IntLoc best = new IntLoc();
-            for (int i = 0;i<100;i++)
+            for (int i = 0;i<200;i++)
             {
                 IntLoc loc = toChooseFrom.ElementAt(Globals.random.Next(0, toChooseFrom.Count));
                 //double e = distributions[loc].entropy()
@@ -305,8 +305,8 @@ namespace dungeon_monogame.WorldGeneration
 
         public void decideAroundPlayer()
         {
-            decideAroundBySampling(3);
-            decideAroundBySampling(7);
+            //decideAroundBySampling(3);
+            //decideAroundBySampling(7);
             decideAroundBySampling(decideTilesWithinWidth);
 
             return;
@@ -348,14 +348,21 @@ namespace dungeon_monogame.WorldGeneration
 
         private void decideAroundBySampling(int radius_in_tiles)
         {
-            HashSet<IntLoc> close = new HashSet<IntLoc>(distributions.Keys.Where(
-                            x => IntLoc.EuclideanDistance(x, new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth)) < radius_in_tiles).ToList());
+            IntLoc center = new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth);
+            //double e = 
 
-            for (int i = 0; i < 50; i++)
+            List<IntLoc> close = new List<IntLoc>(distributions.Keys.Where(
+                            x => IntLoc.EuclideanDistance(x, new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth)) < radius_in_tiles));
+
+            close = close.OrderBy(x => distributions[x].entropy() + Math.Pow((IntLoc.EuclideanDistance(x, center)) * .0f, 1)).Take(10).ToList();
+            
+
+            for (int i = 0; i < 10; i++)
             {
                 if (close.Count > 0)
                 {
-                    IntLoc toDecide = approximatelyBestUndecidedLocation(new IntLoc(playerPerspectiveLoc), close);
+                    //IntLoc toDecide = approximatelyBestUndecidedLocation(new IntLoc(playerPerspectiveLoc), close);
+                    IntLoc toDecide = close[0];
                     close.Remove(toDecide);
                     if (distributions[toDecide].isZero())
                     {
@@ -372,7 +379,8 @@ namespace dungeon_monogame.WorldGeneration
 
         public void notifyOfPlayerLocation(Vector3 l)
         {
-            TileMap.playerPerspectiveLoc = l;
+            TileMap.playerPerspectiveLoc = new Vector3();
+            //TileMap.playerPerspectiveLoc = l;
         }
     }
 }

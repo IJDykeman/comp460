@@ -21,7 +21,7 @@ namespace dungeon_monogame
         private KeyboardState oldKeyboardState;
         private float upDownRot = -2;
         private float leftRightRot = 0;
-        float speed = 10f;
+        float speed = 20f;
         float height = 3.2f;
         float width = 1.5f;
         private bool flying = false;
@@ -30,7 +30,7 @@ namespace dungeon_monogame
         public Player()
         {
             Vector3 cameraPosition = new Vector3(7,5,7);
-            playerActor = new Actor(new AABB(height, width, width));
+            playerActor = new Actor(new AABB(height, width, width), false, 0f);
 
             playerActor.setLocation(cameraPosition);
             Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
@@ -79,7 +79,7 @@ namespace dungeon_monogame
             {
                 if (flying)
                 {
-                    playerActor.addVelocity(Vector3.UnitY * speed);
+                    movement += (Vector3.UnitY * speed);
                     //velocity += ;
                 }
                 else if (playerActor.isOnGround())
@@ -100,6 +100,11 @@ namespace dungeon_monogame
             if (justHit(Keys.Tab, newState))
             {
                 mouseEngaged = !mouseEngaged;
+            }
+
+            if (justHit(Keys.LeftControl, newState))
+            {
+                flying = !flying;
             }
 
             if (!flying && (movement * new Vector3(1,0,1)).Length() !=0)
