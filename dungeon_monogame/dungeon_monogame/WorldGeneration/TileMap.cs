@@ -32,8 +32,7 @@ namespace dungeon_monogame.WorldGeneration
             tileSet = _tiles;
             undecidedEntropy = ProbabilityDistribution.evenOdds(tileSet.size()).entropy();
 
-            double a = ProbabilityDistribution.evenOdds(tileSet.size()).entropy();
-            double b = ProbabilityDistribution.oneHot(tileSet.size(),1).entropy();
+
         }
 
         public void placeTile(IntLoc tileSpacePos, int tileIndex, ChunkManager m)
@@ -231,6 +230,14 @@ namespace dungeon_monogame.WorldGeneration
         public ChunkManager getManager()
         {
             m = new ChunkManager();
+            for (int i = 0; i < 20; i++)
+            {
+                int x = Globals.random.Next(-decideTilesWithinWidth, decideTilesWithinWidth);
+                int y = Globals.random.Next(-decideTilesWithinWidth, decideTilesWithinWidth);
+                int z = Globals.random.Next(-decideTilesWithinWidth, decideTilesWithinWidth);
+                //placeTile(new IntLoc(x, y, z), 0, m);
+                decide(new IntLoc(x, y, z));
+            }
             decide(new IntLoc(0));
             int width = 4;
             foreach (IntLoc l in Globals.gridBFS(width))
