@@ -58,10 +58,17 @@ namespace dungeon_monogame.WorldGeneration
                     for (int k = 0; k < WorldGenParamaters.tileWidth - 1; k++)
                     {
                         Block b = tile.get(i, j, k);
-                        b.color.R = (byte)MathHelper.Clamp(b.color.R - Globals.random.Next(10), 0, 255);
-                        b.color.G = (byte)MathHelper.Clamp(b.color.G - Globals.random.Next(10), 0, 255);
-                        b.color.B = (byte)MathHelper.Clamp(b.color.B - Globals.random.Next(5), 0, 255);
-                        m.set((tileSpacePos * (WorldGenParamaters.tileWidth - 1)) + new IntLoc(i, j, k), b);
+                        if (b.color.R == 252)
+                        {
+                            continue; // ignore air white
+                        }
+                        else
+                        {
+                            b.color.R = (byte)MathHelper.Clamp(b.color.R - Globals.random.Next(10), 0, 255);
+                            b.color.G = (byte)MathHelper.Clamp(b.color.G - Globals.random.Next(10), 0, 255);
+                            b.color.B = (byte)MathHelper.Clamp(b.color.B - Globals.random.Next(5), 0, 255);
+                            m.set((tileSpacePos * (WorldGenParamaters.tileWidth - 1)) + new IntLoc(i, j, k), b);
+                        }
                     }
                 }
             }
@@ -236,10 +243,22 @@ namespace dungeon_monogame.WorldGeneration
                 int y = Globals.random.Next(-decideTilesWithinWidth, decideTilesWithinWidth);
                 int z = Globals.random.Next(-decideTilesWithinWidth, decideTilesWithinWidth);
                 //placeTile(new IntLoc(x, y, z), 0, m);
-                decide(new IntLoc(x, y, z));
+                //decide(new IntLoc(x, y, z));
             }
-            decide(new IntLoc(0));
-            int width = 4;
+
+            for (int i=0; i < decideTilesWithinWidth * 1.2; i++)
+            {
+                for (int j = 0; j < decideTilesWithinWidth * 1.2; j++)
+                {
+                    for (int k = 0; k < decideTilesWithinWidth * 1.2; k++)
+                    {
+                        m.set(new IntLoc(new Vector3(i, j, k) * WorldGenParamaters.tileWidth + new Vector3(WorldGenParamaters.tileWidth / 2.0f) 
+                            - new Vector3(decideTilesWithinWidth) * WorldGenParamaters.tileWidth / 2f) , new Block(1, 255,0,0));
+                    }
+                }
+            }
+
+            int width = 2;
             foreach (IntLoc l in Globals.gridBFS(width))
             {
                 IntLoc toDecide = new IntLoc(-width / 2) + l;

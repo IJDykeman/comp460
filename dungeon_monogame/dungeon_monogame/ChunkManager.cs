@@ -110,6 +110,7 @@ namespace dungeon_monogame
 
         public void set(IntLoc loc, Block val)
         {
+
             IntLoc chunkLoc = locToChunkLoc(loc);
             lock (this)
             {

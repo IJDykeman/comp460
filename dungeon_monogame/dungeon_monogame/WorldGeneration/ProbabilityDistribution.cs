@@ -65,9 +65,16 @@ namespace dungeon_monogame.WorldGeneration
                 return p.sample();
             }
 
-            double power = 27.0 / (Math.Pow(WorldGenParamaters.tileWidth, 3));
+            double power = 1;// 27.0 / (Math.Pow(WorldGenParamaters.tileWidth, 3));
             //power = 1.0 / 10;
             var newVals = distribution.Select(x => Math.Pow(x, power));
+            /*var newVals = distribution.Select(x => { 
+            if (x > 0f)
+            {
+                return 1.0;
+            }
+            return 0.0; }
+            );*/
             double[] tempAdjustedDistribution = newVals.ToArray();
             double sum = newVals.Sum();
 
