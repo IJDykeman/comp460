@@ -68,6 +68,7 @@ namespace dungeon_monogame.WorldGeneration
             double power = 1;// 27.0 / (Math.Pow(WorldGenParamaters.tileWidth, 3));
             //power = 1.0 / 10;
             var newVals = distribution.Select(x => Math.Pow(x, power));
+
             /*var newVals = distribution.Select(x => { 
             if (x > 0f)
             {

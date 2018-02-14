@@ -246,17 +246,17 @@ namespace dungeon_monogame.WorldGeneration
                 //decide(new IntLoc(x, y, z));
             }
 
-            for (int i=0; i < decideTilesWithinWidth * 1.2; i++)
+            /*for (int i=0; i < decideTilesWithinWidth * 1.2; i++)
             {
                 for (int j = 0; j < decideTilesWithinWidth * 1.2; j++)
                 {
                     for (int k = 0; k < decideTilesWithinWidth * 1.2; k++)
                     {
-                        m.set(new IntLoc(new Vector3(i, j, k) * WorldGenParamaters.tileWidth + new Vector3(WorldGenParamaters.tileWidth / 2.0f) 
-                            - new Vector3(decideTilesWithinWidth) * WorldGenParamaters.tileWidth / 2f) , new Block(1, 255,0,0));
+                        //m.set(new IntLoc(new Vector3(i, j, k) * WorldGenParamaters.tileWidth + new Vector3(WorldGenParamaters.tileWidth / 2.0f) 
+                        //    - new Vector3(decideTilesWithinWidth) * WorldGenParamaters.tileWidth / 2f) , new Block(1, 255,0,0));
                     }
                 }
-            }
+            }*/
 
             int width = 2;
             foreach (IntLoc l in Globals.gridBFS(width))

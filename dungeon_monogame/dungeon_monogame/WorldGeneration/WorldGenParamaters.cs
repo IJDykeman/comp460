@@ -8,8 +8,8 @@ namespace dungeon_monogame.WorldGeneration
 {
     static class WorldGenParamaters
     {
-        public static readonly int tileWidth = 7;
+        public static readonly int tileWidth = 11;
         public static readonly int sphereWidth = 5;
-        public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_biased_towers\";
+        public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_biased_fantasy_towers_11\";
     }
 }
