@@ -11,6 +11,11 @@ namespace dungeon_monogame.WorldGeneration
         double[] distribution;
         double entropyCached;
 
+        public double[] getDistributionCopy()
+        {
+            return distribution.ToArray();
+        }
+
         public ProbabilityDistribution(int k)
         {
             distribution = new double[k];
@@ -41,6 +46,7 @@ namespace dungeon_monogame.WorldGeneration
             else
             {
                 entropyCached = distribution.Select(num => -num * Math.Log(num + .0001)).Sum();
+                //entropyCached = distribution.Select(x => { if (x > 0) { return 1d; } return 0d; }).Sum();
             }
         }
 
@@ -67,15 +73,15 @@ namespace dungeon_monogame.WorldGeneration
 
             double power = 1;// 27.0 / (Math.Pow(WorldGenParamaters.tileWidth, 3));
             //power = 1.0 / 10;
-            var newVals = distribution.Select(x => Math.Pow(x, power));
+            //var newVals = distribution.Select(x => Math.Pow(x, power));
 
-            /*var newVals = distribution.Select(x => { 
+            var newVals = distribution.Select(x => { 
             if (x > 0f)
             {
                 return 1.0;
             }
             return 0.0; }
-            );*/
+            );
             double[] tempAdjustedDistribution = newVals.ToArray();
             double sum = newVals.Sum();
 
@@ -169,6 +175,17 @@ namespace dungeon_monogame.WorldGeneration
             }
             result.normalize();
             return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var p = (ProbabilityDistribution)obj;
+            return Enumerable.SequenceEqual(p.distribution, distribution);
+        }
+
+        public override string ToString()
+        {
+            return distribution.ToString();
         }
 
         public static ProbabilityDistribution operator /(ProbabilityDistribution a, ProbabilityDistribution b)

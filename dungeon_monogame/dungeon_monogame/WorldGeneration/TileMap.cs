@@ -11,7 +11,7 @@ namespace dungeon_monogame.WorldGeneration
 {
     class TileMap
     {
-        public static int decideTilesWithinWidth = 15;
+        public static int decideTilesWithinWidth = 10;
         public static int alwaysMeshWithinRange = (int)(.8*decideTilesWithinWidth * WorldGenParamaters.tileWidth / Chunk.chunkWidth);
         public static int alwaysUnmeshOutsideRange = (int)(decideTilesWithinWidth * 1.2 / WorldGenParamaters.tileWidth * Chunk.chunkWidth * Chunk.chunkWidth);
         System.Collections.Concurrent.ConcurrentDictionary<IntLoc, ProbabilityDistribution> distributions;
@@ -258,7 +258,7 @@ namespace dungeon_monogame.WorldGeneration
                 }
             }*/
 
-            int width = 2;
+            int width = 1;
             foreach (IntLoc l in Globals.gridBFS(width))
             {
                 IntLoc toDecide = new IntLoc(-width / 2) + l;
@@ -380,23 +380,27 @@ namespace dungeon_monogame.WorldGeneration
             List<IntLoc> close = new List<IntLoc>(distributions.Keys.Where(
                             x => IntLoc.EuclideanDistance(x, new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth)) < radius_in_tiles));
 
-            close = close.OrderBy(x => distributions[x].entropy() + Math.Pow((IntLoc.EuclideanDistance(x, center)) * .0f, 1)).Take(10).ToList();
+            close = close.OrderBy(x => distributions[x].entropy()).Take(100).ToList();
             
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; )
             {
                 if (close.Count > 0)
                 {
                     //IntLoc toDecide = approximatelyBestUndecidedLocation(new IntLoc(playerPerspectiveLoc), close);
                     IntLoc toDecide = close[0];
                     close.Remove(toDecide);
-                    if (distributions[toDecide].isZero())
+                    ProbabilityDistribution dist = distributions[toDecide];
+                    if (dist.isZero())
                     {
-                        undecideAround(toDecide, 3);
+                        //undecideAround(toDecide, 3);
+                        //decide(toDecide);
+                        break;
                     }
                     else
                     {
                         decide(toDecide);
+                        i++;
                     }
                 }
 
