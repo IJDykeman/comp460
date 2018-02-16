@@ -380,8 +380,9 @@ namespace dungeon_monogame.WorldGeneration
             List<IntLoc> close = new List<IntLoc>(distributions.Keys.Where(
                             x => IntLoc.EuclideanDistance(x, new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth)) < radius_in_tiles));
 
-            close = close.OrderBy(x => distributions[x].entropy()).Take(100).ToList();
-            
+           // close = close.OrderBy(x => distributions[x].entropy()).Take(100).ToList();
+            close = close.OrderBy(x => x.j).Take(100).ToList();
+
 
             for (int i = 0; i < 1; )
             {
@@ -394,7 +395,7 @@ namespace dungeon_monogame.WorldGeneration
                     if (dist.isZero())
                     {
                         //undecideAround(toDecide, 3);
-                        //decide(toDecide);
+                        decide(toDecide);
                         break;
                     }
                     else
