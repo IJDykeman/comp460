@@ -55,10 +55,13 @@ namespace dungeon_monogame
             //landscapeChunks = MagicaVoxel.ChunkManagerFromVox(@"castleOnHill.vox");
             map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
 
-            landscape = new GameObject(map.getManager(), new Vector3(), Vector3.One);
-            
+            //landscape = new GameObject(map.getManager(), new Vector3(), Vector3.One);
+            ChunkManager landscape_model = MagicaVoxel.ChunkManagerFromVox("test.vox");
+            landscape = new GameObject(landscape_model, new Vector3(), Vector3.One);
+
+
             //landscapeChunks.makeColorfulFloor();
-            
+
             player = new Player();
             landscape.addChild(player.getActor());
             landscape.addChild(new Monster(new Vector3(12, 20, 12)));
@@ -89,8 +92,8 @@ namespace dungeon_monogame
             foreach (Action action in actions){
                 action.act(landscape, gameTime);
             }
-            map.notifyOfPlayerLocation(player.getCameraLocation());
-            map.report();
+            //map.notifyOfPlayerLocation(player.getCameraLocation());
+            //map.report();
             base.Update(gameTime);
         }
 
