@@ -10,8 +10,8 @@ namespace dungeon_monogame.WorldGeneration
     {
         public static readonly int tileWidth = 11;
         public static readonly int sphereWidth = 7;
-        public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_basic_test_11\";
-        //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_biased_fantasy_towers_11\";
+        //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_basic_test_11\";
+        public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_biased_fantasy_towers_11\";
 
     }
 }
