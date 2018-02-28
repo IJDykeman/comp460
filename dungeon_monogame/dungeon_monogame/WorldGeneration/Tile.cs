@@ -22,7 +22,7 @@ namespace dungeon_monogame.WorldGeneration
             {
                 return 1.0;
             }
-            return 0;// 1e-12;
+            return 0; //1e-12;
         }
 
         public static bool match(Tile a, Tile b, int di, int dj, int dl)

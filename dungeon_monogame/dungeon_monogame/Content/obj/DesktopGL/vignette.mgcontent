@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>/Users/Isaac/Desktop/comp460/dungeon_monogame/dungeon_monogame/Content/vignette.png</SourceFile>
-  <SourceTime>2018-01-08T15:26:25-06:00</SourceTime>
-  <DestFile>/Users/Isaac/Desktop/comp460/dungeon_monogame/dungeon_monogame/Content/bin/DesktopGL/vignette.xnb</DestFile>
-  <DestTime>2018-01-08T15:26:53-06:00</DestTime>
+  <SourceFile>C:/Users/Isaac/Desktop/comp460/dungeon_monogame/dungeon_monogame/Content/vignette.png</SourceFile>
+  <SourceTime>2018-01-04T17:59:30.628928-05:00</SourceTime>
+  <DestFile>C:/Users/Isaac/Desktop/comp460/dungeon_monogame/dungeon_monogame/Content/bin/DesktopGL/vignette.xnb</DestFile>
+  <DestTime>2018-02-28T13:21:10.8582915-05:00</DestTime>
   <Importer>TextureImporter</Importer>
-  <ImporterTime>2017-03-01T09:06:24-06:00</ImporterTime>
+  <ImporterTime>2017-03-01T10:05:36-05:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
-  <ProcessorTime>2017-03-01T09:06:24-06:00</ProcessorTime>
+  <ProcessorTime>2017-03-01T10:05:36-05:00</ProcessorTime>
   <Parameters>
     <Key>ColorKeyColor</Key>
     <Value>255,0,255,255</Value>
