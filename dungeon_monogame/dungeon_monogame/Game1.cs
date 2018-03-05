@@ -53,7 +53,7 @@ namespace dungeon_monogame
             // TODO: use this.Content to load your game content here
             Rendering.LoadContent(Content, graphics);
             //landscapeChunks = MagicaVoxel.ChunkManagerFromVox(@"castleOnHill.vox");
-            map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
+            //map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
 
             //landscape = new GameObject(map.getManager(), new Vector3(), Vector3.One);
             ChunkManager landscape_model = MagicaVoxel.ChunkManagerFromVox("test.vox");
