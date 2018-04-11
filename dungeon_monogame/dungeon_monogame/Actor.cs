@@ -36,6 +36,17 @@ namespace dungeon_monogame
             gravityFactor = _gravityFactor;
         }
 
+        public void setGravityFactor(float g)
+        {
+            gravityFactor = g;
+        }
+
+        public void setCollides(bool c)
+        {
+            collidesWithWorld = c;
+        }
+
+
 
         public void physicsUpdate(GameTime time, ChunkManager space)
         {

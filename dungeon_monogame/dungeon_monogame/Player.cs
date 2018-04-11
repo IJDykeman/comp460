@@ -24,7 +24,7 @@ namespace dungeon_monogame
         float speed = 20f;
         float height = 3.2f;
         float width = 1.5f;
-        private bool flying = false;
+        private bool flying = true;
         Light torchLight;
 
         public Player()
@@ -105,6 +105,9 @@ namespace dungeon_monogame
             if (justHit(Keys.LeftControl, newState))
             {
                 flying = !flying;
+                playerActor.setVelocity(Vector3.Zero);
+                playerActor.setGravityFactor(flying ? 0f : 1f);
+                playerActor.setCollides(flying ? false : true);
             }
 
             if (!flying && (movement * new Vector3(1,0,1)).Length() !=0)
