@@ -11,9 +11,9 @@ namespace dungeon_monogame.WorldGeneration
 {
     class TileMap
     {
-        public static int decideTilesWithinWidth = 10;
+        public static int decideTilesWithinWidth = 7;
         public static int alwaysMeshWithinRange = (int)(.8*decideTilesWithinWidth * WorldGenParamaters.tileWidth / Chunk.chunkWidth);
-        public static int alwaysUnmeshOutsideRange = (int)(decideTilesWithinWidth * 1.2 / WorldGenParamaters.tileWidth * Chunk.chunkWidth * Chunk.chunkWidth);
+        public static int alwaysUnmeshOutsideRange = (int)(decideTilesWithinWidth * 1.5 / WorldGenParamaters.tileWidth * Chunk.chunkWidth * Chunk.chunkWidth);
         System.Collections.Concurrent.ConcurrentDictionary<IntLoc, ProbabilityDistribution> distributions;
         Dictionary<IntLoc, int> tilesDecided;
         static double undecidedEntropy;
@@ -45,8 +45,7 @@ namespace dungeon_monogame.WorldGeneration
                 multiplyInSphere(sphere, tileSpacePos);
             }
 
-
-            tileSpacePos = placeBlocksFromTile(tileSpacePos, m, tile);
+            placeBlocksFromTile(tileSpacePos, m, tile);
         }
 
         private static IntLoc placeBlocksFromTile(IntLoc tileSpacePos, ChunkManager m, Tile tile)
@@ -237,7 +236,7 @@ namespace dungeon_monogame.WorldGeneration
         public ChunkManager getManager()
         {
             m = new ChunkManager();
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 1; i++)
             {
                 int x = Globals.random.Next(-decideTilesWithinWidth, decideTilesWithinWidth);
                 int y = Globals.random.Next(-decideTilesWithinWidth, decideTilesWithinWidth);
@@ -291,6 +290,7 @@ namespace dungeon_monogame.WorldGeneration
                     decideAroundPlayer();
                     remeshAroundPlayer();
                     m.unmeshOutsideRange();
+                   //Console.WriteLine("completed an iteration of deciding and meshing");
                 }
             }).Start();
             
@@ -310,29 +310,27 @@ namespace dungeon_monogame.WorldGeneration
         void remeshAroundPlayer()
         {
             int meshRadius = alwaysMeshWithinRange;
-            ConcurrentQueue<IntLoc> meshingQueue = getQueueFromBFS(meshRadius * 2);
+            ConcurrentQueue<IntLoc> chunksNearPlayer = getQueueFromBFS(meshRadius * 2);
             //m.remeshAllParallelizeableStep(decided);
             IntLoc centerChunkPos = new IntLoc(TileMap.playerPerspectiveLoc / Chunk.chunkWidth);
             IntLoc toMeshChunkLoc;
 
             IntLoc BFSloc;
-            while (meshingQueue.TryDequeue(out BFSloc))
+            while (chunksNearPlayer.TryDequeue(out BFSloc))
             {
                 toMeshChunkLoc = (BFSloc + centerChunkPos - new IntLoc(meshRadius)) * Chunk.chunkWidth;
                 if (m.chunkNeedsMesh(toMeshChunkLoc))
                 {
                     m.remesh(m, toMeshChunkLoc);
+                    Console.WriteLine("remeshing a chunk near " + centerChunkPos);
                 }
-
-
 
             }
         }
 
         public void decideAroundPlayer()
         {
-            //decideAroundBySampling(3);
-            //decideAroundBySampling(7);
+
             decideAroundBySampling(decideTilesWithinWidth);
 
             return;
@@ -371,47 +369,32 @@ namespace dungeon_monogame.WorldGeneration
 
             }
         }
-
         private void decideAroundBySampling(int radius_in_tiles)
         {
-            IntLoc center = new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth);
-            //double e = 
 
-            List<IntLoc> close = new List<IntLoc>(distributions.Keys.Where(
+            IntLoc center = new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth);
+            Console.WriteLine("deciding around " + playerPerspectiveLoc);
+
+            List<IntLoc> locationsToDecide = new List<IntLoc>(distributions.Keys.Where(
                             x => IntLoc.EuclideanDistance(x, new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth)) < radius_in_tiles));
 
-           // close = close.OrderBy(x => distributions[x].entropy()).Take(100).ToList();
-            close = close.OrderBy(x => x.j).Take(100).ToList();
-
-
-            for (int i = 0; i < 1; )
+            //locationsToDecide = locationsToDecide.OrderBy(x => distributions[x].entropy()).Take(20).ToList();
+            locationsToDecide = locationsToDecide.OrderBy(x => IntLoc.ManhattanDistance(x, center)).Take(20).ToList();
+            while (locationsToDecide.Count > 0)
             {
-                if (close.Count > 0)
-                {
-                    //IntLoc toDecide = approximatelyBestUndecidedLocation(new IntLoc(playerPerspectiveLoc), close);
-                    IntLoc toDecide = close[0];
-                    close.Remove(toDecide);
-                    ProbabilityDistribution dist = distributions[toDecide];
-                    if (dist.isZero())
-                    {
-                        //undecideAround(toDecide, 3);
-                        decide(toDecide);
-                        break;
-                    }
-                    else
-                    {
-                        decide(toDecide);
-                        i++;
-                    }
-                }
+                IntLoc toDecide = locationsToDecide[0];
+                locationsToDecide.Remove(toDecide);
+
+                ProbabilityDistribution dist = distributions[toDecide];
+                decide(toDecide);
+                Console.WriteLine("deciding at " + toDecide);
 
             }
         }
 
         public void notifyOfPlayerLocation(Vector3 l)
         {
-            TileMap.playerPerspectiveLoc = new Vector3();
-            //TileMap.playerPerspectiveLoc = l;
+            TileMap.playerPerspectiveLoc = l;
         }
     }
 }

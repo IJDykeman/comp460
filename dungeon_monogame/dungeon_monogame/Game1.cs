@@ -25,8 +25,8 @@ namespace dungeon_monogame
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 1200;
-            graphics.PreferredBackBufferHeight = 600;
+            graphics.PreferredBackBufferWidth = 2400;
+            graphics.PreferredBackBufferHeight = 1200;
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
 
@@ -53,11 +53,11 @@ namespace dungeon_monogame
             // TODO: use this.Content to load your game content here
             Rendering.LoadContent(Content, graphics);
             //landscapeChunks = MagicaVoxel.ChunkManagerFromVox(@"castleOnHill.vox");
-            //map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
+            map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
 
-            //landscape = new GameObject(map.getManager(), new Vector3(), Vector3.One);
-            ChunkManager landscape_model = MagicaVoxel.ChunkManagerFromVox("test.vox");
-            landscape = new GameObject(landscape_model, new Vector3(), Vector3.One);
+            landscape = new GameObject(map.getManager(), new Vector3(), Vector3.One);
+            //ChunkManager landscape_model = MagicaVoxel.ChunkManagerFromVox("test.vox");
+            //landscape = new GameObject(landscape_model, new Vector3(), Vector3.One);
 
 
             //landscapeChunks.makeColorfulFloor();
@@ -92,7 +92,7 @@ namespace dungeon_monogame
             foreach (Action action in actions){
                 action.act(landscape, gameTime);
             }
-            //map.notifyOfPlayerLocation(player.getCameraLocation());
+            map.notifyOfPlayerLocation(player.getCameraLocation());
             //map.report();
             base.Update(gameTime);
         }
