@@ -322,7 +322,7 @@ namespace dungeon_monogame.WorldGeneration
                 if (m.chunkNeedsMesh(toMeshChunkLoc))
                 {
                     m.remesh(m, toMeshChunkLoc);
-                    Console.WriteLine("remeshing a chunk near " + centerChunkPos);
+                    //Console.WriteLine("remeshing a chunk near " + centerChunkPos);
                 }
 
             }
@@ -378,8 +378,9 @@ namespace dungeon_monogame.WorldGeneration
             List<IntLoc> locationsToDecide = new List<IntLoc>(distributions.Keys.Where(
                             x => IntLoc.EuclideanDistance(x, new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth)) < radius_in_tiles));
 
-            //locationsToDecide = locationsToDecide.OrderBy(x => distributions[x].entropy()).Take(20).ToList();
-            locationsToDecide = locationsToDecide.OrderBy(x => IntLoc.ManhattanDistance(x, center)).Take(20).ToList();
+            locationsToDecide = locationsToDecide.OrderBy(x => distributions[x].entropy()
+                                                                + Math.Pow(IntLoc.ManhattanDistance(x, center) / 3, 2)).Take(20).ToList();
+            //locationsToDecide = locationsToDecide.OrderBy(x => IntLoc.ManhattanDistance(x, center)).Take(20).ToList();
             while (locationsToDecide.Count > 0)
             {
                 IntLoc toDecide = locationsToDecide[0];
@@ -387,7 +388,7 @@ namespace dungeon_monogame.WorldGeneration
 
                 ProbabilityDistribution dist = distributions[toDecide];
                 decide(toDecide);
-                Console.WriteLine("deciding at " + toDecide);
+                //Console.WriteLine("deciding at " + toDecide);
 
             }
         }
