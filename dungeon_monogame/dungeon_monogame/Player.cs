@@ -21,16 +21,18 @@ namespace dungeon_monogame
         private KeyboardState oldKeyboardState;
         private float upDownRot = -2;
         private float leftRightRot = 0;
-        float speed = 20f;
+        float speed = 10f;
         float height = 3.2f;
         float width = 1.5f;
-        private bool flying = true;
+        private bool flying = false;
         Light torchLight;
+
+        float mouseSensitivty = .002f;
 
         public Player()
         {
             Vector3 cameraPosition = new Vector3(7,5,7);
-            playerActor = new Actor(new AABB(height, width, width), false, 0f);
+            playerActor = new Actor(new AABB(height, width, width), true, 1f);
 
             playerActor.setLocation(cameraPosition);
             Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
@@ -51,7 +53,6 @@ namespace dungeon_monogame
             List<Action> result = new List<Action>();
             KeyboardState newState = Keyboard.GetState();
             // cameraLookAtVector = Vector3.Transform(cameraLookAtVector, Matrix.CreateRotationX(.01f));
-            // Is the SPACE key down?
             
             Vector3 movement = playerActor.getVelocity();
             if (newState.IsKeyDown(Keys.W))
@@ -135,8 +136,8 @@ namespace dungeon_monogame
 
             if (mouseEngaged)
             {
-                leftRightRot += -(newMouseState.X - oldMouseState.X) * .005f;
-                upDownRot +=    -(newMouseState.Y - oldMouseState.Y) * .005f;
+                leftRightRot += -(newMouseState.X - oldMouseState.X) * mouseSensitivty;
+                upDownRot +=    -(newMouseState.Y - oldMouseState.Y) * mouseSensitivty;
                 upDownRot = MathHelper.Clamp(upDownRot, (float)(-4.5f), (float)(-1.6f));
                 Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
             }

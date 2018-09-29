@@ -121,6 +121,11 @@ namespace dungeon_monogame
             return other.i == i && other.j == j && other.k == k;
         }
 
+        public override string ToString()
+        {
+            return (i.ToString() + ", " + j.ToString() + ", " + k.ToString());
+        }
+
         public static IntLoc operator %(IntLoc l, int n)
         {
             return new IntLoc(Globals.mod(l.i, n), Globals.mod(l.j, n), Globals.mod(l.k, n));
