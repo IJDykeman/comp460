@@ -8,7 +8,9 @@ namespace dungeon_monogame.WorldGeneration
 {
     class ProbabilityDistribution
     {
-        double[] distribution;
+        protected ProbabilityDistribution() { }
+
+        protected double[] distribution;
         double entropyCached;
 
         public double[] getDistributionCopy()
@@ -37,7 +39,14 @@ namespace dungeon_monogame.WorldGeneration
             //normalize();
         }
 
-        void updateEntropy()
+
+        public void setAll(double[] p)
+        {
+            distribution = p;
+            //normalize();
+        }
+
+        protected void updateEntropy()
         {
             if (distribution.Sum() == 0)
             {
@@ -45,7 +54,7 @@ namespace dungeon_monogame.WorldGeneration
             }
             else
             {
-                entropyCached = distribution.Select(num => -num * Math.Log(num + .0001)).Sum();
+                entropyCached = distribution.Select(num => -num * Math.Log(num + .000001)).Sum();
                 //entropyCached = distribution.Select(x => { if (x > 0) { return 1d; } return 0d; }).Sum();
             }
         }
@@ -66,9 +75,10 @@ namespace dungeon_monogame.WorldGeneration
 
             if (distribution.Sum() == 0)
             {
-                ProbabilityDistribution p = new ProbabilityDistribution(k());
-                p.setEvenOdds();
-                return p.sample();
+                //ProbabilityDistribution p = new ProbabilityDistribution(k());
+                //p.setEvenOdds();
+                //return p.sample();
+                setEvenOdds();
             }
 
             double power = 1;// 27.0 / (Math.Pow(WorldGenParamaters.tileWidth, 3));
@@ -117,16 +127,8 @@ namespace dungeon_monogame.WorldGeneration
             }
         }
 
-        public void normalize()
+        public virtual void normalize()
         {
-            /*
-            for (int i = 0; i < distribution.Length; i++)
-            {
-                if (distribution[i] > 0)
-                {
-                    distribution[i] = 1;
-                }
-            }*/
             double s = distribution.Sum();
             if (s != 0)
             {
@@ -135,6 +137,7 @@ namespace dungeon_monogame.WorldGeneration
                     distribution[i] /= s;
                 }
             }
+
             updateEntropy();
         }
 

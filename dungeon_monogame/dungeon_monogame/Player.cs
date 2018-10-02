@@ -31,6 +31,7 @@ namespace dungeon_monogame
 
         public Player()
         {
+            
             Vector3 cameraPosition = new Vector3(7,5,7);
             playerActor = new Actor(new AABB(height, width, width), true, 1f);
 
@@ -50,6 +51,7 @@ namespace dungeon_monogame
 
         public List<Action> handleInput()
         {
+
             List<Action> result = new List<Action>();
             KeyboardState newState = Keyboard.GetState();
             // cameraLookAtVector = Vector3.Transform(cameraLookAtVector, Matrix.CreateRotationX(.01f));
@@ -106,6 +108,11 @@ namespace dungeon_monogame
             if (justHit(Keys.LeftControl, newState))
             {
                 flying = !flying;
+
+            }
+
+            if (flying)
+            {
                 playerActor.setVelocity(Vector3.Zero);
                 playerActor.setGravityFactor(flying ? 0f : 1f);
                 playerActor.setCollides(flying ? false : true);

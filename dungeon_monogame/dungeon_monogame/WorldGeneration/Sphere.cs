@@ -8,6 +8,7 @@ namespace dungeon_monogame.WorldGeneration
     class Sphere
     {
         ProbabilityDistribution[, ,] sphere;
+        //string name;
 
         public ProbabilityDistribution get(int i, int j, int k)
         {
@@ -16,6 +17,9 @@ namespace dungeon_monogame.WorldGeneration
 
         public Sphere(TileSet set, int tileIndex)
         {
+            //name = _name;
+            //Console.WriteLine(name);
+
             sphere = new ProbabilityDistribution[WorldGenParamaters.sphereWidth, WorldGenParamaters.sphereWidth, WorldGenParamaters.sphereWidth];
 
             for (int i = 0; i < WorldGenParamaters.sphereWidth; i++)

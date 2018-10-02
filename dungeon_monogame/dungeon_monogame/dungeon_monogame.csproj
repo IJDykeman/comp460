@@ -61,6 +61,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorldGeneration\ConcurrentHashset.cs" />
     <Compile Include="WorldGeneration\Matrix.cs" />
+    <Compile Include="WorldGeneration\WorldTileProbabilityDistribution.cs" />
     <Compile Include="WorldGeneration\ProbabilityDistribution.cs" />
     <Compile Include="WorldGeneration\Sphere.cs" />
     <Compile Include="WorldGeneration\Tile.cs" />
