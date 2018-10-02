@@ -11,9 +11,8 @@ namespace dungeon_monogame.WorldGeneration
 {
     class TileMap
     {
-        public static int decideTilesWithinWidth = 7;
-        public static int alwaysMeshWithinRange = (int)(.8*decideTilesWithinWidth * WorldGenParamaters.tileWidth / Chunk.chunkWidth);
-        public static int alwaysUnmeshOutsideRange = (int)(decideTilesWithinWidth * 1.5 / WorldGenParamaters.tileWidth * Chunk.chunkWidth * Chunk.chunkWidth);
+        public static int alwaysMeshWithinRange = (int)(.8* WorldGenParamaters.decideTilesWithinWidth * WorldGenParamaters.tileWidth / Chunk.chunkWidth);
+        public static int alwaysUnmeshOutsideRange = (int)(WorldGenParamaters.decideTilesWithinWidth * 1.5 / WorldGenParamaters.tileWidth * Chunk.chunkWidth * Chunk.chunkWidth);
         System.Collections.Concurrent.ConcurrentDictionary<IntLoc, ProbabilityDistribution> distributions;
         Dictionary<IntLoc, int> tilesDecided;
         static double undecidedEntropy;
@@ -238,9 +237,9 @@ namespace dungeon_monogame.WorldGeneration
             m = new ChunkManager();
             for (int i = 0; i < 1; i++)
             {
-                int x = Globals.random.Next(-decideTilesWithinWidth, decideTilesWithinWidth);
-                int y = Globals.random.Next(-decideTilesWithinWidth, decideTilesWithinWidth);
-                int z = Globals.random.Next(-decideTilesWithinWidth, decideTilesWithinWidth);
+                int x = Globals.random.Next(-WorldGenParamaters.decideTilesWithinWidth, WorldGenParamaters.decideTilesWithinWidth);
+                int y = Globals.random.Next(-WorldGenParamaters.decideTilesWithinWidth, WorldGenParamaters.decideTilesWithinWidth);
+                int z = Globals.random.Next(-WorldGenParamaters.decideTilesWithinWidth, WorldGenParamaters.decideTilesWithinWidth);
                 //placeTile(new IntLoc(x, y, z), 0, m);
                 //decide(new IntLoc(x, y, z));
             }
@@ -331,18 +330,18 @@ namespace dungeon_monogame.WorldGeneration
         public void decideAroundPlayer()
         {
 
-            decideAroundBySampling(decideTilesWithinWidth);
+            decideAroundBySampling(WorldGenParamaters.decideTilesWithinWidth);
 
             return;
 
-            ConcurrentQueue<IntLoc> decidingQueue = getQueueFromBFS(decideTilesWithinWidth);
+            ConcurrentQueue<IntLoc> decidingQueue = getQueueFromBFS(WorldGenParamaters.decideTilesWithinWidth);
             List<IntLoc> tileLocsToDecide = new List<IntLoc>();
             IntLoc toDecideLoc;
             IntLoc tileSpacePos = new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth);
             IntLoc l;
             while (decidingQueue.TryDequeue(out l))
             {
-                toDecideLoc = new IntLoc(-decideTilesWithinWidth / 2) + l + tileSpacePos;
+                toDecideLoc = new IntLoc(-WorldGenParamaters.decideTilesWithinWidth / 2) + l + tileSpacePos;
                 if (!decided(toDecideLoc) && distributions.ContainsKey(toDecideLoc))
                 {
                     tileLocsToDecide.Add(toDecideLoc);

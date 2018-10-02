@@ -22,9 +22,9 @@ namespace dungeon_monogame
         private float upDownRot = -2;
         private float leftRightRot = 0;
         float speed = 10f;
-        float height = 3.2f;
-        float width = 1.5f;
-        private bool flying = false;
+        float height = .5f;
+        float width = .5f;
+        private bool flying = true;
         Light torchLight;
 
         float mouseSensitivty = .002f;

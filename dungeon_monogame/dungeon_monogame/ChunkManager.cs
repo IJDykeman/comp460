@@ -68,9 +68,9 @@ namespace dungeon_monogame
             }*/
             IntLoc centerTilePos = new IntLoc(TileMap.playerPerspectiveLoc);
             IntLoc toMeshTileLoc;
-            foreach (IntLoc BFSloc in Globals.gridBFS(TileMap.decideTilesWithinWidth))
+            foreach (IntLoc BFSloc in Globals.gridBFS(WorldGenParamaters.decideTilesWithinWidth))
             {
-                toMeshTileLoc = new IntLoc(-TileMap.decideTilesWithinWidth / 2) + BFSloc + centerTilePos;
+                toMeshTileLoc = new IntLoc(-WorldGenParamaters.decideTilesWithinWidth / 2) + BFSloc + centerTilePos;
                 if (decided(toMeshTileLoc))
                 {
                     IntLoc ToMeshChunkLoc = locToChunkLoc(toMeshTileLoc * WorldGenParamaters.tileWidth);
