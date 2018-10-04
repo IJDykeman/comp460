@@ -11,7 +11,7 @@ namespace dungeon_monogame.WorldGeneration
     {
         Tile[] tiles;
         Sphere[] spheres;
-        Dictionary<IntLoc, MyMatrix> deltaToTransitionMatrix;
+        Dictionary<IntLoc, DomainMatrix> deltaToTransitionMatrix;
 
 
         public TileSet(string folderPath)
@@ -48,7 +48,7 @@ namespace dungeon_monogame.WorldGeneration
 
         void buildTransitionMatrices()
         {
-            deltaToTransitionMatrix = new Dictionary<IntLoc, MyMatrix>();
+            deltaToTransitionMatrix = new Dictionary<IntLoc, DomainMatrix>();
             IntLoc[] directions = new IntLoc[]{
                 new IntLoc(-1,0,0),
                 new IntLoc(1,0,0),
@@ -59,12 +59,12 @@ namespace dungeon_monogame.WorldGeneration
             };
             foreach (IntLoc d in directions)
             {
-                MyMatrix m = Tile.buildTransitionMatrix(d.i, d.j, d.k, this);
+                DomainMatrix m = Tile.buildTransitionMatrix(d.i, d.j, d.k, this);
                 deltaToTransitionMatrix[d] = m;
             }
         }
 
-        public MyMatrix getTransitionMatrix(IntLoc delta)
+        public DomainMatrix getTransitionMatrix(IntLoc delta)
         {
             return deltaToTransitionMatrix[delta];
         }

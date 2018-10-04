@@ -15,14 +15,14 @@ namespace dungeon_monogame.WorldGeneration
             blocks = _blocks;
         }
 
-        public static double potential(Tile a, Tile b, int di, int dj, int dl)
+        public static bool potential(Tile a, Tile b, int di, int dj, int dl)
         {
             bool matchVal = match(a, b, di, dj, dl);
             if (matchVal)
             {
-                return 1.0;
+                return true;
             }
-            return 0; //1e-12;
+            return false;
         }
 
         public static bool match(Tile a, Tile b, int di, int dj, int dl)
@@ -83,7 +83,7 @@ namespace dungeon_monogame.WorldGeneration
             return true;
         }
 
-        public static MyMatrix buildTransitionMatrix(int di, int dj, int dl, TileSet tiles)
+        public static DomainMatrix buildTransitionMatrix(int di, int dj, int dl, TileSet tiles)
         {
             /*
             double p = Tile.potential(tiles.getTile(0), tiles.getTile(1), 0, 1, 0);
@@ -94,7 +94,7 @@ namespace dungeon_monogame.WorldGeneration
             Console.Write("");
             p = Tile.potential(tiles.getTile(0), tiles.getTile(1), 0, 0, 1);
             Console.Write("");*/
-            Double[,] result = new double[tiles.size(), tiles.size()];
+            Boolean[,] result = new bool[tiles.size(), tiles.size()];
             for (int i = 0; i < tiles.size(); i++)
             {
                 for (int j = 0; j < tiles.size(); j++)
@@ -131,7 +131,7 @@ namespace dungeon_monogame.WorldGeneration
                     }
                 }
             }
-            return new MyMatrix(result);
+            return new DomainMatrix(result);
         }
 
         public Block get(int i, int p, int j)

@@ -21,7 +21,7 @@ namespace dungeon_monogame
         private KeyboardState oldKeyboardState;
         private float upDownRot = -2;
         private float leftRightRot = 0;
-        float speed = 10f;
+        float speed = 25f;
         float height = .5f;
         float width = .5f;
         private bool flying = true;
@@ -166,8 +166,9 @@ namespace dungeon_monogame
 
         public Matrix getViewMatrix()
         {
+            Vector3 backup = getFacingVector() * 0;
             return Matrix.CreateLookAt(
-              getCameraLocation(), getCameraLocation() + getFacingVector(), cameraUpVector);
+              getCameraLocation() + backup, getCameraLocation() + getFacingVector() + backup, cameraUpVector);
         }
 
         public Vector3 getCameraLocation()

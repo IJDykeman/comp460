@@ -7,20 +7,17 @@ namespace dungeon_monogame.WorldGeneration
 {
     class Sphere
     {
-        ProbabilityDistribution[, ,] sphere;
-        //string name;
+        Domain[, ,] sphere;
 
-        public ProbabilityDistribution get(int i, int j, int k)
+        public Domain get(int i, int j, int k)
         {
             return sphere[i, j, k];
         }
 
         public Sphere(TileSet set, int tileIndex)
         {
-            //name = _name;
-            //Console.WriteLine(name);
 
-            sphere = new ProbabilityDistribution[WorldGenParamaters.sphereWidth, WorldGenParamaters.sphereWidth, WorldGenParamaters.sphereWidth];
+            sphere = new Domain[WorldGenParamaters.sphereWidth, WorldGenParamaters.sphereWidth, WorldGenParamaters.sphereWidth];
 
             for (int i = 0; i < WorldGenParamaters.sphereWidth; i++)
             {
@@ -28,12 +25,12 @@ namespace dungeon_monogame.WorldGeneration
                 {
                     for (int k = 0; k < WorldGenParamaters.sphereWidth; k++)
                     {
-                        sphere[i, j, k] = new ProbabilityDistribution(set.size());
-                        sphere[i, j, k].setEvenOdds();
+                        sphere[i, j, k] = new Domain(set.size());
+                        sphere[i, j, k].setAllTrue();
                     }
                 }
             }
-            sphere[WorldGenParamaters.sphereWidth / 2, WorldGenParamaters.sphereWidth / 2, WorldGenParamaters.sphereWidth / 2] = ProbabilityDistribution.oneHot(set.size(), tileIndex);
+            sphere[WorldGenParamaters.sphereWidth / 2, WorldGenParamaters.sphereWidth / 2, WorldGenParamaters.sphereWidth / 2] = Domain.oneHot(set.size(), tileIndex);
             List<IntLoc> bfsOrder = Globals.gridBFS(WorldGenParamaters.sphereWidth).AsEnumerable().ToList();
             bfsOrder.RemoveAt(0); // don't consider center of sphere
 
@@ -45,25 +42,23 @@ namespace dungeon_monogame.WorldGeneration
                 {
                     foreach (IntLoc neighbor in Globals.neighbors(queryLoc, WorldGenParamaters.sphereWidth))
                     {
-                        ProbabilityDistribution probFrom = sphere[neighbor.i, neighbor.j, neighbor.k];
+                        Domain probFrom = sphere[neighbor.i, neighbor.j, neighbor.k];
                         IntLoc delta = neighbor - queryLoc;
-                        MyMatrix trans = set.getTransitionMatrix(delta);
+                        DomainMatrix trans = set.getTransitionMatrix(delta);
 
-                        ProbabilityDistribution old = sphere[queryLoc.i, queryLoc.j, queryLoc.k];
+                        Domain old = sphere[queryLoc.i, queryLoc.j, queryLoc.k];
 
-                        Double[] probTo = MyMatrix.dot(trans, probFrom.toDoubleArray()).Select(x => { if (x > 0) { return 1d; } return 0d; }).ToArray();
-                        ProbabilityDistribution mask = new ProbabilityDistribution(probTo);
-                        ProbabilityDistribution result = old * mask;
+                        bool[] probTo = DomainMatrix.dot(trans, probFrom.toBoolArray());
+                        Domain mask = new Domain(probTo);
+                        Domain result = old * mask;
 
                         sphere[queryLoc.i, queryLoc.j, queryLoc.k] = result;
 
                         changedOne = !(Enumerable.SequenceEqual(
-                            old.toDoubleArray().Select(x => { if (x > 0) { return 1d; } return 0d; }),
-                            result.toDoubleArray().Select(x => { if (x > 0) { return 1d; } return 0d; })
+                            old.toBoolArray(), result.toBoolArray()
                         )) || changedOne;
 
                     }
-                    sphere[queryLoc.i, queryLoc.j, queryLoc.k].normalize();
                 }
                 if (!changedOne)
                 {

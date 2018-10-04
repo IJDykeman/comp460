@@ -13,7 +13,7 @@ namespace dungeon_monogame.WorldGeneration
     {
         public static int alwaysMeshWithinRange = (int)(.8 * WorldGenParamaters.decideTilesWithinWidth * WorldGenParamaters.tileWidth / Chunk.chunkWidth);
         public static int alwaysUnmeshOutsideRange = (int)(WorldGenParamaters.decideTilesWithinWidth * 1.5 / WorldGenParamaters.tileWidth * Chunk.chunkWidth * Chunk.chunkWidth);
-        System.Collections.Concurrent.ConcurrentDictionary<IntLoc, WorldTileDistribution> distributions;
+        System.Collections.Concurrent.ConcurrentDictionary<IntLoc, Domain> distributions;
         Dictionary<IntLoc, int> tilesDecided;
         static double undecidedEntropy;
 
@@ -25,7 +25,7 @@ namespace dungeon_monogame.WorldGeneration
 
         public TileMap(TileSet _tiles)
         {
-            distributions = new System.Collections.Concurrent.ConcurrentDictionary<IntLoc, WorldTileDistribution>();
+            distributions = new System.Collections.Concurrent.ConcurrentDictionary<IntLoc, Domain>();
             tilesDecided = new Dictionary<IntLoc, int>();
             meshingQueue = new ConcurrentQueue<IntLoc>();
             tileSet = _tiles;
@@ -75,11 +75,11 @@ namespace dungeon_monogame.WorldGeneration
 
         private void decide(IntLoc tileSpaceLoc)
         {
-            WorldTileDistribution d = getDistributionAt(tileSpaceLoc);
-            int tileIndex = d.sample();
+            Domain d = getDistributionAt(tileSpaceLoc);
+            int tileIndex = d.getRandomTrueIndex();
             placeTile(tileSpaceLoc, tileIndex, m);
 
-            WorldTileDistribution _;
+            Domain _;
             distributions.TryRemove(tileSpaceLoc, out _);
         }
 
@@ -116,21 +116,23 @@ namespace dungeon_monogame.WorldGeneration
             return tilesDecided.ContainsKey(loc);
         }
 
-        private WorldTileDistribution getDistributionAt(IntLoc loc)
+        private Domain getDistributionAt(IntLoc loc)
         {
-            WorldTileDistribution p;
+            Domain p;
             if (distributions.TryGetValue(loc, out p))
             {
                 return p;
             }
-            p = new WorldTileDistribution(ProbabilityDistribution.evenOdds(tileSet.size()));
+            p = Domain.allTrue(tileSet.size());
             distributions[loc] = p;
             return p;
         }
 
-        private void setDistributionAt(IntLoc loc, WorldTileDistribution d)
+        private void setDistributionAt(IntLoc loc, Domain d)
         {
-            distributions[loc] = d;
+
+                distributions[loc] = d;
+
         }
 
         public void multiplyInSphere(Sphere sphere, IntLoc center)
@@ -142,10 +144,19 @@ namespace dungeon_monogame.WorldGeneration
                     for (int k = 0; k < WorldGenParamaters.sphereWidth; k++)
                     {
                         IntLoc location = new IntLoc(i, j, k) + center - new IntLoc(WorldGenParamaters.sphereWidth / 2);
-                        if (!decided(location))
+                        if (!decided(location) && location.j == 0)
                         {
-                            WorldTileDistribution d = new WorldTileDistribution ((ProbabilityDistribution)getDistributionAt(location) * (sphere.get(i, j, k)));
+                            Domain d = getDistributionAt(location) * (sphere.get(i, j, k));
+                            if(d.sum() == 0)
+                            {
+                                d = Domain.allTrue(d.k());
+                            }
                             setDistributionAt(location, d);
+                            /*if (d.sum() != 0)
+                            {
+                                setDistributionAt(location, d);
+                            }*/
+
                         }
                     }
                 }
@@ -184,8 +195,10 @@ namespace dungeon_monogame.WorldGeneration
             Console.WriteLine(distributions.Keys.Count);
             foreach (IntLoc loc in distributions.Keys)
             {
-                float distance = IntLoc.EuclideanDistance(loc, new IntLoc(playerPerspectiveLoc / WorldGenParamaters.tileWidth));
-                double e = distributions[loc].entropy();
+                IntLoc snapped_player_loc = new IntLoc(TileMap.playerPerspectiveLoc / Chunk.chunkWidth); // / WorldGenParamaters.decideTilesWithinWidth * WorldGenParamaters.decideTilesWithinWidth;
+
+                float distance = IntLoc.EuclideanDistance(loc, snapped_player_loc);
+                double e = distributions[loc].sum();
                 if (!decided(loc) && (!best.HasValue || e < lowest) && distance < WorldGenParamaters.decideTilesWithinWidth)
                 {
                     lowest = e;
@@ -268,10 +281,11 @@ namespace dungeon_monogame.WorldGeneration
                 decide(new IntLoc());
                 while (true)
                 {
-                    for (int i = 0; i < 10; i++)
+                    for (int i = 0; i < 6; i++)
                     {
                         placeATile(m);
                     }
+                    Thread.Sleep(200);
                     remeshAroundPlayer();
                     m.unmeshOutsideRange();
                     //Console.WriteLine("completed an iteration of deciding and meshing");

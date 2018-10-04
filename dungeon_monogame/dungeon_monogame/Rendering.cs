@@ -17,11 +17,12 @@ namespace dungeon_monogame
         private static RenderTarget2D depthRT, positionRT;
         public static Texture2D vignette;
         static int backBufferWidth, backBufferHeight;
+        static Color bgColor = Color.Black;
 
 
         static Effect createGBufferEffect, renderSceneEffect;
         static Vector2 halfPixel;
-        private static float ambientLightLevel = 0.4f;
+        private static float ambientLightLevel = 0.8f;
 
         public static void LoadContent(ContentManager Content, GraphicsDeviceManager graphics)
         {
@@ -62,7 +63,7 @@ namespace dungeon_monogame
             //graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, bgColor, 1.0f, 0);
 
 
             createGBufferEffect.CurrentTechnique = createGBufferEffect.Techniques["RenderGBuffer"];
@@ -143,7 +144,7 @@ namespace dungeon_monogame
             float fieldOfView = MathHelper.ToRadians(70f) ;
             float nearClipPlane = .1f;
             float farClipPlane = 200;
-
+            //return Matrix.CreateOrthographic(15, 15, .001f, 20);
             return Matrix.CreatePerspectiveFieldOfView(
                 fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
         }
