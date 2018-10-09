@@ -219,7 +219,7 @@ namespace dungeon_monogame
         {
             foreach (IntLoc l in chunks.Keys)
             {
-                if(IntLoc.ManhattanDistance(l, new IntLoc(TileMap.playerPerspectiveLoc)) > TileMap.alwaysUnmeshOutsideRange)
+                if(IntLoc.EuclideanDistance(l, new IntLoc(TileMap.playerPerspectiveLoc)) > TileMap.alwaysUnmeshOutsideRange)
                 {
                     chunks[l].forgetMesh();
                 }

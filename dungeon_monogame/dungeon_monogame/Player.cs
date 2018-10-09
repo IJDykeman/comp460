@@ -21,10 +21,10 @@ namespace dungeon_monogame
         private KeyboardState oldKeyboardState;
         private float upDownRot = -2;
         private float leftRightRot = 0;
-        float speed = 25f;
-        float height = .5f;
-        float width = .5f;
-        private bool flying = true;
+        float speed = 12f;
+        float height = 3.5f;
+        float width = 1.5f;
+        private bool flying = false;
         Light torchLight;
 
         float mouseSensitivty = .002f;
@@ -108,25 +108,14 @@ namespace dungeon_monogame
             if (justHit(Keys.LeftControl, newState))
             {
                 flying = !flying;
+                playerActor.setGravityFactor(flying ? 0f : 1f);
+                playerActor.setCollides(flying ? false : true);
 
             }
 
             if (flying)
             {
                 playerActor.setVelocity(Vector3.Zero);
-                playerActor.setGravityFactor(flying ? 0f : 1f);
-                playerActor.setCollides(flying ? false : true);
-            }
-
-            if (!flying && (movement * new Vector3(1,0,1)).Length() !=0)
-            {
-               // movement.Y = 0;
-               // movement.Normalize();
-               // movement *= speed;
-                if (movement.Y != 0)
-                {
-
-                }
             }
 
             

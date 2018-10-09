@@ -143,7 +143,7 @@ namespace dungeon_monogame
                 graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight;
             float fieldOfView = MathHelper.ToRadians(70f) ;
             float nearClipPlane = .1f;
-            float farClipPlane = 200;
+            float farClipPlane = 500;
             //return Matrix.CreateOrthographic(15, 15, .001f, 20);
             return Matrix.CreatePerspectiveFieldOfView(
                 fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
