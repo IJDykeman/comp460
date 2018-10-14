@@ -9,18 +9,17 @@ namespace dungeon_monogame
 {
     class Spell : Actor
     {
-        bool dead = false;
-        Color lightColor;
+        protected bool dead = false;
+        protected Color lightColor;
 
         public Spell(Vector3 _location, Vector3 velocity)
             : base(new AABB(.1f, .1f, .1f))
         {
-            lightColor = Color.Lime;
             setLocation(_location);
             this.addVelocity(velocity);
             gravityFactor = 0f;
 
-            lightColor = Globals.ColorFromHSV(Globals.random.NextDouble() * 255, 1, 1);
+            lightColor = Globals.ColorFromHSV(Globals.random.NextDouble() * 255, 1, 255);
 
             addChild(new Light(.6f, lightColor));
 
@@ -58,6 +57,63 @@ namespace dungeon_monogame
         }
     }
 
+    class StickingLight : Actor
+    {
+        protected bool hasCollided = false;
+        protected Color lightColor;
+        protected MagicLantern lantern;
+
+
+        public StickingLight(Vector3 _location, Vector3 velocity)
+            : base(new AABB(1.0f, 1.0f, 1.0f))
+        {
+            setLocation(_location);
+            this.addVelocity(velocity);
+            gravityFactor = 0f;
+
+            lightColor = Globals.ColorFromHSV(Globals.random.NextDouble() * 90 + 150, 1, 1);
+
+            lantern = new MagicLantern(0.2f, lightColor);
+            addChild(lantern);
+
+            GameObject model = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-.5f - .5f - .5f) * -.0f, Vector3.One * .1f);
+            addChild(model);
+            model.setEmissiveness(lightColor);
+        }
+
+        protected override void onCollision()
+        {
+            hasCollided = true;
+            lantern.setIntensity(2.0f);
+
+        }
+
+
+
+        protected override List<Action> update()
+        {
+            List<Action> result = new List<Action>();
+
+            if (hasCollided)
+            {
+                this.velocity *= 0;
+                if (Globals.random.NextDouble() > .995f)
+                {
+                    result.Add(new SpawnAction(new Spark(getLocation() - .2f * Vector3.Normalize(previousVelocity)
+                        ,
+                        Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 2f,
+                        lightColor)));
+                }
+
+            }
+            else
+            {
+                result.Add(new RequestPhysicsUpdate(this));
+            }
+            return result;
+        }
+    }
+
     class Spark : Actor
     {
         bool dead = false;
@@ -72,7 +128,7 @@ namespace dungeon_monogame
             this.addVelocity(velocity);
             bounciness = .7f + (float)(Globals.random.NextDouble() -.5) *.2f;
             gravityFactor = .6f + (float)(Globals.random.NextDouble() -.5) *.1f;
-            light = new Light(.3f + (float)(Globals.random.NextDouble() - .5) * .1f, color);
+            light = new Light(.4f + (float)(Globals.random.NextDouble() - .5) * .1f, color);
             addChild(light);
             ChunkManager model = MagicaVoxel.ChunkManagerFromVox(@"spell.vox");
             Vector3 offset = model.getCenter();
@@ -101,10 +157,10 @@ namespace dungeon_monogame
 
             }
             this.scale *= scaleFactor;
-            light.setIntensity(light.getIntensity() * .999f);
+            light.setIntensity(light.getIntensity() * .99995f);
             if (this.scale.Length() < .05f)
             {
-                light.setIntensity(light.getIntensity() * .99f);
+               // light.setIntensity(light.getIntensity() * .9995f);
 
             }
             if (this.scale.Length() < .005f)

@@ -14,7 +14,7 @@ namespace dungeon_monogame.WorldGeneration
             return sphere[i, j, k];
         }
 
-        public Sphere(TileSet set, int tileIndex)
+        public Sphere(TileSet set, int tileIndex, string name)
         {
 
             sphere = new Domain[WorldGenParamaters.sphereWidth, WorldGenParamaters.sphereWidth, WorldGenParamaters.sphereWidth];
@@ -51,12 +51,14 @@ namespace dungeon_monogame.WorldGeneration
                         bool[] probTo = DomainMatrix.dot(trans, probFrom.toBoolArray());
                         Domain mask = new Domain(probTo);
                         Domain result = old * mask;
+                        if (result.sum() == 0)
+                        {
+                            throw new Exception("Sphere contains zero domain: " + name);
+                        }
 
                         sphere[queryLoc.i, queryLoc.j, queryLoc.k] = result;
 
-                        changedOne = !(Enumerable.SequenceEqual(
-                            old.toBoolArray(), result.toBoolArray()
-                        )) || changedOne;
+                        changedOne = !(old.Equals(result)) || changedOne;
 
                     }
                 }

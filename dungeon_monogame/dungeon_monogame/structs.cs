@@ -110,9 +110,18 @@ namespace dungeon_monogame
             return new Vector3(i, j, k);
         }
 
+        private static int quickhash(int i)
+        {
+            return (i* 1655131) % 227254201;
+        }
+
         public override int GetHashCode()
         {
-            return i.GetHashCode() ^ j.GetHashCode() << 2 ^ k.GetHashCode() >> 2;
+            //int b = 0.GetHashCode();
+            //int c = 1.GetHashCode();
+            
+            return (quickhash(i)) ^ (quickhash(j)) << 2 ^ (quickhash(k)) >> 2;
+            //return i.GetHashCode() - (j.GetHashCode() / k.GetHashCode());
         }
 
         public override bool Equals(object obj)

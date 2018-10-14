@@ -8,9 +8,9 @@ namespace dungeon_monogame.WorldGeneration
 {
     class Tile
     {
-        Block[, ,] blocks;
+        Block[,,] blocks;
 
-        public Tile(Block[, ,] _blocks)
+        public Tile(Block[,,] _blocks)
         {
             blocks = _blocks;
         }
@@ -42,7 +42,7 @@ namespace dungeon_monogame.WorldGeneration
                     }
                     else if (di == 0 && dj == -1 && dl == 0)
                     {
-                        if (!(a.get(i, 0, j).Equals(b.get(i, w-1, j))))
+                        if (!(a.get(i, 0, j).Equals(b.get(i, w - 1, j))))
                         {
                             return false;
                         }
@@ -50,14 +50,14 @@ namespace dungeon_monogame.WorldGeneration
 
                     else if (di == 1 && dj == 0 && dl == 0)
                     {
-                        if (!(a.get(w-1, i, j).Equals(b.get(0, i, j))))
+                        if (!(a.get(w - 1, i, j).Equals(b.get(0, i, j))))
                         {
                             return false;
                         }
                     }
                     else if (di == -1 && dj == 0 && dl == 0)
                     {
-                        if (!(a.get(0, i, j).Equals(b.get(w-1, i, j))))
+                        if (!(a.get(0, i, j).Equals(b.get(w - 1, i, j))))
                         {
                             return false;
                         }
@@ -65,7 +65,7 @@ namespace dungeon_monogame.WorldGeneration
 
                     else if (di == 0 && dj == 0 && dl == 1)
                     {
-                        if (!(a.get(i, j, w - 1).Equals(b.get(i, j,0))))
+                        if (!(a.get(i, j, w - 1).Equals(b.get(i, j, 0))))
                         {
                             return false;
                         }
@@ -73,7 +73,7 @@ namespace dungeon_monogame.WorldGeneration
 
                     else if (di == 0 && dj == 0 && dl == -1)
                     {
-                        if (!(a.get(i, j,0).Equals(b.get(i, j, w - 1))))
+                        if (!(a.get(i, j, 0).Equals(b.get(i, j, w - 1))))
                         {
                             return false;
                         }
@@ -149,15 +149,15 @@ namespace dungeon_monogame.WorldGeneration
             {
                 result.Add(new Tuple<int, int>(0, x));
             }
-            for (int x = 1; x < ring-1; x++)
+            for (int x = 1; x < ring - 1; x++)
             {
                 result.Add(new Tuple<int, int>(x, ring - 1));
             }
             for (int x = ring - 1; x >= 0; x--)
             {
-                result.Add(new Tuple<int, int>(ring - 1,x));
+                result.Add(new Tuple<int, int>(ring - 1, x));
             }
-            for (int x = ring-2; x >= 1; x--)
+            for (int x = ring - 2; x >= 1; x--)
             {
                 result.Add(new Tuple<int, int>(x, 0));
             }
@@ -169,28 +169,47 @@ namespace dungeon_monogame.WorldGeneration
         {
             List<Tuple<int, int>> l = ringOrder(5);
 
-            Block[, ,] newBlocks = new Block[WorldGenParamaters.tileWidth, WorldGenParamaters.tileWidth, WorldGenParamaters.tileWidth];
+            Block[,,] newBlocks = new Block[WorldGenParamaters.tileWidth, WorldGenParamaters.tileWidth, WorldGenParamaters.tileWidth];
 
-            for (int ring = 1; ring <= WorldGenParamaters.tileWidth; ring+=2)
+            for (int ring = 1; ring <= WorldGenParamaters.tileWidth; ring += 2)
             {
                 List<Tuple<int, int>> ringIndices = ringOrder(ring);
                 for (int y = 0; y < WorldGenParamaters.tileWidth; y++)
                 {
                     for (int i = 0; i < ringIndices.Count; i++)
                     {
-                        int offset = (WorldGenParamaters.tileWidth - ring)/2;
+                        int offset = (WorldGenParamaters.tileWidth - ring) / 2;
                         newBlocks[ringIndices[i].Item1 + offset, y,
                                   ringIndices[i].Item2 + offset] =
-                            blocks[ringIndices[(i + ring-1) % ringIndices.Count].Item1 + offset, y,
-                                   ringIndices[(i + ring-1) % ringIndices.Count].Item2 + offset];
+                            blocks[ringIndices[(i + ring - 1) % ringIndices.Count].Item1 + offset, y,
+                                   ringIndices[(i + ring - 1) % ringIndices.Count].Item2 + offset];
                     }
                     newBlocks[WorldGenParamaters.tileWidth / 2, y, WorldGenParamaters.tileWidth / 2] = blocks[WorldGenParamaters.tileWidth / 2, y, WorldGenParamaters.tileWidth / 2];
                 }
 
             }
-            
+
             return new Tile(newBlocks);
         }
 
+        public override bool Equals(Object obj)
+        {
+            Tile o = (Tile)obj;
+            for (int i = 0; i < WorldGenParamaters.tileWidth; i++)
+            {
+                for (int j = 0; j < WorldGenParamaters.tileWidth; j++)
+                {
+                    for (int k = 0; k < WorldGenParamaters.tileWidth; k++)
+                    {
+                        if (this.get(i,j,k).color != o.get(i, j, k).color)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+
+        }
     }
 }

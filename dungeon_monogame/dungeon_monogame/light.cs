@@ -11,7 +11,7 @@ namespace dungeon_monogame
     class Light : GameObject
     {
         float lightIntesity = .6f;
-        Color color = Color.LightYellow;
+        protected Color color = Color.LightYellow;
 
         public Light() { }
 
@@ -44,12 +44,37 @@ namespace dungeon_monogame
         }
 
 
-        public void setIntensity(float intensity)
+        public virtual void setIntensity(float intensity)
         {
             intensity = Math.Max(intensity, 0);
             lightIntesity = intensity;
         }
 
+    }
+
+    class MagicLantern : Light
+    {
+        float targetIntensity;
+        public MagicLantern(float _intensity, Color _color)
+        {
+            targetIntensity = _intensity;
+            base.setIntensity(0);
+            
+            color = _color;
+        }
+
+
+        protected override List<Action> update()
+        {
+            float lambda = .93f;
+            base.setIntensity(lambda * getIntensity() + (1 - lambda) * (targetIntensity + (float)(Globals.random.NextDouble() - .5)  * targetIntensity));
+            return new List<Action>();
+        }
+
+        public override void setIntensity(float intensity)
+        {
+            targetIntensity = intensity;
+        }
     }
 
     class FireLight : Light
@@ -58,7 +83,7 @@ namespace dungeon_monogame
         float luminanceTendency = 0;
         protected override List<Action> update()
         {
-            luminanceTendency += .2f * (.5f*((float)Globals.random.NextDouble() - .5f) - (float)Math.Tanh(luminanceTendency));
+            luminanceTendency += .2f * (.5f * ((float)Globals.random.NextDouble() - .5f) - ((float)Math.Tanh(luminanceTendency) * .9f + .05f));
 
             level += luminanceTendency;
             level = MathHelper.Clamp(level, -2, 2);

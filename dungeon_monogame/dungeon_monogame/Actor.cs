@@ -133,11 +133,12 @@ namespace dungeon_monogame
                         }
                     }
                 }
+
+                finalLocation += prospectiveLocation * Globals.unit(axis);
                 if (collided)
                 {
                     onCollision();
                 }
-                finalLocation += prospectiveLocation * Globals.unit(axis);
             }
             return finalLocation;
         }

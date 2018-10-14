@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,48 +11,77 @@ namespace dungeon_monogame.WorldGeneration
     {
         protected Domain() { }
 
-        protected bool[] distribution;
+        //protected bool[] distribution;
 
-        public bool[] getDistributionCopy()
-        {
-            return distribution.ToArray();
-        }
+        protected BitArray distribution;
+        //static Int32[] ints;
+
+
 
         public Domain(int k)
         {
-            distribution = new bool[k];
-            for (int i=0; i < k; i++)
-            {
-                distribution[i] = false;
-            }
+            setup(k);
         }
+
 
         public Domain(bool[] d)
         {
-            distribution = d;
+            setup(d.Length);
+            setAll(d);
+        }
+
+        private void setup(int k)
+        {
+            distribution = new BitArray(k);
+            for (int i = 0; i < k; i++)
+            {
+                distribution[i] = false;
+            }
+            
         }
 
         public bool get(int i){
             return distribution[i];
         }
 
+        static int sum(BitArray bitarray)
+        {
+            int[] ints = new Int32[(bitarray.Count >> 5) + 1];
+            bitarray.CopyTo(ints, 0);
+
+            Int32 count = 0;
+
+            // fix for not truncated bits in last integer that may have been set to true with SetAll()
+            ints[ints.Length - 1] &= ~(-1 << (bitarray.Count % 32));
+
+            for (Int32 i = 0; i < ints.Length; i++)
+            {
+
+                Int32 c = ints[i];
+
+                // magic (http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel)
+                unchecked
+                {
+                    c = c - ((c >> 1) & 0x55555555);
+                    c = (c & 0x33333333) + ((c >> 2) & 0x33333333);
+                    c = ((c + (c >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+                }
+
+                count += c;
+
+            }
+
+            return count;
+        }
+
         public int sum()
         {
-            int result = 0;
-            for (int i = 0; i < distribution.Count(); i++)
-            {
-                if (distribution[i])
-                {
-                    result++;
-                }
-            }
-            return result;
-
+            return Domain.sum(distribution);
         }
         public int getRandomTrueIndex()
         {
             List<int> trueIndices = new List<int>();
-            for (int i=0; i < distribution.Count(); i++)
+            for (int i=0; i < distribution.Length; i++)
             {
                 if (distribution[i])
                 {
@@ -69,12 +99,18 @@ namespace dungeon_monogame.WorldGeneration
 
         public bool[] toBoolArray()
         {
-            return (bool[])distribution.Clone();
+
+            bool[] result = new bool[distribution.Length];
+            for (int i = 0; i < distribution.Length; i++)
+            {
+                result[i] = distribution[i];
+            }
+            return result;
         }
 
         public void setAll(bool[] p)
         {
-            distribution = p;
+            distribution = new BitArray(p);
         }
 
         public int k()
@@ -116,15 +152,16 @@ namespace dungeon_monogame.WorldGeneration
             return result;
         }
 
-        public override bool Equals(object obj)
-        {
-            var p = (Domain)obj;
-            return Enumerable.SequenceEqual(p.distribution, distribution);
-        }
 
         public override string ToString()
         {
             return distribution.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var p = (Domain)obj;
+            return Domain.sum(distribution.Xor(p.distribution)) == 0;
         }
 
     }

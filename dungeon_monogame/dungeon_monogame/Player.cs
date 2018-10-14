@@ -78,6 +78,7 @@ namespace dungeon_monogame
                 movement -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
             }
 
+
             if (newState.IsKeyDown(Keys.Space))
             {
                 if (flying)
@@ -105,6 +106,16 @@ namespace dungeon_monogame
                 mouseEngaged = !mouseEngaged;
             }
 
+            if (justHit(Keys.Up, newState))
+            {
+                Rendering.adjustAmbientLight(+0.1f);
+            }
+
+            if (justHit(Keys.Down, newState))
+            {
+                Rendering.adjustAmbientLight(-0.1f);
+            }
+
             if (justHit(Keys.LeftControl, newState))
             {
                 flying = !flying;
@@ -126,9 +137,15 @@ namespace dungeon_monogame
 
             if (newMouseState.LeftButton == ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Released)
             {
-                Spell spell = new Spell(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 35f);
+                Spell spell = new Spell(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 55f);
                 result.Add(new SpawnAction(spell));
-            } 
+            }
+
+            if (newMouseState.RightButton == ButtonState.Pressed && oldMouseState.RightButton == ButtonState.Released)
+            {
+                StickingLight spell = new StickingLight(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 55f);
+                result.Add(new SpawnAction(spell));
+            }
 
             if (mouseEngaged)
             {

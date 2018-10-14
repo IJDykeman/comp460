@@ -12,11 +12,10 @@ namespace dungeon_monogame.WorldGeneration
 {
     class TileMap
     {
-        public static readonly int alwaysMeshWithinRange =  (int)(1.2 * WorldGenParamaters.decideTilesWithinWidth * WorldGenParamaters.tileWidth / Chunk.chunkWidth);
-        public static readonly int alwaysUnmeshOutsideRange =  (int)(WorldGenParamaters.doNotGenerateOutsideRadius / WorldGenParamaters.tileWidth * Chunk.chunkWidth * Chunk.chunkWidth);
+        public static readonly int alwaysMeshWithinRange = WorldGenParamaters.MeshWithinBlockRange; 
+        public static readonly int alwaysUnmeshOutsideRange = (int)(alwaysMeshWithinRange * 1.5f);
         System.Collections.Concurrent.ConcurrentDictionary<IntLoc, Domain> distributions;
         Dictionary<IntLoc, int> tilesDecided;
-        static double undecidedEntropy;
 
         ConcurrentQueue<IntLoc> meshingQueue;
 
@@ -30,7 +29,6 @@ namespace dungeon_monogame.WorldGeneration
             tilesDecided = new Dictionary<IntLoc, int>();
             meshingQueue = new ConcurrentQueue<IntLoc>();
             tileSet = _tiles;
-            undecidedEntropy = ProbabilityDistribution.evenOdds(tileSet.size()).entropy();
 
 
         }
@@ -59,9 +57,9 @@ namespace dungeon_monogame.WorldGeneration
                         }
                         else
                         {
-                            b.color.R = (byte)MathHelper.Clamp(b.color.R - Globals.random.Next(5), 0, 255);
-                            b.color.G = (byte)MathHelper.Clamp(b.color.G - Globals.random.Next(5), 0, 255);
-                            b.color.B = (byte)MathHelper.Clamp(b.color.B - Globals.random.Next(2), 0, 255);
+                            b.color.R = (byte)MathHelper.Clamp(b.color.R - Globals.random.Next(6), 0, 255);
+                            b.color.G = (byte)MathHelper.Clamp(b.color.G - Globals.random.Next(6), 0, 255);
+                            b.color.B = (byte)MathHelper.Clamp(b.color.B - Globals.random.Next(3), 0, 255);
                             m.set((tileSpacePos * (WorldGenParamaters.tileWidth - 1)) + new IntLoc(i, j, k), b);
                         }
                     }
@@ -121,7 +119,6 @@ namespace dungeon_monogame.WorldGeneration
                 return p;
             }
             p = Domain.allTrue(tileSet.size());
-            distributions[loc] = p;
             return p;
         }
 
@@ -141,7 +138,7 @@ namespace dungeon_monogame.WorldGeneration
                     for (int k = 0; k < WorldGenParamaters.sphereWidth; k++)
                     {
                         IntLoc location = new IntLoc(i, j, k) + center - new IntLoc(WorldGenParamaters.sphereWidth / 2);
-                        if (!decided(location) && location.j == 0 || !WorldGenParamaters.onlyOneLevel)
+                        if (!decided(location) && (location.j == 0 || !WorldGenParamaters.onlyOneLevel))
                         {
                             Domain d = getDistributionAt(location) * (sphere.get(i, j, k));
                             if(d.sum() == 0)
@@ -197,6 +194,18 @@ namespace dungeon_monogame.WorldGeneration
             
         }
 
+        private float decisionUrgency(Domain d, IntLoc tileLoc, IntLoc perspectiveTileLoc)
+        {
+            float urgency = -d.sum();
+
+            if (IntLoc.EuclideanDistance(perspectiveTileLoc, tileLoc) < WorldGenParamaters.decideTilesWithinWidth)
+            {
+                urgency += 1000;
+            }
+            return urgency;
+        }
+
+
         private IntLoc? lowestEntropyUndecidedLocation()
         {
             IntLoc snapped_player_loc = new IntLoc(TileMap.playerPerspectiveLoc / WorldGenParamaters.tileWidth);
@@ -205,20 +214,27 @@ namespace dungeon_monogame.WorldGeneration
             {
                 return snapped_player_loc;
             }
-            double lowest = 10000000;
+            double greatestUrgency = 10000000;
             IntLoc? best = null;
             if (undecidedTilesAreInTheAlwaysRegion())
             {
                 foreach (IntLoc loc in distributions.Keys)
                 {
-
+                    //if(!decided(loc)){
+                    Domain d = getDistributionAt(loc);
                     float distance = IntLoc.EuclideanDistance(loc, snapped_player_loc);
-                    double e = distributions[loc].sum();
-                    if (!decided(loc) && (!best.HasValue || e < lowest) && distance < WorldGenParamaters.doNotGenerateOutsideRadius)
+                    double e = decisionUrgency(d, loc, snapped_player_loc);
+                    bool isBetter = e > greatestUrgency;
+                    if ((!best.HasValue || isBetter) && distance < WorldGenParamaters.doNotGenerateOutsideRadius)
                     {
-                        lowest = e;
+                        greatestUrgency = e;
                         best = loc;
+                        if (d.sum() == 1)
+                        {
+                            return best;
+                        }
                     }
+                    //}
                 }
 
             }
@@ -296,15 +312,15 @@ namespace dungeon_monogame.WorldGeneration
                 {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
-                    while(stopwatch.ElapsedMilliseconds < 10)
+                    while(stopwatch.ElapsedMilliseconds < 50)
                     {
                         placeATile(m);
                     }
                     stopwatch = new Stopwatch();
                     stopwatch.Start();
                     remeshAroundPlayer();
-                    Console.WriteLine("remesh time" + stopwatch.ElapsedMilliseconds.ToString());
-                    //m.unmeshOutsideRange();
+                    //Console.WriteLine("remesh time" + stopwatch.ElapsedMilliseconds.ToString());
+                    m.unmeshOutsideRange();
                 }
             }).Start();
 
@@ -323,7 +339,7 @@ namespace dungeon_monogame.WorldGeneration
 
         void remeshAroundPlayer()
         {
-            int meshRadius = alwaysMeshWithinRange;
+            int meshRadius = alwaysMeshWithinRange / Chunk.chunkWidth;
             ConcurrentQueue<IntLoc> chunksNearPlayer = getQueueFromBFS(meshRadius * 2);
             //m.remeshAllParallelizeableStep(decided);
             IntLoc centerChunkPos = new IntLoc(TileMap.playerPerspectiveLoc / Chunk.chunkWidth);

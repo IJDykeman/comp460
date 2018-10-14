@@ -22,7 +22,7 @@ namespace dungeon_monogame
 
         static Effect createGBufferEffect, renderSceneEffect;
         static Vector2 halfPixel;
-        private static float ambientLightLevel = 0.8f;
+        private static float ambientLightLevel = 0.0f;
 
         public static void LoadContent(ContentManager Content, GraphicsDeviceManager graphics)
         {
@@ -42,6 +42,13 @@ namespace dungeon_monogame
             halfPixel.X = 0.5f / (float)graphics.GraphicsDevice.PresentationParameters.BackBufferWidth;
             halfPixel.Y = 0.5f / (float)graphics.GraphicsDevice.PresentationParameters.BackBufferHeight;
 
+        }
+
+        public static void adjustAmbientLight(float delta)
+        {
+            ambientLightLevel += delta;
+            ambientLightLevel = Math.Min(ambientLightLevel, 1.0f);
+            ambientLightLevel = Math.Max(ambientLightLevel, 0.0f);
         }
 
         public static void renderWorld(GraphicsDeviceManager graphics, GameObject landscape, Player player)

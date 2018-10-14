@@ -240,7 +240,14 @@ namespace dungeon_monogame
 
         internal bool empty()
         {
-            return vertices == null || vertices.Length == 0;
+            lock (this)
+            {
+                if (vertices == null)
+                {
+                    return false;
+                }
+                return vertices.Length == 0;
+            }
         }
 
         public void forgetMesh()

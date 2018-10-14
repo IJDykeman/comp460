@@ -18,14 +18,35 @@ namespace dungeon_monogame.WorldGeneration
         {
 
             string[] files = Directory.GetFiles(MagicaVoxel.tileRoot, "*.vox");
+            List<String> fileNameList = new List<string>();
             List<Tile> tilesList = new List<Tile>();
             for (int i=0;i<files.Length; i++){
-                tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])));
+                Tile t = new Tile(MagicaVoxel.blocksFromVox(files[i]));
+                if (!tilesList.Contains(t))
+                {
+                    tilesList.Add(t);
+                    fileNameList.Add(files[i]);
+                }
                 if (!files[i].Contains("norotation"))
                 {
-                    tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90());
-                    tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90().getRotated90());
-                    tilesList.Add(new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90().getRotated90().getRotated90());
+                    t = (new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90());
+                    if (!tilesList.Contains(t))
+                    {
+                        tilesList.Add(t);
+                        fileNameList.Add(files[i]);
+                    }
+                    t = (new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90().getRotated90());
+                    if (!tilesList.Contains(t))
+                    {
+                        tilesList.Add(t);
+                        fileNameList.Add(files[i]);
+                    }
+                    t = (new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90().getRotated90().getRotated90());
+                    if (!tilesList.Contains(t))
+                    {
+                        tilesList.Add(t);
+                        fileNameList.Add(files[i]);
+                    }
                 }
                 else
                 {
@@ -38,13 +59,14 @@ namespace dungeon_monogame.WorldGeneration
             spheres = new Sphere[tiles.Length];
             //for (int i = 0; i < tiles.Length; i++)
             //{
-            Parallel.For(0, tiles.Length, i=>
-            {
-                spheres[i] = new Sphere(this, i);
+            Parallel.For(0, tiles.Length, i=> {
+                spheres[i] = new Sphere(this, i, fileNameList[i]);
             });
             //}
 
         }
+
+
 
         void buildTransitionMatrices()
         {
