@@ -181,7 +181,7 @@ float4 PointLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 	//normalize light vector
 	lightVector = normalize(lightVector);
 	//compute diffuse light
-	float NdL = max(0, dot(normal, lightVector));
+	float NdL = max(.05, dot(normal, lightVector));
 	NdL = sqrt(-1 / (NdL + 1) + 1);
 	float3 diffuseLight = NdL * colorData.rgb;
 		//reflection vector

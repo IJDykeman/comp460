@@ -21,13 +21,18 @@ namespace dungeon_monogame
         private KeyboardState oldKeyboardState;
         private float upDownRot = -2;
         private float leftRightRot = 0;
-        float speed = 12f;
+        
+        static float walkingSpeed = 12f;
+        static float flyingSpeed = walkingSpeed * 2.5f;
+        static float speed = 12f;
+
         float height = 3.5f;
         float width = 1.5f;
         private bool flying = false;
         Light torchLight;
 
         float mouseSensitivty = .002f;
+        private float jumpVelocity = 6.5f;
 
         public Player()
         {
@@ -88,7 +93,7 @@ namespace dungeon_monogame
                 }
                 else if (playerActor.isOnGround())
                 {
-                    playerActor.addVelocity(Vector3.UnitY * 5.5f);
+                    playerActor.addVelocity(Vector3.UnitY * jumpVelocity);
                     //Console.WriteLine("jump");
                     //Console.WriteLine(playerActor.getVelocity().Y);
                     
@@ -119,6 +124,7 @@ namespace dungeon_monogame
             if (justHit(Keys.LeftControl, newState))
             {
                 flying = !flying;
+                speed = (flying ? flyingSpeed : walkingSpeed);
                 playerActor.setGravityFactor(flying ? 0f : 1f);
                 playerActor.setCollides(flying ? false : true);
 
@@ -137,13 +143,13 @@ namespace dungeon_monogame
 
             if (newMouseState.LeftButton == ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Released)
             {
-                Spell spell = new Spell(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 55f);
+                Spell spell = new Spell(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 45f);
                 result.Add(new SpawnAction(spell));
             }
 
             if (newMouseState.RightButton == ButtonState.Pressed && oldMouseState.RightButton == ButtonState.Released)
             {
-                StickingLight spell = new StickingLight(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 55f);
+                StickingLight spell = new StickingLight(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 45f);
                 result.Add(new SpawnAction(spell));
             }
 

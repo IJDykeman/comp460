@@ -210,7 +210,7 @@ namespace dungeon_monogame.WorldGeneration
         {
             IntLoc snapped_player_loc = new IntLoc(TileMap.playerPerspectiveLoc / WorldGenParamaters.tileWidth);
 
-            if (!decided(snapped_player_loc))
+            if (!decided(snapped_player_loc) && !WorldGenParamaters.onlyOneLevel)
             {
                 return snapped_player_loc;
             }
