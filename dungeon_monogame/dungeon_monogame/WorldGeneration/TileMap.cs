@@ -138,7 +138,7 @@ namespace dungeon_monogame.WorldGeneration
                     for (int k = 0; k < WorldGenParamaters.sphereWidth; k++)
                     {
                         IntLoc location = new IntLoc(i, j, k) + center - new IntLoc(WorldGenParamaters.sphereWidth / 2);
-                        if (!decided(location) && (location.j == 0 || !WorldGenParamaters.onlyOneLevel))
+                        if (!decided(location) && (location.j == 0 || !WorldGenParamaters.onlyOneHorizontalLevel) && (location.i == 0 || !WorldGenParamaters.onlyOneVerticalLevel))
                         {
                             Domain d = getDistributionAt(location) * (sphere.get(i, j, k));
                             if(d.sum() == 0)
@@ -210,7 +210,7 @@ namespace dungeon_monogame.WorldGeneration
         {
             IntLoc snapped_player_loc = new IntLoc(TileMap.playerPerspectiveLoc / WorldGenParamaters.tileWidth);
 
-            if (!decided(snapped_player_loc) && !WorldGenParamaters.onlyOneLevel)
+            if (!decided(snapped_player_loc) && !(WorldGenParamaters.onlyOneHorizontalLevel || WorldGenParamaters.onlyOneVerticalLevel))
             {
                 return snapped_player_loc;
             }

@@ -20,7 +20,7 @@ namespace dungeon_monogame
 
         public static void horribleRandomRefresh()
         {
-            random = new Random(seed);
+            random = new Random(DateTime.Now.ToString("HH:mm:ss.ffffff").GetHashCode());
         }
 
         public static int getSeed()

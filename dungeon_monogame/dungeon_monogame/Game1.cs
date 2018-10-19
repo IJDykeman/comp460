@@ -25,8 +25,8 @@ namespace dungeon_monogame
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 3600;
-            graphics.PreferredBackBufferHeight = 2000;
+            graphics.PreferredBackBufferWidth = 1920;
+            graphics.PreferredBackBufferHeight = 1080;
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
 
