@@ -187,6 +187,50 @@ namespace dungeon_monogame
             return blocks;
         }
 
+        public static List<Block[,,]> TilesFromPath(string path)
+        {
+            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(path);
+            List<IntLoc> blockLocs = data.Item1;
+            List<int> colorIndices = data.Item3;
+            Color[] colors = data.Item2;
+            Tuple<int, int, int, int, int, int> extents = data.Item4;
+
+            int xSize = (int)Math.Ceiling(((extents.Item2 - extents.Item1 + 1) / (double)WorldGeneration.WorldGenParamaters.tileWidth)) * WorldGeneration.WorldGenParamaters.tileWidth;
+            int ySize = (int)Math.Ceiling(((extents.Item4 - extents.Item3 + 1) / (double)WorldGeneration.WorldGenParamaters.tileWidth)) * WorldGeneration.WorldGenParamaters.tileWidth;
+            int zSize = (int)Math.Ceiling(((extents.Item6 - extents.Item5 + 1) / (double)WorldGeneration.WorldGenParamaters.tileWidth)) * WorldGeneration.WorldGenParamaters.tileWidth;
+            Block[,,] megaTile = new Block[xSize, ySize, zSize];
+            for (int i = 0; i < blockLocs.Count; i++)
+            {
+                megaTile[blockLocs[i].i, blockLocs[i].j, blockLocs[i].k] = new Block(1, colors[colorIndices[i]]);
+            }
+            List<Block[,,]> result = new List<Block[,,]>();
+            for (int a = 0; a < xSize / WorldGeneration.WorldGenParamaters.tileWidth; a++)
+            {
+                for (int b = 0; b < ySize / WorldGeneration.WorldGenParamaters.tileWidth; b++)
+                {
+                    for (int c = 0; c < zSize / WorldGeneration.WorldGenParamaters.tileWidth; c++)
+                    {
+                        Block[,,] smalltile = new Block[WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth];
+                        for (int i = 0; i < WorldGeneration.WorldGenParamaters.tileWidth; i++)
+                        {
+                            for (int j = 0; j < WorldGeneration.WorldGenParamaters.tileWidth; j++)
+                            {
+                                for (int k = 0; k < WorldGeneration.WorldGenParamaters.tileWidth; k++)
+                                {
+                                    smalltile[i, j, k] = megaTile[a * WorldGeneration.WorldGenParamaters.tileWidth + i, b * WorldGeneration.WorldGenParamaters.tileWidth + j, c * WorldGeneration.WorldGenParamaters.tileWidth + k];
+
+                                }
+                            }
+                        }
+                        result.Add(smalltile);
+                    }
+                }
+
+            }
+            return result;
+        }
+
+
 
     }
 }

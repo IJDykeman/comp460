@@ -12,7 +12,7 @@ namespace dungeon_monogame
     {
         ChunkManager chunkManager;
         private Vector3 location = new Vector3();
-        protected Vector3 scale = Vector3.One;
+        public Vector3 scale = Vector3.One;
         Quaternion rotation = Quaternion.Identity;
         protected List<GameObject> children;
         protected Color emissiveness = Color.Black;

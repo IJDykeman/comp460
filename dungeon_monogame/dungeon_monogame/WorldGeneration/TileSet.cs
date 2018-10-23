@@ -20,36 +20,38 @@ namespace dungeon_monogame.WorldGeneration
             string[] files = Directory.GetFiles(MagicaVoxel.tileRoot, "*.vox");
             List<String> fileNameList = new List<string>();
             List<Tile> tilesList = new List<Tile>();
-            for (int i=0;i<files.Length; i++){
-                Tile t = new Tile(MagicaVoxel.blocksFromVox(files[i]));
-                if (!tilesList.Contains(t))
+            for (int i = 0; i < files.Length; i++)
+            {
+                List<Block[,,]> tiles = MagicaVoxel.TilesFromPath(files[i]);
+                foreach (Block[,,] blockSubArray in tiles)
                 {
-                    tilesList.Add(t);
-                    fileNameList.Add(files[i]);
-                }
-                if (!files[i].Contains("norotation"))
-                {
-                    t = (new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90());
-                    if (!tilesList.Contains(t))
+                    if (!tilesList.Contains(new Tile(blockSubArray)))
                     {
-                        tilesList.Add(t);
+                        tilesList.Add(new Tile(blockSubArray));
                         fileNameList.Add(files[i]);
                     }
-                    t = (new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90().getRotated90());
-                    if (!tilesList.Contains(t))
+                    if (!files[i].Contains("norotation"))
                     {
-                        tilesList.Add(t);
-                        fileNameList.Add(files[i]);
+                        Tile t;
+                        t = (new Tile(blockSubArray).getRotated90());
+                        if (!tilesList.Contains(t))
+                        {
+                            tilesList.Add(t);
+                            fileNameList.Add(files[i]);
+                        }
+                        t = (new Tile(blockSubArray).getRotated90().getRotated90());
+                        if (!tilesList.Contains(t))
+                        {
+                            tilesList.Add(t);
+                            fileNameList.Add(files[i]);
+                        }
+                        t = (new Tile(blockSubArray).getRotated90().getRotated90().getRotated90());
+                        if (!tilesList.Contains(t))
+                        {
+                            tilesList.Add(t);
+                            fileNameList.Add(files[i]);
+                        }
                     }
-                    t = (new Tile(MagicaVoxel.blocksFromVox(files[i])).getRotated90().getRotated90().getRotated90());
-                    if (!tilesList.Contains(t))
-                    {
-                        tilesList.Add(t);
-                        fileNameList.Add(files[i]);
-                    }
-                }
-                else
-                {
 
                 }
             }
