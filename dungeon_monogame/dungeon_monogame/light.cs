@@ -61,7 +61,7 @@ namespace dungeon_monogame
         public static readonly float HIGH_STABILITY = .96f;
         public static readonly float LOW_STABILITY = .9f;
         public static readonly float MEDIUM_FLICKER_INTENSITY = 1.0f;
-        public static readonly float HIGH_FLICKER_INTENSITY = 2.0f;
+        public static readonly float HIGH_FLICKER_INTENSITY = 4.0f;
         public MagicLantern(float _intensity, Color _color)
         {
             targetIntensity = _intensity;

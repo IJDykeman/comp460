@@ -80,13 +80,10 @@ namespace dungeon_monogame
 
         public static Vector3 randomVectorOnUnitSphere()
         {
-            // based on http://corysimon.github.io/articles/uniformdistn-on-sphere/
-            double theta = 2 * Math.PI * random.NextDouble();
-            double phi = Math.PI * random.NextDouble();
-            double x = Math.Sin(phi) * Math.Cos(theta);
-            double y = Math.Sin(phi) * Math.Sin(theta);
-            double z = Math.Cos(phi);
-            return new Vector3((float)x, (float)y, (float)z);
+
+            Vector3 result =  new Vector3((float)standardGaussianSample(), (float)standardGaussianSample(), (float)standardGaussianSample());
+            result.Normalize();
+            return result;
         }
 
         public static float standardGaussianSample() {

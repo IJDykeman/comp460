@@ -48,7 +48,7 @@ namespace dungeon_monogame
 
 
 
-        public void physicsUpdate(GameTime time, ChunkManager space)
+        public List<Action> physicsUpdate(GameTime time, ChunkManager space)
         {
             previousVelocity = velocity;
             float deltaTime = time.ElapsedGameTime.Milliseconds / 1000f;
@@ -58,23 +58,28 @@ namespace dungeon_monogame
 
             if (collidesWithWorld)
             {
-                setLocation(collide(space, desiredMovement));
+                Tuple<Vector3, List<Action>> newLocation_actions = collide(space, desiredMovement);
+                setLocation(newLocation_actions.Item1);
+                return newLocation_actions.Item2;
             }
             else
             {
                 setLocation(desiredMovement + getLocation());
+                return new List<Action>();
             }
             
         }
 
 
-        private Vector3 collide(ChunkManager space, Vector3 desiredMovement)
+        private Tuple<Vector3, List<Action>> collide(ChunkManager space, Vector3 desiredMovement)
         {
 
             Vector3 currentLocation = getLocation();
             Vector3 desiredFinalLocation = getLocation() + desiredMovement;
             Vector3 finalLocation = new Vector3();
             currentlyOnGround = false;
+            List<Action> actions = new List<Action>();
+            bool didCollde = false;
             foreach (Globals.axes axis in Globals.allAxes)
             {
                 Vector3 prospectiveLocation = desiredFinalLocation * Globals.unit(axis);
@@ -137,10 +142,15 @@ namespace dungeon_monogame
                 finalLocation += prospectiveLocation * Globals.unit(axis);
                 if (collided)
                 {
-                    onCollision();
+                    didCollde = true;
+                    
                 }
             }
-            return finalLocation;
+            if (didCollde)
+            {
+                actions = onCollision();
+            }
+            return new Tuple<Vector3, List<Action>>(finalLocation, actions);
         }
 
         public void setVelocity(Vector3 v)
@@ -175,8 +185,9 @@ namespace dungeon_monogame
             return result;
         }
 
-        protected virtual void onCollision() 
+        protected virtual List<Action> onCollision() 
         {
+            return new List<Action>();
         }
 
         public AABB getAabb()

@@ -9,7 +9,6 @@ namespace dungeon_monogame
 {
     class Spell : Actor
     {
-        protected bool dead = false;
         protected Color lightColor;
 
         public Spell(Vector3 _location, Vector3 velocity)
@@ -28,31 +27,30 @@ namespace dungeon_monogame
             model.setEmissiveness(lightColor);
         }
 
-        protected override void onCollision()
+        protected override List<Action> onCollision()
         {
-            dead = true;
+            List<Action> result = new List<Action>();
+
+            result.Add(new DissapearAction(this));
+            result.Add(new SpawnAction(new Flash(getLocation() - .1f * Vector3.Normalize(previousVelocity))));
+            for (int i = 0; i < Globals.random.Next(15, 30); i++)
+            {
+                result.Add(new SpawnAction(new Spark(getLocation() - .2f * Vector3.Normalize(previousVelocity)
+                    ,
+                    Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 8f,
+                    lightColor
+
+                    )));
+
+            }
+            return result;
+
         }
 
         protected override List<Action> update()
         {
             List<Action> result = new List<Action>();
             result.Add(new RequestPhysicsUpdate(this));
-            if (dead)
-            {
-                result.Add(new DissapearAction(this));
-                result.Add(new SpawnAction(new Flash(getLocation() - .1f * Vector3.Normalize(previousVelocity))));
-                for (int i = 0; i < Globals.random.Next(15,30); i++)
-                {
-                    result.Add(new SpawnAction(new Spark(getLocation() - .2f * Vector3.Normalize(previousVelocity)
-                        ,
-                        Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 8f,
-                        lightColor
-
-                        )));
-
-                }
-
-            }
             return result;
         }
     }
@@ -84,11 +82,12 @@ namespace dungeon_monogame
             model.setEmissiveness(lightColor);
         }
 
-        protected override void onCollision()
+        protected override List<Action> onCollision()
         {
             hasCollided = true;
             lantern.setIntensity(2.0f);
             lantern.setStability(MagicLantern.MEDIUM_STABILITY);
+            return new List<Action>();
 
         }
 
@@ -143,12 +142,13 @@ namespace dungeon_monogame
             addChild(obj);
         }
 
-        protected override void onCollision()
+        protected override List<Action> onCollision()
         {
             if (Globals.random.NextDouble() < dissapear_on_collide_probability)
             {
                 dead = true;
             }
+            return new List<Action>();
         }
 
         protected override List<Action> update()
@@ -202,50 +202,57 @@ namespace dungeon_monogame
 
     class FireBall : Actor
     {
-        protected bool dead = false;
         protected Color lightColor;
+        protected MagicLantern light;
+        GameObject model;
 
         public FireBall(Vector3 _location, Vector3 velocity)
-            : base(new AABB(.1f, .1f, .1f))
+            : base(new AABB(1.1f, 1.1f, 1.1f))
         {
             setLocation(_location);
             this.addVelocity(velocity);
-            gravityFactor = 0f;
+            gravityFactor = 1f;
 
             lightColor = Globals.ColorFromHSV(23, .8, .9);
 
-            addChild(new Light(.6f, lightColor));
+            
+            light = new MagicLantern(1.6f, lightColor);
+            light.setStability(MagicLantern.LOW_STABILITY);
+            light.setFlickerIntensity(MagicLantern.HIGH_FLICKER_INTENSITY);
+            addChild(light);
 
-            GameObject model = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-.5f - .5f - .5f) * -.0f, Vector3.One * .1f);
-            addChild(model);
-            model.setEmissiveness(lightColor);
+            //model = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(), Vector3.One * .1f);
+            //addChild(model);
+           // model.setEmissiveness(lightColor);
         }
 
-        protected override void onCollision()
+        protected override List<Action> onCollision()
         {
-            dead = true;
+            List<Action> result = new List<Action>();
+            result.Add(new DissapearAction(this));
+            result.Add(new SpawnAction(new Flash(getLocation() - .1f * Vector3.Normalize(previousVelocity))));
+            for (int i = 0; i < Globals.random.Next(100, 150); i++)
+            {
+                result.Add(new SpawnAction(new FireParticle(getLocation()
+                    ,
+                    Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 20f ,
+                    lightColor
+
+                    )));
+
+            }
+            return result;
         }
 
         protected override List<Action> update()
         {
             List<Action> result = new List<Action>();
             result.Add(new RequestPhysicsUpdate(this));
-            if (dead)
-            {
-                result.Add(new DissapearAction(this));
-                result.Add(new SpawnAction(new Flash(getLocation() - .1f * Vector3.Normalize(previousVelocity))));
-                for (int i = 0; i < Globals.random.Next(100, 150); i++)
-                {
-                    result.Add(new SpawnAction(new FireParticle(getLocation() - 5f * Vector3.Normalize(previousVelocity)
-                        ,
-                        Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 5f,
-                        lightColor
+            //model.scale = Vector3.One * .1f * light.getIntensity();
+            result.Add(new SpawnAction(new FireParticle(getLocation(), Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 3f,lightColor
 
-                        )));
+    )));
 
-                }
-
-            }
             return result;
         }
     }
@@ -253,60 +260,71 @@ namespace dungeon_monogame
     class FireParticle : Actor
     {
         bool dead = false;
-        
-        Light light;
+
+        MagicLantern light;
         GameObject shape;
 
 
         float temperature = 1f;
+        float mass;
+        float age = 0;
 
         public FireParticle(Vector3 _location, Vector3 velocity, Color color)
 
         {
+            aabb = new AABB(.001f, .001f, .001f);
             setLocation(_location);
             this.addVelocity(velocity);
-            bounciness = 1f;
             gravityFactor = -1;
-            light = new Light(0f, color);
-
-            if (Globals.random.NextDouble() > .9f)
+            light = new MagicLantern(0f, color);
+            light.setStability(MagicLantern.HIGH_STABILITY);
+            light.setFlickerIntensity(MagicLantern.MEDIUM_FLICKER_INTENSITY);
+            mass = (float)Globals.random.NextDouble();
+            if (Globals.random.NextDouble() > .7f)
             {
                 addChild(light);
             }
-            ChunkManager model = MagicaVoxel.ChunkManagerFromVox(@"spell.vox");
+            ChunkManager model = MagicaVoxel.ChunkManagerFromVox(@"smoke.vox");
             Vector3 offset = model.getCenter();
             
-            shape = new GameObject(model, -offset, Vector3.One);
+            shape = new GameObject(model, offset*0, Vector3.One);
             shape.scale = Vector3.One * 6 * (.08f + (float)(Globals.random.NextDouble() - .5) * .03f);
             shape.setEmissiveness(color);
-            this.aabb = model.getAaabbFromModelExtents();
             addChild(shape);
-            velocity += Vector3.UnitY * 10f;
-        }
-
-        protected override void onCollision()
-        {
-
+            mass = (float)Globals.random.NextDouble();
+            collidesWithWorld = true;
+            age = 2;
         }
 
         protected override List<Action> update()
         {
-            
+            age += .3f + (1 - mass);
+
+
             List<Action> result = new List<Action>();
             
             result.Add(new RequestPhysicsUpdate(this));
 
-            temperature *= (float)Globals.random.NextDouble() * .08f + .92f;
-            light.setIntensity((float)Math.Sqrt(temperature ));
-            shape.scale = Vector3.One * temperature;
-            gravityFactor = -1;// temperature;
-            this.velocity *= .98f;
-            shape.setEmissiveness(Globals.ColorFromHSV(23, temperature, temperature));
 
-            if (shape.scale.Length() < .005f)
+            //temperature *= (float)Globals.random.NextDouble() * (1-decay_factor) + decay_factor;
+            float clock = age / 20;
+            temperature =  ((float)(Math.Exp(clock / Math.Exp(clock))) -1)/1.2f;
+            bounciness = temperature;
+
+            light.setIntensity((float)(temperature ) * 4);
+            shape.scale = Vector3.One * (float)(temperature);
+            gravityFactor = (-temperature*4 + mass);
+            this.velocity -= .0001f * velocity.LengthSquared() / mass * velocity;
+
+            Color emit = Globals.ColorFromHSV(23, (1 - temperature), light.getIntensity() * light.getIntensity() );
+            shape.setEmissiveness(emit);// light.getIntensity() * light.getIntensity()/3008));
+            light.updateWithChildren();
+
+            if (temperature < .01f && age > 10)
             {
                 result.Add(new DissapearAction(this));
             }
+
             return result;
         }
     }

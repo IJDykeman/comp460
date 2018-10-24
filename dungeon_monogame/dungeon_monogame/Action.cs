@@ -26,7 +26,10 @@ namespace dungeon_monogame
 
         public void act(GameObject world, GameTime dt)
         {
-            actor.physicsUpdate(dt, world.getChunkSpace());
+            foreach(Action act in actor.physicsUpdate(dt, world.getChunkSpace()))
+            {
+                act.act(world, dt);
+            }
         }
     }
 
