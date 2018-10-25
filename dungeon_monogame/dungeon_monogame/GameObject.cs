@@ -99,7 +99,7 @@ namespace dungeon_monogame
             return result;
         }
 
-
+        public virtual void burn() { }
 
         internal ChunkManager getChunkSpace()
         {
@@ -119,6 +119,20 @@ namespace dungeon_monogame
                     c.recursiveRemove(obj);
                 }
             }
+        }
+
+        internal List<GameObject> recursiveGetWithinSphere(Vector3 center, float radius)
+        {
+            List<GameObject> results = new List<GameObject>();
+            foreach (GameObject child in children){
+                if ((child.getLocation() - center).Length() <= radius)
+                {
+                    results.Add(child);
+                    results.AddRange(child.recursiveGetWithinSphere(center - this.getLocation(), radius));
+
+                }
+            }
+            return results;
         }
 
         public void setRotation(Quaternion quaternion)

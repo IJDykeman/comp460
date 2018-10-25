@@ -9,7 +9,8 @@ namespace dungeon_monogame
 {
     class Monster : Actor
     {
-        int health = 10;
+        float health = 1;
+        bool onFire = false;
         public Monster(Vector3 location)
         {
             setLocation(location);
@@ -25,12 +26,21 @@ namespace dungeon_monogame
         {
             List<Action> result = new List<Action>();
             result.Add(new RequestPhysicsUpdate(this));
-
+            if (onFire)
+            {
+                health -= 1.0f / 250;
+            }
             if (health <= 0)
             {
                 result.Add(new DissapearAction(this));
             }
             return result;
+        }
+
+        public override void burn()
+        {
+            addChild(new Fire(this));
+            onFire = true;
         }
 
         public override void takeDamage(int damage)

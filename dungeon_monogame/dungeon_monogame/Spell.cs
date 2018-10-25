@@ -200,11 +200,39 @@ namespace dungeon_monogame
         }
     }
 
+    class Fire : Actor
+    {
+        public Color lightColor;
+        protected MagicLantern light;
+        protected Actor onFire;
+        public Fire(Actor _onFire)
+            : base(new AABB(1.1f, 1.1f, 1.1f))
+        {
+            onFire = _onFire;
+            gravityFactor = 1f;
+
+            lightColor = Globals.ColorFromHSV(23, .8, .9);
+
+
+            light = new MagicLantern(1.6f, lightColor);
+            light.setStability(MagicLantern.LOW_STABILITY);
+            light.setFlickerIntensity(MagicLantern.HIGH_FLICKER_INTENSITY);
+            addChild(light);
+        }
+        protected override List<Action> update()
+        {
+            List<Action> result = new List<Action>();
+            result.Add(new SpawnAction(new FireParticle(onFire.getLocation(), Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 3f, lightColor)));
+
+            return result;
+        }
+    }
+
     class FireBall : Actor
     {
-        protected Color lightColor;
-        protected MagicLantern light;
+
         GameObject model;
+        Fire fire;
 
         public FireBall(Vector3 _location, Vector3 velocity)
             : base(new AABB(1.1f, 1.1f, 1.1f))
@@ -213,30 +241,22 @@ namespace dungeon_monogame
             this.addVelocity(velocity);
             gravityFactor = 1f;
 
-            lightColor = Globals.ColorFromHSV(23, .8, .9);
-
-            
-            light = new MagicLantern(1.6f, lightColor);
-            light.setStability(MagicLantern.LOW_STABILITY);
-            light.setFlickerIntensity(MagicLantern.HIGH_FLICKER_INTENSITY);
-            addChild(light);
-
-            //model = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(), Vector3.One * .1f);
-            //addChild(model);
-           // model.setEmissiveness(lightColor);
+            fire = new Fire(this);
+            addChild(fire);
         }
 
         protected override List<Action> onCollision()
         {
             List<Action> result = new List<Action>();
             result.Add(new DissapearAction(this));
+            result.Add(new EngulfInFlameAction(getLocation(), 10f));
             result.Add(new SpawnAction(new Flash(getLocation() - .1f * Vector3.Normalize(previousVelocity))));
             for (int i = 0; i < Globals.random.Next(100, 150); i++)
             {
                 result.Add(new SpawnAction(new FireParticle(getLocation()
                     ,
                     Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 20f ,
-                    lightColor
+                    fire.lightColor
 
                     )));
 
@@ -248,10 +268,7 @@ namespace dungeon_monogame
         {
             List<Action> result = new List<Action>();
             result.Add(new RequestPhysicsUpdate(this));
-            //model.scale = Vector3.One * .1f * light.getIntensity();
-            result.Add(new SpawnAction(new FireParticle(getLocation(), Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 3f,lightColor
-
-    )));
+    
 
             return result;
         }

@@ -64,6 +64,29 @@ namespace dungeon_monogame
             world.recursiveRemove(actor);
         }
     }
+
+    class EngulfInFlameAction : Action
+    {
+        Vector3 center;
+        float radius;
+
+        public EngulfInFlameAction(Vector3 _center, float _radius)
+        {
+            center = _center;
+            radius = _radius;
+        }
+
+
+        public void act(GameObject world, GameTime dt)
+        {
+            List<GameObject> burnedObjects = world.recursiveGetWithinSphere(center, radius);
+            foreach(GameObject obj in burnedObjects)
+            {
+                obj.burn();
+            }
+
+        }
+    }
 }
 
 
