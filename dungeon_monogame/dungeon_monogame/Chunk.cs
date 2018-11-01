@@ -13,12 +13,15 @@ namespace dungeon_monogame
 
     class Chunk
     {
-        public static readonly int chunkWidth = 14;
+        public static readonly int chunkWidth = 32; // 14
         private Block[,,] blocks;
         //public short[] indices; //having this be a short could be causing the chunk complexity limit issue
         public VertexPostitionColorPaintNormal[] vertices;
         public int[] indices;
         bool meshReflectsBlocks = false;
+        public IndexBuffer indexBuffer;
+        public VertexBuffer vertexBuffer;
+
 
         private static readonly Vector3[] probes = new Vector3[]{
                 new Vector3(.5f, .5f, .5f),
@@ -123,6 +126,9 @@ namespace dungeon_monogame
                     indices[i / 4 * 6 + 4] = (int)(i + 3);
                     indices[i / 4 * 6 + 5] = (int)(i + 2);
                 }
+                vertexBuffer = null;
+                indexBuffer = null;
+                
                 meshReflectsBlocks = true;
             }
 
@@ -257,6 +263,10 @@ namespace dungeon_monogame
                 vertices = null;
                 indices = null;
                 meshReflectsBlocks = false;
+                //vertexBuffer.Dispose();
+                vertexBuffer = null;
+                //indexBuffer.Dispose();
+                indexBuffer = null;
             }
         }
     }

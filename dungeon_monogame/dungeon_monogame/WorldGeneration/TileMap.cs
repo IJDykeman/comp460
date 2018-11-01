@@ -231,7 +231,7 @@ namespace dungeon_monogame.WorldGeneration
                         best = loc;
                         if (d.sum() == 1)
                         {
-                            return best;
+                                return best;
                         }
                     }
                     //}
@@ -304,23 +304,21 @@ namespace dungeon_monogame.WorldGeneration
             }).Start();
             new Thread(() => { keepTilesUpdated(); }).Start();
             */
-            
+            decide(new IntLoc());
             new Thread(() =>
             {
-                decide(new IntLoc());
+                
                 while (true)
                 {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
-                    while(stopwatch.ElapsedMilliseconds < 50)
+                    while (stopwatch.ElapsedMilliseconds < 50)
                     {
-                        placeATile(m);
+                    placeATile(m);
                     }
-                    stopwatch = new Stopwatch();
-                    stopwatch.Start();
                     remeshAroundPlayer();
-                    //Console.WriteLine("remesh time" + stopwatch.ElapsedMilliseconds.ToString());
                     m.unmeshOutsideRange();
+                    
                 }
             }).Start();
 
@@ -329,7 +327,10 @@ namespace dungeon_monogame.WorldGeneration
         }
 
 
+        public void update()
+        {
 
+        }
 
         public void report()
         {

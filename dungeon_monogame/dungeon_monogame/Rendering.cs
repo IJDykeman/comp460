@@ -22,7 +22,7 @@ namespace dungeon_monogame
 
         static Effect createGBufferEffect, renderSceneEffect;
         static Vector2 halfPixel;
-        private static float ambientLightLevel = 0.0f;
+        private static float ambientLightLevel = 0.2f;
 
         public static void LoadContent(ContentManager Content, GraphicsDeviceManager graphics)
         {
@@ -150,7 +150,7 @@ namespace dungeon_monogame
                 graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight;
             float fieldOfView = MathHelper.ToRadians(70f) ;
             float nearClipPlane = .1f;
-            float farClipPlane = 500;
+            float farClipPlane = 1500;
             //return Matrix.CreateOrthographic(15, 15, .001f, 20);
             return Matrix.CreatePerspectiveFieldOfView(
                 fieldOfView, aspectRatio, nearClipPlane, farClipPlane);

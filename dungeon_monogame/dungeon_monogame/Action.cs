@@ -13,7 +13,7 @@ namespace dungeon_monogame
 
         void act(GameObject world, GameTime dt);
     }
-    
+
     class RequestPhysicsUpdate : Action
     {
         private Actor actor;
@@ -22,13 +22,76 @@ namespace dungeon_monogame
         {
             actor = a;
         }
-        
+
 
         public void act(GameObject world, GameTime dt)
         {
-            foreach(Action act in actor.physicsUpdate(dt, world.getChunkSpace()))
+            foreach (Action act in actor.physicsUpdate(dt, world.getChunkSpace()))
             {
                 act.act(world, dt);
+            }
+        }
+    }
+
+    class MoveTowardTaggedActorAction : Action
+    {
+        private Monster monster;
+        private ActorTag tag;
+        float minDist, maxDist;
+
+        public MoveTowardTaggedActorAction(Monster a, ActorTag _tag, float _minDist, float _maxDist)
+        {
+            monster = a;
+            tag = _tag;
+            minDist = _minDist;
+            maxDist = _maxDist;
+        }
+
+
+        public void act(GameObject world, GameTime dt)
+        {
+            List<GameObject> tagged = world.getChildrenWithTag(tag);
+            if (tagged.Count > 0)
+            {
+                float distance = (monster.getLocation() - tagged[0].getLocation()).Length();
+                Vector3 targetCenter = tagged[0].getLocation();
+                Vector3 targetDelta = targetCenter - monster.getLocation();
+                float dist = targetDelta.Length();
+                targetDelta.Normalize();
+                targetDelta *= Math.Max(0, dist - minDist);
+                if (minDist < distance && distance < maxDist)
+                {
+                    monster.setTargetLocation(targetDelta + monster.getLocation());
+                }
+            }
+        }
+
+    }
+
+    class AofDamage : Action
+    {
+        Vector3 center;
+        float radius;
+        ActorTag tag;
+        float damage;
+
+        public AofDamage(Vector3 _center, ActorTag _tag, float _radius, float _damage)
+        {
+            center = _center;
+            radius = _radius;
+            tag = _tag;
+            damage = _damage;
+        }
+
+
+        public void act(GameObject world, GameTime dt)
+        {
+            foreach (Actor a in world.getChildrenWithTag(tag))
+            {
+                if((a.getLocation() - center).Length() < radius)
+                {
+                    a.takeDamage(damage);
+                }
             }
         }
     }

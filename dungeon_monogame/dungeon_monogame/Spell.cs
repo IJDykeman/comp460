@@ -38,7 +38,8 @@ namespace dungeon_monogame
                 result.Add(new SpawnAction(new Spark(getLocation() - .2f * Vector3.Normalize(previousVelocity)
                     ,
                     Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 8f,
-                    lightColor
+                    lightColor,
+                    @"spell.vox"
 
                     )));
 
@@ -105,7 +106,7 @@ namespace dungeon_monogame
                     result.Add(new SpawnAction(new Spark(getLocation() - .2f * Vector3.Normalize(previousVelocity)
                         ,
                         Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 2f,
-                        lightColor)));
+                        lightColor, @"spell.vox")));
                 }
 
             }
@@ -117,29 +118,54 @@ namespace dungeon_monogame
         }
     }
 
-    class Spark : Actor
+    class BalisticModel : Actor
+    {
+        protected float scaleFactor = .99f;
+        protected GameObject obj;
+        public BalisticModel(Vector3 _location, Vector3 velocity, float scale, string modelPath)
+        {
+            this.addVelocity(velocity);
+            setLocation(_location);
+            ChunkManager model = MagicaVoxel.ChunkManagerFromVox(modelPath);
+            Vector3 offset = model.getCenter();
+            obj = new GameObject(model, -offset, Vector3.One);
+
+            this.aabb = model.getAaabbFromModelExtents();
+            this.scale = Vector3.One * scale;
+            addChild(obj);
+        }
+        protected override List<Action> update()
+        {
+            List<Action> result = new List<Action>();
+            result.Add(new RequestPhysicsUpdate(this));
+            this.scale *= scaleFactor;
+            if (this.scale.Length() < .005f)
+            {
+                result.Add(new DissapearAction(this));
+            }
+            return result;
+
+        }
+    }
+
+    class Spark : BalisticModel
     {
         bool dead = false;
         float dissapear_on_collide_probability = .2f;
         Light light;
-        float scaleFactor = .99f;
 
-        public Spark(Vector3 _location, Vector3 velocity, Color color)
+        public Spark(Vector3 _location, Vector3 velocity, Color color, string modelPath) : base(_location, velocity, 1, modelPath)
            
         {
-            setLocation(_location);
-            this.addVelocity(velocity);
+            
+            
             bounciness = .7f + (float)(Globals.random.NextDouble() -.5) *.2f;
             gravityFactor = .6f + (float)(Globals.random.NextDouble() -.5) *.1f;
             light = new Light(.4f + (float)(Globals.random.NextDouble() - .5) * .1f, color);
             addChild(light);
-            ChunkManager model = MagicaVoxel.ChunkManagerFromVox(@"spell.vox");
-            Vector3 offset = model.getCenter();
-            this.scale = Vector3.One * (.08f + (float)(Globals.random.NextDouble() -.5) *.03f);
-            GameObject obj = new GameObject(model, -offset, Vector3.One);
             obj.setEmissiveness(color);
-            this.aabb = model.getAaabbFromModelExtents();
-            addChild(obj);
+            this.scale = Vector3.One * (.08f + (float)(Globals.random.NextDouble() -.5) *.03f);
+
         }
 
         protected override List<Action> onCollision()
@@ -153,24 +179,14 @@ namespace dungeon_monogame
 
         protected override List<Action> update()
         {
-            List<Action> result = new List<Action>();
-            result.Add(new RequestPhysicsUpdate(this));
+            List<Action> result = base.update();
             if (dead)
             {
                 scaleFactor = .90f;
 
             }
-            this.scale *= scaleFactor;
             light.setIntensity(light.getIntensity() * .99995f);
-            if (this.scale.Length() < .05f)
-            {
-               // light.setIntensity(light.getIntensity() * .9995f);
 
-            }
-            if (this.scale.Length() < .005f)
-            {
-                result.Add(new DissapearAction(this));
-            }
             return result;
         }
     }
@@ -222,6 +238,7 @@ namespace dungeon_monogame
         protected override List<Action> update()
         {
             List<Action> result = new List<Action>();
+            if(Globals.visualsRandom.NextDouble() > .5f)
             result.Add(new SpawnAction(new FireParticle(onFire.getLocation(), Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 3f, lightColor)));
 
             return result;
@@ -289,7 +306,7 @@ namespace dungeon_monogame
         public FireParticle(Vector3 _location, Vector3 velocity, Color color)
 
         {
-            aabb = new AABB(.001f, .001f, .001f);
+            aabb = new AABB(.1f, .1f, .1f);
             setLocation(_location);
             this.addVelocity(velocity);
             gravityFactor = -1;
@@ -304,7 +321,7 @@ namespace dungeon_monogame
             ChunkManager model = MagicaVoxel.ChunkManagerFromVox(@"smoke.vox");
             Vector3 offset = model.getCenter();
             
-            shape = new GameObject(model, offset*0, Vector3.One);
+            shape = new GameObject(model, -offset * 0, Vector3.One);
             shape.scale = Vector3.One * 6 * (.08f + (float)(Globals.random.NextDouble() - .5) * .03f);
             shape.setEmissiveness(color);
             addChild(shape);

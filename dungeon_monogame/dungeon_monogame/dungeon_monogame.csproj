@@ -47,6 +47,7 @@
     <Compile Include="Actor.cs" />
     <Compile Include="Chunk.cs" />
     <Compile Include="ChunkManager.cs" />
+    <Compile Include="Creature.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="light.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="Monster.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Rendering.cs" />
+    <Compile Include="Slime.cs" />
     <Compile Include="Spell.cs" />
     <Compile Include="structs.cs" />
     <Compile Include="Game1.cs" />

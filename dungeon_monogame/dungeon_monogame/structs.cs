@@ -9,6 +9,12 @@ using System.Threading.Tasks;
 namespace dungeon_monogame
 {
 
+    enum ActorTag
+    {
+        Player
+    }
+
+
     public struct VertexPostitionColorPaintNormal : IVertexType
     {
         public Vector3 Position;
@@ -174,3 +180,4 @@ namespace dungeon_monogame
 
 }
 
+ 

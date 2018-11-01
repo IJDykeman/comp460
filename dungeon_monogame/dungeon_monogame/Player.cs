@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using dungeon_monogame.WorldGeneration;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -22,12 +23,12 @@ namespace dungeon_monogame
         private float upDownRot = -2;
         private float leftRightRot = 0;
         
-        static float walkingSpeed = 12f;
+        static float walkingSpeed = 12f * WorldGenParamaters.gameScale;
         static float flyingSpeed = walkingSpeed * 2.5f;
         static float speed = 12f;
 
-        float height = 3.5f;
-        float width = 1.5f;
+        float height = 3.5f * WorldGenParamaters.gameScale;
+        float width = 1.5f * WorldGenParamaters.gameScale;
         private bool flying = false;
         Light torchLight;
 
@@ -52,6 +53,7 @@ namespace dungeon_monogame
             //torch.addChild(new GameObject(MagicaVoxel.Read(@"torch.vox"), new Vector3(-3, 0, 0), Vector3.One * .5f));
             playerActor.addChild(torch);
             //playerActor.addChild(new Light());
+            playerActor.addTag(ActorTag.Player);
         }
 
         public List<Action> handleInput()
@@ -133,6 +135,11 @@ namespace dungeon_monogame
             if (flying)
             {
                 playerActor.setVelocity(Vector3.Zero);
+            }
+
+            if(justHit(Keys.M, newState))
+            {
+                result.Add(new SpawnAction(new Slime(getCameraLocation())));
             }
 
             

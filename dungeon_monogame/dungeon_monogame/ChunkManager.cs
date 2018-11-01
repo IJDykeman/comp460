@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -159,59 +160,97 @@ namespace dungeon_monogame
             return chunks.ContainsKey(locToChunkLoc(loc));
         }
 
+        bool IsLocked(object o)
+        {
+            if (!Monitor.TryEnter(o))
+                return true;
+            Monitor.Exit(o);
+            return false;
+        }
+
         public void draw(Effect effect, Matrix transform, Color emission, BoundingFrustum frustum)
         {
+            bool alreadyPushedABuffer = false;
             foreach (KeyValuePair<IntLoc, Chunk> p in chunks)
             {
                 Chunk c = p.Value;
-                    IntLoc loc = p.Key;
+                IntLoc loc = p.Key;
 
+                if (IsLocked(c))
+                {
+                    continue; //someone else is working on this chunk.  let's not wait for them.
+                }
 
-
-                    Matrix oldWorldMat = effect.Parameters["xWorld"].GetValueMatrix();
-
-                    if (c.empty() || !c.readyToDraw())
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                lock (c)
+                {
+                    if (c.vertexBuffer == null)
                     {
-                        continue;
-                    }
-                    //Game1.graphics.GraphicsDevice.Indices = c.indexBuffer;
-                    //Game1.graphics.GraphicsDevice.SetVertexBuffer(c.vertexBuffer);
-                    Game1.graphics.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
+                        if (alreadyPushedABuffer)
+                        {
+                            //continue;
+                        }
+
+
+                        if (c.empty() || !c.readyToDraw())
+                        {
+                            continue;
+                        }
+
+                        Game1.graphics.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+
+
+                        c.indexBuffer = new IndexBuffer(Game1.graphics.GraphicsDevice, typeof(int), c.indices.Length, BufferUsage.WriteOnly);
+                        c.indexBuffer.SetData(c.indices);
+
+                        c.vertexBuffer = new VertexBuffer(Game1.graphics.GraphicsDevice, typeof(VertexPostitionColorPaintNormal), c.vertices.Length, BufferUsage.WriteOnly);
+                        c.vertexBuffer.SetData<VertexPostitionColorPaintNormal>(c.vertices);
+;
+                        alreadyPushedABuffer = true;
+                    }
+                    Matrix oldWorldMat = effect.Parameters["xWorld"].GetValueMatrix();
                     Matrix worldMatrix = Matrix.Multiply(oldWorldMat, Matrix.CreateTranslation(loc.toVector3()) * transform);
                     effect.Parameters["xWorld"].SetValue(worldMatrix);
+                    effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
 
                     BoundingBox box = new BoundingBox(Vector3.Transform(new Vector3(), worldMatrix),
-                                                        Vector3.Transform(Vector3.One * Chunk.chunkWidth, worldMatrix));
+                                    Vector3.Transform(Vector3.One * Chunk.chunkWidth, worldMatrix));
 
-                    if (frustum.Intersects(box))
+                    //if (!frustum.Intersects(box))
+                    //{
+                    //  continue;
+                    //}
+
+                    Game1.graphics.GraphicsDevice.SetVertexBuffer(c.vertexBuffer);
+                    Game1.graphics.GraphicsDevice.Indices = c.indexBuffer;
+                    foreach (var pass in effect.CurrentTechnique.Passes)
                     {
+                        pass.Apply();
 
-
-                        //effect.Parameters["xAmbient"].SetValue(ambient_light);
-                        //effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
-                        effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
-
-                        foreach (var pass in effect.CurrentTechnique.Passes)
-                        {
-                            pass.Apply();
-                        //Game1.graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
-                        //    c.indexBuffer.IndexCount / 3);
                         try // if the chunk has been unmeshed since the beginning of the draw call, the call will fail
                         {
-                            Game1.graphics.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, c.vertices, 0,
-                                c.vertices.Length, c.indices, 0, c.indices.Length / 3);
+
+                            Game1.graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
+                                c.indices.Length / 3);
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
 
                         }
                         finally { }
-                        }
-
-
                     }
+
+
+
+                    //}
                     effect.Parameters["xWorld"].SetValue(oldWorldMat);
+                }
+                watch.Stop();
+                if(watch.ElapsedMilliseconds > 0){
+
+                }
             }
         }
 

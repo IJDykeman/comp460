@@ -16,6 +16,8 @@ namespace dungeon_monogame
         Quaternion rotation = Quaternion.Identity;
         protected List<GameObject> children;
         protected Color emissiveness = Color.Black;
+        private HashSet<ActorTag> tags = new HashSet<ActorTag>();
+
 
         public GameObject()
         {
@@ -37,6 +39,29 @@ namespace dungeon_monogame
         {
             rotation = _rotation;
         }
+
+        public void addTag(ActorTag tag)
+        {
+            tags.Add(tag);
+        }
+
+        public bool hasTag(ActorTag tag)
+        {
+            return tags.Contains(tag);
+        }
+
+        public List<GameObject> getChildrenWithTag(ActorTag tag)
+        {
+            List<GameObject> result = new List<GameObject>();
+            if (hasTag(tag)) {
+                result.Add(this);
+            }
+            foreach (GameObject o in children){
+                result.AddRange(o.getChildrenWithTag(tag));
+            }
+            return result;
+        }
+
 
         public void addChild(GameObject child)
         {
@@ -140,7 +165,7 @@ namespace dungeon_monogame
             rotation = quaternion;
         }
 
-        public virtual void takeDamage(int damage) { }
+        public virtual void takeDamage(float damage) { }
 
     }
 }

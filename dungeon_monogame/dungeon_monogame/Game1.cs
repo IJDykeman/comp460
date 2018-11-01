@@ -25,6 +25,8 @@ namespace dungeon_monogame
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.GraphicsProfile = GraphicsProfile.HiDef;
+
             graphics.PreferredBackBufferWidth = 1920 *2 ;
             graphics.PreferredBackBufferHeight = 1080 * 2;
             graphics.ApplyChanges();
@@ -64,7 +66,7 @@ namespace dungeon_monogame
 
             player = new Player();
             landscape.addChild(player.getActor());
-            landscape.addChild(new Monster(new Vector3(12, 20, 12)));
+            landscape.addChild(new Slime(new Vector3(12, 20, 12)));
             //landscape.addChild(new GameObject(map.getManager(), new Vector3(1,2,1), Vector3.One * .2f));
             Console.WriteLine("global seed is " + Globals.getSeed().ToString());
             
@@ -97,6 +99,7 @@ namespace dungeon_monogame
             base.Update(gameTime);
             Console.WriteLine(Globals.random.Next());
             Globals.horribleRandomRefresh();
+            map.update();
         }
 
 

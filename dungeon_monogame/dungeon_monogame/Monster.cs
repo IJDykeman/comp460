@@ -1,51 +1,38 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace dungeon_monogame
 {
-    class Monster : Actor
+    class Monster : Creature
     {
-        float health = 1;
-        bool onFire = false;
-        public Monster(Vector3 location)
+
+        Vector3 targetLocation = new Vector3();
+
+
+
+        public Monster()
         {
-            setLocation(location);
-            ChunkManager model = MagicaVoxel.ChunkManagerFromVox("goblin1.vox");
-            scale = Vector3.One * .08f;
-            Vector3 offset = model.getCenter();
-            GameObject obj = new GameObject(model, -offset, Vector3.One);
-            this.aabb = model.getAaabbFromModelExtents();
-            addChild(obj);
+            lifeStopwatch = new Stopwatch();
+            lifeStopwatch.Start();
         }
 
-        protected override List<Action> update()
+
+
+        public void setTargetLocation(Vector3 loc)
         {
-            List<Action> result = new List<Action>();
-            result.Add(new RequestPhysicsUpdate(this));
-            if (onFire)
-            {
-                health -= 1.0f / 250;
-            }
-            if (health <= 0)
-            {
-                result.Add(new DissapearAction(this));
-            }
-            return result;
+            targetLocation = loc;
         }
 
-        public override void burn()
+        public Vector3 getTargetLocation()
         {
-            addChild(new Fire(this));
-            onFire = true;
+            return targetLocation;
         }
 
-        public override void takeDamage(int damage)
-        {
-            health -= damage;
-        }
+
     }
 }

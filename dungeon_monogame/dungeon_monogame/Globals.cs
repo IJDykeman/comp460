@@ -15,12 +15,14 @@ namespace dungeon_monogame
         static int seed = new Random().Next();
         
         public static Random random = new Random(seed);
-        
+        public static Random visualsRandom = new Random(seed + 1);
+
         static ConcurrentDictionary<int, List<IntLoc>> BFScache= new ConcurrentDictionary<int, List<IntLoc>>();
 
         public static void horribleRandomRefresh()
         {
-            random = new Random(DateTime.Now.ToString("HH:mm:ss.ffffff").GetHashCode());
+            random = new Random(DateTime.Now.ToString("HH:mm:ss.ffvisualRandomffff").GetHashCode());
+            visualsRandom = new Random(DateTime.Now.ToString("HH:mm:ss.ffvisualRandomffff").GetHashCode() + 1);
         }
 
         public static int getSeed()

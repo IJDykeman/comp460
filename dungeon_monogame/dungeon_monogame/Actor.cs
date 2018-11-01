@@ -21,13 +21,13 @@ namespace dungeon_monogame
 
 
 
-
         public Actor() { }
 
         public Actor(AABB aabb)
         {
             this.aabb = aabb;
         }
+
 
         public Actor(AABB aabb, bool collides, float _gravityFactor)
         {
