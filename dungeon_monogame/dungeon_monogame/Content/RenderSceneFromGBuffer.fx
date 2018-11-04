@@ -14,6 +14,10 @@ texture normalMap;
 texture depthMap;
 texture positionMap;
 texture emissiveMap;
+texture shadowDepthMap;
+// used to compute distances to lights
+float4x4 lightView;
+float4x4 lightProjection;
 float lightIntensity;
 float3 lightPosition;
 
@@ -68,10 +72,22 @@ sampler emissiveSampler = sampler_state
 	Texture = (emissiveMap);
 	AddressU = CLAMP;
 	AddressV = CLAMP;
+	MagFilter = LINEAR;
+	MinFilter = LINEAR;
+	Mipfilter = LINEAR;
+};
+
+sampler shadowDepthMapSampler = sampler_state
+{
+	Texture = (shadowDepthMap);
+	AddressU = CLAMP;
+	AddressV = CLAMP;
 	MagFilter = POINT;
 	MinFilter = POINT;
 	Mipfilter = POINT;
 };
+
+
 
 struct VertexShaderInput
 {
@@ -93,6 +109,12 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	return output;
 }
 
+float4 EmmissiveMaterialsPixelShaderFunction(VertexShaderOutput input) : COLOR0
+{
+	float4 emissiveData = tex2D(emissiveSampler, input.TexCoord);
+	return float4((emissiveData.rgb * 2), 1);
+}
+
 float4 DirectionalLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
 	
@@ -100,26 +122,21 @@ float4 DirectionalLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float4 normalData = tex2D(normalSampler, input.TexCoord);
 	float4 colorData = tex2D(colorSampler, input.TexCoord);
 	float4 emissiveData = tex2D(emissiveSampler, input.TexCoord);
-	emissiveData = emissiveData;
-	float3 lightVector = -normalize(lightDirection);
 	//compute diffuse light
 	float3 normal = 2.0f * normalData.xyz - 1.0f;
 
-	float NdL = max(0, dot(normal, lightVector)) + .3;
+	float NdL = max(0, -dot(normal, lightDirection));
 	float3 diffuseLight = NdL * colorData.rgb;
 	//return float4(diffuseLight.rgb, 1);
 
 	//tranform normal back into [-1,1] range
 
 
-	//get specular power, and get it into [0,255] range]
-	float specularPower = normalData.a * 255;
-	//get specular intensity from the colorMap
-	float specularIntensity = tex2D(colorSampler, input.TexCoord).a;
-	//read depth
 	float depthVal = tex2D(depthSampler, input.TexCoord).r;
 	//compute screen-space position
 	float4 position;
+	float4 position2;
+
 	position.x = input.TexCoord.x * 2.0f - 1.0f;
 	position.y = -(input.TexCoord.y * 2.0f - 1.0f);
 	position.z = depthVal;
@@ -127,16 +144,28 @@ float4 DirectionalLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 	//transform to world space
 	position = mul(position, InvertViewProjection);
 	position /= position.w;
-	//surface-to-light vector
 
-	//reflexion vector
-	float3 reflectionVector = normalize(reflect(lightVector, normal));
-	//camera-to-surface vector
-	float3 directionToCamera = normalize(cameraPosition - position);
-	//compute specular light
-	float specularLight = specularIntensity * pow(saturate(dot(reflectionVector, directionToCamera)), specularPower);
-	//output the two lights
-	return float4(diffuseLight.rgb * lightIntensity + (emissiveData.rgb * 2), 1);
+	position2=position;
+	position2.z *=1;
+
+
+	//surface-to-light vector
+	float4x4 lightViewProjection = mul(lightView, lightProjection);
+	float2 shadowMapTexCoord = mul(position, lightViewProjection);
+	shadowMapTexCoord.x = shadowMapTexCoord.x/2 +  .5;
+	shadowMapTexCoord.y = -shadowMapTexCoord.y/2 + .5;
+	float4 shadowMapDepthData = tex2D(shadowDepthMapSampler, shadowMapTexCoord); 
+
+
+	float3 result = (diffuseLight.rgb * lightIntensity + (emissiveData.rgb));
+	float4 lightViewProjPos = mul(position, lightViewProjection);
+	float d = (lightViewProjPos.z / lightViewProjPos.w);
+	float s = shadowMapDepthData.r;
+	if ((s + .003f< d) || shadowMapDepthData.z > 0 || shadowMapTexCoord.x > 1 || shadowMapTexCoord.y > 1 || shadowMapTexCoord.x < 0 || shadowMapTexCoord.y < 0 ){
+		result *=0;
+	}
+
+	return float4(result, 1);
 }
 
 float4x4 InvertView;
@@ -202,8 +231,18 @@ technique DirectionalLightTechnique
 {
 	pass Pass0
 	{
+		VertexShader = compile vs_3_0 VertexShaderFunction();
+		PixelShader = compile ps_3_0 DirectionalLightPixelShaderFunction();
+	}
+}
+
+
+technique EmmissiveMaterialsTechnique
+{
+	pass Pass0
+	{
 		VertexShader = compile vs_2_0 VertexShaderFunction();
-		PixelShader = compile ps_2_0 DirectionalLightPixelShaderFunction();
+		PixelShader = compile ps_2_0 EmmissiveMaterialsPixelShaderFunction();
 	}
 }
 

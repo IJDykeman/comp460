@@ -12,32 +12,33 @@ namespace dungeon_monogame
     static class Rendering
     {
 
-        private static RenderTarget2D colorRT;
-        private static RenderTarget2D normalRT, emissiveRT;
-        private static RenderTarget2D depthRT, positionRT;
+        static RenderTargets cameraTargets;
         public static Texture2D vignette;
         static int backBufferWidth, backBufferHeight;
         static Color bgColor = Color.Black;
+        static int scale_factor = 1;
 
 
         static Effect createGBufferEffect, renderSceneEffect;
         static Vector2 halfPixel;
-        private static float ambientLightLevel = 0.2f;
+        private static float ambientLightLevel = 0.0f;
 
-        public static void LoadContent(ContentManager Content, GraphicsDeviceManager graphics)
+        static GraphicsDeviceManager graphics;
+        static GameObject worldRootObject;
+
+        public static void LoadContent(ContentManager Content, GraphicsDeviceManager _graphics, GameObject _worldRoot)
         {
+            graphics = _graphics;
+            worldRootObject = _worldRoot;
             backBufferHeight = graphics.PreferredBackBufferHeight;
             backBufferWidth  = graphics.PreferredBackBufferWidth;
             createGBufferEffect = Content.Load<Effect>("DeferredRender");
             renderSceneEffect = Content.Load<Effect>("RenderSceneFromGBuffer");
             vignette = Content.Load<Texture2D>("vignette");
 
-            int scale_factor = 1;
-            colorRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Color, DepthFormat.Depth24);
-            normalRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Color, DepthFormat.None);
-            depthRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Single, DepthFormat.None);
-            positionRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Vector4, DepthFormat.None);
-            emissiveRT = new RenderTarget2D(graphics.GraphicsDevice, backBufferWidth * scale_factor, backBufferHeight * scale_factor, false, SurfaceFormat.Color, DepthFormat.None);
+            cameraTargets = new RenderTargets(backBufferWidth, backBufferHeight, graphics.GraphicsDevice);
+
+
 
             halfPixel.X = 0.5f / (float)graphics.GraphicsDevice.PresentationParameters.BackBufferWidth;
             halfPixel.Y = 0.5f / (float)graphics.GraphicsDevice.PresentationParameters.BackBufferHeight;
@@ -47,102 +48,101 @@ namespace dungeon_monogame
         public static void adjustAmbientLight(float delta)
         {
             ambientLightLevel += delta;
-            ambientLightLevel = Math.Min(ambientLightLevel, 1.0f);
+            ambientLightLevel = Math.Min(ambientLightLevel, 1.4f);
             ambientLightLevel = Math.Max(ambientLightLevel, 0.0f);
         }
 
-        public static void renderWorld(GraphicsDeviceManager graphics, GameObject landscape, Player player)
+        public static void renderWorld(Player player)
         {
-            using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
-            {
-                sprite.Begin(depthStencilState: DepthStencilState.Default);
-                sprite.End();
-            }
             GraphicsDevice GraphicsDevice = graphics.GraphicsDevice;
-            //BasicEffect effect = new BasicEffect(graphics.GraphicsDevice);
+            using (SpriteBatch sprite = new SpriteBatch(GraphicsDevice))
+            {
+                sprite.Begin(depthStencilState: DepthStencilState.Default);
+                sprite.End();
+            }
 
-            //effect.View = Matrix.CreateLookAt(
-            //    cameraPosition, cameraPosition + cameraLookAlongVector, cameraUpVector);
+            
 
-            //graphics.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
-            GraphicsDevice.SetRenderTargets(colorRT, normalRT, depthRT, emissiveRT);
-            // render options
-            //graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.BlendState = BlendState.Opaque;
-            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, bgColor, 1.0f, 0);
+            GBuffer buffer = DrawGBuffer(player.getViewMatrix(), projection(graphics), cameraTargets);
 
+            worldRootObject.drawAlternateGBufferFirstPass(createGBufferEffect, Matrix.Identity, new BoundingFrustum(Matrix.Identity), graphics.GraphicsDevice);
 
-            createGBufferEffect.CurrentTechnique = createGBufferEffect.Techniques["RenderGBuffer"];
-            createGBufferEffect.Parameters["xProjection"].SetValue(projection(graphics));
-            createGBufferEffect.Parameters["xView"].SetValue(player.getViewMatrix());
-            createGBufferEffect.Parameters["xWorld"].SetValue(Matrix.Identity);
-            // worldChunkManager.draw(createGBufferEffect, Matrix.Identity);
-            landscape.drawFirstPass(createGBufferEffect, Matrix.Identity, new BoundingFrustum(player.getViewMatrix() * projection(graphics)));
-            //player.draw(createGBufferEffect);
+            //GBuffer LightPerspectiveGBuffer = renderDirectionalLightFirstPass(graphics, rootObject, player, GraphicsDevice);
+            setupParams(player, buffer.diffuseTex, buffer.norm, buffer.depth, buffer.emissive);
 
-            Texture2D diffuseTex = (Texture2D)colorRT;
-            Texture2D norm = (Texture2D)normalRT;
-            Texture2D depth = (Texture2D)depthRT;
-            Texture2D position = (Texture2D)positionRT;
-            Texture2D emissive = (Texture2D)emissiveRT;
-            GraphicsDevice.SetRenderTargets(null);
+            renderSceneEffect.Parameters["InvertViewProjection"].SetValue(Matrix.Invert(player.getViewMatrix() * projection(graphics)));
+            renderSceneEffect.Parameters["halfPixel"].SetValue(halfPixel);
+            new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
+            GraphicsDevice.BlendState = BlendState.Additive;
+            worldRootObject.drawSecondPass(renderSceneEffect, Matrix.Identity, GraphicsDevice);
 
+            // render light coming directly from emmissize objects
+            renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["EmmissiveMaterialsTechnique"];
+            new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
+            
+            //renderDirectionalLightSecondPass(graphics, rootObject, player, GraphicsDevice, LightPerspectiveGBuffer);
 
             using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
             {
-                //effect.CurrentTechnique = effect.Techniques["ClearGBuffer"];
-                sprite.Begin(depthStencilState: DepthStencilState.Default);
-                //sprite.Begin(0, BlendState.Opaque, null, null, null, effect);
-                sprite.Draw(diffuseTex, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 0.4f, SpriteEffects.None, 1);
-                sprite.Draw(norm, new Vector2(500, 0), null, Color.White, 0, new Vector2(0, 0), 0.4f, SpriteEffects.None, 1);
-                sprite.Draw(depth, new Vector2(0, 300), null, Color.White, 0, new Vector2(0, 0), 0.4f, SpriteEffects.None, 1);
-                sprite.Draw(emissive, new Vector2(500, 300), null, Color.White, 0, new Vector2(0, 0), 0.4f, SpriteEffects.None, 1);
+                sprite.Begin(depthStencilState: DepthStencilState.None);
+                sprite.Draw(vignette, new Vector2(0, 0), null, Color.Black * .7f, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+
+                float squareScale = .2f;
+                int w = 800;
+                int h = w / 5 * 3;
+                //sprite.Draw(LightPerspectiveGBuffer.diffuseTex, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), squareScale, SpriteEffects.None, 1);
+                //sprite.Draw(LightPerspectiveGBuffer.norm, new Vector2(w, 0), null, Color.White, 0, new Vector2(0, 0), squareScale, SpriteEffects.None, 1);
+                //sprite.Draw(LightPerspectiveGBuffer.depth, new Vector2(0, h), null, Color.White, 0, new Vector2(0, 0), squareScale, SpriteEffects.None, 1);
+                //sprite.Draw(LightPerspectiveGBuffer.emissive, new Vector2(w, h), null, Color.White, 0, new Vector2(0, 0), squareScale, SpriteEffects.None, 1);
+
                 sprite.End();
             }
-            if (true)
+
+        
+            using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
             {
-                renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["PointLightTechnique"];
+                sprite.Begin(depthStencilState: DepthStencilState.Default);
 
-                //set all parameters
-                renderSceneEffect.Parameters["lightIntensity"].SetValue(1f);
-                renderSceneEffect.Parameters["colorMap"].SetValue(diffuseTex);
-                renderSceneEffect.Parameters["normalMap"].SetValue(norm);
-                renderSceneEffect.Parameters["depthMap"].SetValue(depth);
-                renderSceneEffect.Parameters["emissiveMap"].SetValue(emissive);
-                //renderSceneEffect.Parameters["positionMap"].SetValue(position);
-                renderSceneEffect.Parameters["lightDirection"].SetValue(new Vector3(1, -2, 3));
-                // renderSceneEffect.Parameters["Color"].SetValue(new Vector3(0,.5f, .5f));
-                //renderSceneEffect.Parameters["lightDirection"].SetValue(new Vector3(1, -2, 3));
-                renderSceneEffect.Parameters["lightRadius"].SetValue(0f);
-                renderSceneEffect.Parameters["lightPosition"].SetValue(player.getCameraLocation());
-                //renderSceneEffect.Parameters["cameraPosition"].SetValue(player.getCameraLocation());
-                renderSceneEffect.Parameters["InvertViewProjection"].SetValue(Matrix.Invert(player.getViewMatrix() * projection(graphics)));
-                renderSceneEffect.Parameters["halfPixel"].SetValue(halfPixel);
-                GraphicsDevice.BlendState = BlendState.Opaque;
-
-                new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-                GraphicsDevice.BlendState = BlendState.Additive;
-                landscape.drawDeferredPass(renderSceneEffect, Matrix.Identity, GraphicsDevice);
-
-
-                new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-                renderSceneEffect.Parameters["lightIntensity"].SetValue(ambientLightLevel);
-                renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["DirectionalLightTechnique"];
-                //GraphicsDevice.BlendState = BlendState.Opaque;
-
-                new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
-                using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
-                {
-                    sprite.Begin(depthStencilState: DepthStencilState.None);
-                    sprite.Draw(vignette, new Vector2(0, 0), null, Color.Black * .6f, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
-                    sprite.End();
-                }
+                sprite.End();
             }
 
 
         }
 
+        public static GBuffer DrawGBuffer(Matrix viewMatrix, Matrix projectionMatrix, RenderTargets targets)
+        {
+
+            GraphicsDevice device = graphics.GraphicsDevice;
+            targets.setTargets(device);
+            // render options
+            graphics.GraphicsDevice.BlendState = BlendState.Opaque;
+            device.RasterizerState = RasterizerState.CullCounterClockwise;
+            device.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, bgColor, 1.0f, 0);
+
+            createGBufferEffect.CurrentTechnique = createGBufferEffect.Techniques["RenderGBuffer"];
+            createGBufferEffect.Parameters["xProjection"].SetValue(projectionMatrix);
+            createGBufferEffect.Parameters["xView"].SetValue(viewMatrix);
+            createGBufferEffect.Parameters["xWorld"].SetValue(Matrix.Identity);
+            worldRootObject.drawFirstPass(createGBufferEffect, Matrix.Identity, new BoundingFrustum(viewMatrix * projectionMatrix));
+
+            GBuffer buffer = targets.getTextures();
+            device.SetRenderTargets(null);
+            return buffer;
+        }
+
+        private static void setupParams(Player player, Texture2D diffuseTex, Texture2D norm, Texture2D depth, Texture2D emissive)
+        {
+            //render global directional light
+            renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["PointLightTechnique"];
+            //set all parameters
+            renderSceneEffect.Parameters["lightIntensity"].SetValue(1f);
+            renderSceneEffect.Parameters["colorMap"].SetValue(diffuseTex);
+            renderSceneEffect.Parameters["normalMap"].SetValue(norm);
+            renderSceneEffect.Parameters["depthMap"].SetValue(depth);
+            renderSceneEffect.Parameters["emissiveMap"].SetValue(emissive);
+            renderSceneEffect.Parameters["lightRadius"].SetValue(0f);
+            renderSceneEffect.Parameters["lightPosition"].SetValue(player.getCameraLocation());
+        }
 
         public static Matrix projection(GraphicsDeviceManager graphics)
         {
@@ -159,6 +159,55 @@ namespace dungeon_monogame
     }
 }
 
+struct GBuffer
+{
+    public Texture2D diffuseTex;
+    public Texture2D norm;
+    public Texture2D depth;
+    public Texture2D position;
+    public Texture2D emissive;
+    public GBuffer(Texture2D _diffuseTex, Texture2D _norm, Texture2D _depth, Texture2D _position, Texture2D _emissive)
+    {
+        diffuseTex = _diffuseTex;
+        norm = _norm;
+        depth = _depth;
+        position = _position;
+        emissive = _emissive;
+    }
+}
+
+class RenderTargets
+{
+    public RenderTarget2D colorRT;
+    public RenderTarget2D normalRT;
+    public RenderTarget2D depthRT;
+    public RenderTarget2D positionRT;
+    public RenderTarget2D emissiveRT;
+
+    public RenderTargets(int width, int height, GraphicsDevice device)
+    {
+        colorRT = new RenderTarget2D(device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
+        normalRT = new RenderTarget2D(device, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+        depthRT = new RenderTarget2D(device, width, height, false, SurfaceFormat.Single, DepthFormat.Depth24);
+        positionRT = new RenderTarget2D(device, width, height, false, SurfaceFormat.Vector4, DepthFormat.None);
+        emissiveRT = new RenderTarget2D(device, width, height, false, SurfaceFormat.Color, DepthFormat.None);
+    }
+
+    public void setTargets(GraphicsDevice device)
+    {
+        device.SetRenderTargets(colorRT, normalRT, depthRT, emissiveRT);
+    }
+
+    public GBuffer getTextures()
+    {
+        Texture2D diffuseTex = ((Texture2D)colorRT);
+        Texture2D norm = (Texture2D)normalRT;
+        Texture2D depth = (Texture2D)depthRT;
+        Texture2D position = (Texture2D)positionRT;
+        Texture2D emissive = (Texture2D)emissiveRT;
+        return new GBuffer(diffuseTex, norm, depth, position, emissive);
+    }
+}
 
 
 internal sealed class QuadRenderer

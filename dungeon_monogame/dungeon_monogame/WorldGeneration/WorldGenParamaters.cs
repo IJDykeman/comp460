@@ -8,9 +8,9 @@ namespace dungeon_monogame.WorldGeneration
 {
     static class WorldGenParamaters
     {
-        public static readonly int tileWidth = 65;
+        public static readonly int tileWidth = 39;
         public static readonly int sphereWidth = 9;
-        public static readonly int decideTilesWithinWidth = 10;
+        public static readonly int decideTilesWithinWidth = 15;
         public static readonly int doNotGenerateOutsideRadius = decideTilesWithinWidth / 2 + 1;
         public static readonly float gameScale = 4f;
 
@@ -18,7 +18,8 @@ namespace dungeon_monogame.WorldGeneration
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\15_dungeon\";
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\21_dungeon\";
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_jake_9\";
-        public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_65_dungeon\";
+        //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_65_dungeon\";
+        public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_islands_65\";
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_spacious_15\";
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_spacious_21_dungeon\";
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_3_hills\";

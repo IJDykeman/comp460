@@ -49,15 +49,17 @@ namespace dungeon_monogame
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-        //Content.RootDirectory = "Content";
+            //Content.RootDirectory = "Content";
             // use C:\Program Files (x86)\MSBuild\MonoGame\v3.0\Tools pipeline tool for this
 
             // TODO: use this.Content to load your game content here
-            Rendering.LoadContent(Content, graphics);
+
             //landscapeChunks = MagicaVoxel.ChunkManagerFromVox(@"castleOnHill.vox");
             map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
 
             landscape = new GameObject(map.getManager(), new Vector3(), Vector3.One);
+            landscape.addChild(new DirectionalLight(GraphicsDevice));
+            Rendering.LoadContent(Content, graphics, landscape);
             //ChunkManager landscape_model = MagicaVoxel.ChunkManagerFromVox("test.vox");
             //landscape = new GameObject(landscape_model, new Vector3(), Vector3.One);
 
@@ -72,10 +74,6 @@ namespace dungeon_monogame
             
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
@@ -112,7 +110,7 @@ namespace dungeon_monogame
             GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
-            Rendering.renderWorld(graphics, landscape, player);
+            Rendering.renderWorld(player);
 
             base.Draw(gameTime);
         }

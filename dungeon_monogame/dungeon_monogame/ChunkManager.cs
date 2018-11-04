@@ -170,7 +170,6 @@ namespace dungeon_monogame
 
         public void draw(Effect effect, Matrix transform, Color emission, BoundingFrustum frustum)
         {
-            bool alreadyPushedABuffer = false;
             foreach (KeyValuePair<IntLoc, Chunk> p in chunks)
             {
                 Chunk c = p.Value;
@@ -187,13 +186,6 @@ namespace dungeon_monogame
                 {
                     if (c.vertexBuffer == null)
                     {
-
-                        if (alreadyPushedABuffer)
-                        {
-                            //continue;
-                        }
-
-
                         if (c.empty() || !c.readyToDraw())
                         {
                             continue;
@@ -207,8 +199,6 @@ namespace dungeon_monogame
 
                         c.vertexBuffer = new VertexBuffer(Game1.graphics.GraphicsDevice, typeof(VertexPostitionColorPaintNormal), c.vertices.Length, BufferUsage.WriteOnly);
                         c.vertexBuffer.SetData<VertexPostitionColorPaintNormal>(c.vertices);
-;
-                        alreadyPushedABuffer = true;
                     }
                     Matrix oldWorldMat = effect.Parameters["xWorld"].GetValueMatrix();
                     Matrix worldMatrix = Matrix.Multiply(oldWorldMat, Matrix.CreateTranslation(loc.toVector3()) * transform);

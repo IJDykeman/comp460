@@ -83,6 +83,16 @@ namespace dungeon_monogame
             emissiveness = e;
         }
 
+        public virtual void drawAlternateGBufferFirstPass(Effect effect, Matrix transform, BoundingFrustum frustum, GraphicsDevice device)
+        {
+            transform = getTransform(ref transform);
+
+            foreach (GameObject child in children)
+            {
+                child.drawAlternateGBufferFirstPass(effect, transform, frustum, device);
+            }
+        }
+
         public void drawFirstPass(Effect effect, Matrix transform, BoundingFrustum frustum)
         {
             transform = getTransform(ref transform);
@@ -94,14 +104,14 @@ namespace dungeon_monogame
             }
         }
 
-        public virtual void drawDeferredPass(Effect effect, Matrix transform, GraphicsDevice device)
+        public virtual void drawSecondPass(Effect effect, Matrix transform, GraphicsDevice device)
         {
             foreach (GameObject child in children)
             {
-                child.drawDeferredPass(effect, getTransform(ref transform), device);
+                child.drawSecondPass(effect, getTransform(ref transform), device);
             }
         }
-
+        
         protected Matrix getTransform(ref Matrix transform)
         {
             return (Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(rotation) * Matrix.CreateTranslation(location)) * transform;

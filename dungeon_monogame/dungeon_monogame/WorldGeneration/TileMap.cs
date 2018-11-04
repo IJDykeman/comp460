@@ -288,8 +288,6 @@ namespace dungeon_monogame.WorldGeneration
         {
             m = new ChunkManager();
 
-
-
             /*for (int i = 0; i < 5; i++)
             {
                 new Thread(() =>
