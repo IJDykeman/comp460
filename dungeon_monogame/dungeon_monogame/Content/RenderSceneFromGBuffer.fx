@@ -25,7 +25,9 @@ float3 lightPosition;
 //float lightRadius;
 //control the brightness of the light
 //float lightIntensity = 1.0f;
-
+float4x4 InvertView;
+float4x4 InvertProjection;
+float lightRadius;
 
 sampler colorSampler = sampler_state
 {
@@ -151,9 +153,9 @@ float4 DirectionalLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 
 	//surface-to-light vector
 	float4x4 lightViewProjection = mul(lightView, lightProjection);
-	float2 shadowMapTexCoord = mul(position, lightViewProjection);
-	shadowMapTexCoord.x = shadowMapTexCoord.x/2 +  .5;
-	shadowMapTexCoord.y = -shadowMapTexCoord.y/2 + .5;
+	float4 shadowMapTexCoord = mul(position, lightViewProjection);
+	shadowMapTexCoord.x = shadowMapTexCoord.x/shadowMapTexCoord.w/2 +  .5;
+	shadowMapTexCoord.y = -shadowMapTexCoord.y/shadowMapTexCoord.w/2 + .5;
 	float4 shadowMapDepthData = tex2D(shadowDepthMapSampler, shadowMapTexCoord); 
 
 
@@ -161,16 +163,85 @@ float4 DirectionalLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float4 lightViewProjPos = mul(position, lightViewProjection);
 	float d = (lightViewProjPos.z / lightViewProjPos.w);
 	float s = shadowMapDepthData.r;
-	if ((s + .003f< d) || shadowMapDepthData.z > 0 || shadowMapTexCoord.x > 1 || shadowMapTexCoord.y > 1 || shadowMapTexCoord.x < 0 || shadowMapTexCoord.y < 0 ){
+	if (
+		(s + .003f< d) ||
+		//(s + .003f< d-100000) ||
+		shadowMapTexCoord.x > 1 || shadowMapTexCoord.y > 1 || shadowMapTexCoord.x < 0 || shadowMapTexCoord.y < 0 ){
+		result *=0;
+	}
+	if(d < 0 || d > 1 ){
 		result *=0;
 	}
 
 	return float4(result, 1);
 }
 
-float4x4 InvertView;
-float4x4 InvertProjection;
-float lightRadius;
+
+float4 SpotLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
+{
+	
+	//get normal data from the normalMap
+	float4 normalData = tex2D(normalSampler, input.TexCoord);
+	float4 colorData = tex2D(colorSampler, input.TexCoord);
+	float4 emissiveData = tex2D(emissiveSampler, input.TexCoord);
+	//compute diffuse light
+	float3 normal = 2.0f * normalData.xyz - 1.0f;
+	
+
+
+	float depthVal = tex2D(depthSampler, input.TexCoord).r;
+	//compute screen-space position
+	float4 position;
+	float4 position2;
+
+	position.x = input.TexCoord.x * 2.0f - 1.0f;
+	position.y = -(input.TexCoord.y * 2.0f - 1.0f);
+	position.z = depthVal;
+	position.w = 1.0f;
+	//transform to world space
+	position = mul(position, InvertViewProjection);
+	position /= position.w;
+
+	position2=position;
+	position2.z *=1;
+
+
+	float3 lightVector = lightPosition - position;
+	float attenuation = saturate(pow(max(0, 1.0f - length(lightVector) / lightRadius),2));
+	//normalize light vector
+	lightVector = normalize(lightVector);
+	//compute diffuse light
+	float NdL = max(.05, dot(normal, lightVector));
+	//NdL = sqrt(-1 / (NdL + 1) + 1);
+	float3 diffuseLight = NdL * colorData.rgb;
+	float3 result = (diffuseLight.rgb * lightIntensity*attenuation + (emissiveData.rgb));
+
+	float4x4 lightViewProjection = mul(lightView, lightProjection);
+	float4 shadowMapTexCoord = mul(position, lightViewProjection);
+	shadowMapTexCoord.x = shadowMapTexCoord.x/shadowMapTexCoord.w/2 +  .5;
+	shadowMapTexCoord.y = -shadowMapTexCoord.y/shadowMapTexCoord.w/2 + .5;
+	float4 shadowMapDepthData = tex2D(shadowDepthMapSampler, shadowMapTexCoord); 
+
+
+
+	float4 lightViewProjPos = mul(position, lightViewProjection);
+	float d = (lightViewProjPos.z / lightViewProjPos.w);
+	float s = shadowMapDepthData.r;
+	if (
+		(s + .003f< d) ||
+		//(s + .003f< d-100000) ||
+		shadowMapTexCoord.x > 1 || shadowMapTexCoord.y > 1 || shadowMapTexCoord.x < 0 || shadowMapTexCoord.y < 0 ){
+		result *=0;
+	}
+	if(d < 0 || d > 1 ){
+		result *=0;
+	}
+
+	return float4(result, 1);
+}
+
+
+
 
 float4 PointLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
@@ -233,6 +304,17 @@ technique DirectionalLightTechnique
 	{
 		VertexShader = compile vs_3_0 VertexShaderFunction();
 		PixelShader = compile ps_3_0 DirectionalLightPixelShaderFunction();
+	}
+}
+
+
+
+technique SpotLightTechnique
+{
+	pass Pass0
+	{
+		VertexShader = compile vs_3_0 VertexShaderFunction();
+		PixelShader = compile ps_3_0 SpotLightPixelShaderFunction();
 	}
 }
 

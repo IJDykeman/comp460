@@ -63,13 +63,14 @@ namespace dungeon_monogame
         protected bool hasCollided = false;
         protected Color lightColor;
         protected MagicLantern lantern;
+        int lifeForce = 120;
 
 
         public StickingLight(Vector3 _location, Vector3 velocity)
-            : base(new AABB(1.0f, 1.0f, 1.0f))
+            : base(new AABB(1.2f, 1.2f, 1.2f))
         {
             setLocation(_location);
-            this.addVelocity(velocity);
+            this.addVelocity(velocity/4);
             gravityFactor = 0f;
 
             lightColor = Globals.ColorFromHSV(Globals.random.NextDouble() * 150 + 40, 1, 1);
@@ -78,7 +79,7 @@ namespace dungeon_monogame
             lantern.setStability(MagicLantern.LOW_STABILITY);
             addChild(lantern);
 
-            GameObject model = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-1.5f -1.5f -1.5f) * -.0f, Vector3.One * .1f);
+            GameObject model = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-1.5f -1.5f -1.5f) * -.0f, Vector3.One * .02f);
             addChild(model);
             model.setEmissiveness(lightColor);
         }
@@ -88,7 +89,9 @@ namespace dungeon_monogame
             hasCollided = true;
             lantern.setIntensity(2.0f);
             lantern.setStability(MagicLantern.MEDIUM_STABILITY);
-            return new List<Action>();
+            List<Action> result = new List<Action>();
+            
+            return result;
 
         }
 
@@ -107,6 +110,11 @@ namespace dungeon_monogame
                         ,
                         Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 2f,
                         lightColor, @"spell.vox")));
+                }
+                lifeForce--;
+                if (lifeForce < 0)
+                {
+                    result.Add(new DissapearAction(this));
                 }
 
             }

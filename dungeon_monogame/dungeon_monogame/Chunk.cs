@@ -103,8 +103,7 @@ namespace dungeon_monogame
 
         public void remeshParallelStep(ChunkManager space, Vector3 chunkLoc)
         {
-            lock (this)
-            {
+
                 if (!needsRemesh())
                 {
                     return;
@@ -126,11 +125,13 @@ namespace dungeon_monogame
                     indices[i / 4 * 6 + 4] = (int)(i + 3);
                     indices[i / 4 * 6 + 5] = (int)(i + 2);
                 }
+            //lock (this)
+            //{
                 vertexBuffer = null;
                 indexBuffer = null;
                 
                 meshReflectsBlocks = true;
-            }
+            //}
 
         }
 

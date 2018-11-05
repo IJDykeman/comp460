@@ -83,13 +83,13 @@ namespace dungeon_monogame
             emissiveness = e;
         }
 
-        public virtual void drawAlternateGBufferFirstPass(Effect effect, Matrix transform, BoundingFrustum frustum, GraphicsDevice device)
+        public virtual void drawAlternateGBufferFirstPass(Matrix transform)
         {
             transform = getTransform(ref transform);
 
             foreach (GameObject child in children)
             {
-                child.drawAlternateGBufferFirstPass(effect, transform, frustum, device);
+                child.drawAlternateGBufferFirstPass(transform);
             }
         }
 

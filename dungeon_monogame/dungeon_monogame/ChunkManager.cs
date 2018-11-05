@@ -35,7 +35,7 @@ namespace dungeon_monogame
             return false;
         }
 
-        public void remeshAllSerial(int centeri = 0, int centerj = 0, int centerk = 0)
+        public void remeshAllSerial()
         {
 
             foreach (IntLoc l in chunks.Keys)
@@ -168,7 +168,7 @@ namespace dungeon_monogame
             return false;
         }
 
-        public void draw(Effect effect, Matrix transform, Color emission, BoundingFrustum frustum)
+        public void draw(Effect effect, Matrix transform, Color emission,  BoundingFrustum frustum = null)
         {
             foreach (KeyValuePair<IntLoc, Chunk> p in chunks)
             {
@@ -184,6 +184,11 @@ namespace dungeon_monogame
                 watch.Start();
                 lock (c)
                 {
+                    if(c.indices == null || c.vertices ==null)
+                    {
+                        //TODO remove this hack and make it so that the chunk has some reasonable behavior
+                        continue;
+                    }
                     if (c.vertexBuffer == null)
                     {
                         if (c.empty() || !c.readyToDraw())
@@ -205,36 +210,40 @@ namespace dungeon_monogame
                     effect.Parameters["xWorld"].SetValue(worldMatrix);
                     effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
 
-                    BoundingBox box = new BoundingBox(Vector3.Transform(new Vector3(), worldMatrix),
-                                    Vector3.Transform(Vector3.One * Chunk.chunkWidth, worldMatrix));
+                    //BoundingBox box = new BoundingBox(Vector3.Transform(new Vector3(), worldMatrix),
+                    //                Vector3.Transform(Vector3.One * Chunk.chunkWidth, worldMatrix));
+                    BoundingBox box = new BoundingBox(loc.toVector3(), loc.toVector3() + Vector3.One * Chunk.chunkWidth);
 
-                    //if (!frustum.Intersects(box))
-                    //{
-                    //  continue;
-                    //}
-
-                    Game1.graphics.GraphicsDevice.SetVertexBuffer(c.vertexBuffer);
-                    Game1.graphics.GraphicsDevice.Indices = c.indexBuffer;
-                    foreach (var pass in effect.CurrentTechnique.Passes)
+                    if (frustum != null)
                     {
-                        pass.Apply();
-
-                        try // if the chunk has been unmeshed since the beginning of the draw call, the call will fail
+                        if (frustum.Intersects(box))
                         {
 
-                            Game1.graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
-                                c.indices.Length / 3);
-                        }
-                        catch (Exception e)
-                        {
 
+                            Game1.graphics.GraphicsDevice.SetVertexBuffer(c.vertexBuffer);
+                            Game1.graphics.GraphicsDevice.Indices = c.indexBuffer;
+                            foreach (var pass in effect.CurrentTechnique.Passes)
+                            {
+                                pass.Apply();
+
+                                try // if the chunk has been unmeshed since the beginning of the draw call, the call will fail
+                                {
+
+                                    Game1.graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
+                                        c.indices.Length / 3);
+                                }
+                                catch (Exception e)
+                                {
+
+                                }
+                                finally { }
+                            }
+
+
+
+                            //}
                         }
-                        finally { }
                     }
-
-
-
-                    //}
                     effect.Parameters["xWorld"].SetValue(oldWorldMat);
                 }
                 watch.Stop();

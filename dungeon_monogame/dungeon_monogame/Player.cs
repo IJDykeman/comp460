@@ -10,7 +10,21 @@ using System.Threading.Tasks;
 
 namespace dungeon_monogame
 {
-    class Player
+    abstract class InputHandler
+    {
+        protected KeyboardState oldKeyboardState;
+
+        public abstract List<Action> handleInput();
+
+        protected bool justHit(Keys key, KeyboardState newState)
+        {
+            return oldKeyboardState.IsKeyDown(key) && !newState.IsKeyDown(key);
+        }
+
+    }
+
+
+    class Player : InputHandler
     {
         
         Vector3 cameraLookAlongVector = -Vector3.UnitZ;
@@ -19,7 +33,6 @@ namespace dungeon_monogame
         bool mouseEngaged = true;
 
         Actor playerActor;
-        private KeyboardState oldKeyboardState;
         private float upDownRot = -2;
         private float leftRightRot = 0;
         
@@ -49,14 +62,14 @@ namespace dungeon_monogame
             //torchLight = new Light(1f, Color.LightGoldenrodYellow);
             torchLight = new FireLight();
             torchLight.setLocation(new Vector3(3, 8, 3));
-            torch.addChild(torchLight);
+            //torch.addChild(torchLight);
             //torch.addChild(new GameObject(MagicaVoxel.Read(@"torch.vox"), new Vector3(-3, 0, 0), Vector3.One * .5f));
             playerActor.addChild(torch);
             //playerActor.addChild(new Light());
             playerActor.addTag(ActorTag.Player);
         }
 
-        public List<Action> handleInput()
+        public override List<Action> handleInput()
         {
 
             List<Action> result = new List<Action>();
@@ -91,13 +104,10 @@ namespace dungeon_monogame
                 if (flying)
                 {
                     movement += (Vector3.UnitY * speed);
-                    //velocity += ;
                 }
                 else if (playerActor.isOnGround())
                 {
                     playerActor.addVelocity(Vector3.UnitY * jumpVelocity);
-                    //Console.WriteLine("jump");
-                    //Console.WriteLine(playerActor.getVelocity().Y);
                     
                 }
             }
@@ -170,18 +180,11 @@ namespace dungeon_monogame
             oldMouseState = Mouse.GetState();
             oldKeyboardState = Keyboard.GetState();
 
-            //torchLight.setIntensity(MathHelper.Min(torchLight.getIntensity(), 1.3f));
-            //torchLight.setIntensity(MathHelper.Max(torchLight.getIntensity(), .7f));
-            //torchLight.setIntensity(torchLight.getIntensity() +(float) (Globals.random.NextDouble()-.5f) * .06f);
-
             playerActor.setRotation(Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY(leftRightRot)));
             return result;
         }
 
-        private bool justHit(Keys key, KeyboardState newState)
-        {
-            return oldKeyboardState.IsKeyDown(key) && !newState.IsKeyDown(key);
-        }
+
 
         public Matrix getViewMatrix()
         {
@@ -198,12 +201,6 @@ namespace dungeon_monogame
         private Vector3 getFacingVector()
         {
             return Vector3.Transform(Vector3.UnitZ, Matrix.CreateRotationX(upDownRot) * Matrix.CreateRotationY(leftRightRot));
-        }
-
-
-        internal void draw(Effect effect)
-        {
-            //playerActor.drawFirstPass(effect, Matrix.Identity);
         }
 
         internal GameObject getActor()

@@ -58,7 +58,7 @@ namespace dungeon_monogame
             map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
 
             landscape = new GameObject(map.getManager(), new Vector3(), Vector3.One);
-            landscape.addChild(new DirectionalLight(GraphicsDevice));
+            //landscape.addChild(new DirectionalLight(GraphicsDevice));
             Rendering.LoadContent(Content, graphics, landscape);
             //ChunkManager landscape_model = MagicaVoxel.ChunkManagerFromVox("test.vox");
             //landscape = new GameObject(landscape_model, new Vector3(), Vector3.One);
