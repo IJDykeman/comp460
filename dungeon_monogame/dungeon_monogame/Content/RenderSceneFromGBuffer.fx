@@ -297,6 +297,61 @@ float4 PointLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 }
 
 
+float4 HemisphereLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
+{
+	//float lightRadius = 10;
+	
+	//get normal data from the normalMap
+	float4 normalData = tex2D(normalSampler, input.TexCoord);
+	float4 colorData = tex2D(colorSampler, input.TexCoord);
+	float4 positionData = tex2D(positionSampler, input.TexCoord);
+
+	//compute diffuse light
+	float3 normal = 2.0f * normalData.xyz - 1.0f;
+
+
+
+
+	//get specular power, and get it into [0,255] range]
+	float specularPower = normalData.a * 255;
+	//get specular intensity from the colorMap
+	float specularIntensity = tex2D(colorSampler, input.TexCoord).a;
+	//read depth
+	float depthVal = tex2D(depthSampler, input.TexCoord).r;
+	//compute screen-space position
+	float4 position;
+	position.x = input.TexCoord.x * 2.0f - 1.0f;
+	position.y = -(input.TexCoord.y * 2.0f - 1.0f);
+	position.z = depthVal;
+	position.w = 1.0f;
+	//transform to world space
+	position = mul(position, InvertViewProjection);
+	position /= position.w;
+
+	float3 lightVector = lightPosition - position;
+	float attenuation = saturate(pow(max(0, 1.0f - length(lightVector) / lightRadius),2));
+	//normalize light vector
+	lightVector = normalize(lightVector);
+	//compute diffuse light
+	float NdL = max(.05, dot(normal, lightVector));
+	NdL = sqrt(-1 / (NdL + 1) + 1);
+	float3 diffuseLight = NdL * colorData.rgb;
+		//reflection vector
+		float3 reflectionVector = normalize(reflect(-lightVector, normal));
+		//camera-to-surface vector
+		float3 directionToCamera = normalize(cameraPosition - position);
+		//compute specular light
+		float specularLight = specularIntensity * pow(saturate(dot(reflectionVector, directionToCamera)), specularPower);
+	//take into account attenuation and lightIntensity.
+	float3 finalColor = attenuation * lightIntensity * diffuseLight.rgb;
+	//return float4(diffuseLight.rgb * 0 + position.xyz / 10,1);
+	if (dot(-lightDirection,lightVector) <0){
+		return 0;
+	}
+	return float4(finalColor.rgb * lightColor, 1);
+}
+
+
 
 technique DirectionalLightTechnique
 {
@@ -334,6 +389,15 @@ technique PointLightTechnique
 	{
 		VertexShader = compile vs_2_0 VertexShaderFunction();
 		PixelShader = compile ps_2_0 PointLightPixelShaderFunction();
+	}
+}
+
+technique HemisphereLightTechnique
+{
+	pass Pass0
+	{
+		VertexShader = compile vs_2_0 VertexShaderFunction();
+		PixelShader = compile ps_2_0 HemisphereLightPixelShaderFunction();
 	}
 }
 

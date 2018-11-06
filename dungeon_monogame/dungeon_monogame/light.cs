@@ -52,7 +52,36 @@ namespace dungeon_monogame
 
     }
 
-    class MagicLantern : Light
+    class HemisphereLight : Light
+    {
+
+        Vector3 direction;
+        public HemisphereLight(float _intensity, Color _color, Vector3 _direction) : base(_intensity, _color)
+        {
+            direction = _direction;
+        }
+
+        public override void drawSecondPass(Effect effect, Matrix transform, GraphicsDevice device)
+        {
+            transform = getTransform(ref transform);
+            effect.CurrentTechnique = effect.Techniques["HemisphereLightTechnique"];
+            effect.Parameters["lightIntensity"].SetValue(getIntensity());
+            effect.Parameters["lightRadius"].SetValue(20f * getIntensity());
+            effect.Parameters["lightDirection"].SetValue(direction);
+            effect.Parameters["lightColor"].SetValue(color.ToVector4());
+            Vector3 position = Vector3.Transform(getLocation(), transform);
+            effect.Parameters["lightPosition"].SetValue(position);
+            new QuadRenderer().Render(effect, device);
+
+            foreach (GameObject child in children)
+            {
+                child.drawSecondPass(effect, transform, device);
+            }
+        }
+    
+    }
+
+    class MagicLantern : PointLight
     {
         float targetIntensity;
         float stability = MEDIUM_STABILITY;
@@ -65,10 +94,9 @@ namespace dungeon_monogame
         public MagicLantern(float _intensity, Color _color)
         {
             targetIntensity = _intensity;
-            base.setIntensity(0);
             color = _color;
-            stability = MEDIUM_STABILITY;
-            addChild(new PointLight());
+
+            addChild(new HemisphereLight( _intensity, _color, Vector3.UnitY));
         }
 
         public void setStability(float s)
@@ -83,9 +111,9 @@ namespace dungeon_monogame
 
         protected override List<Action> update()
         {
-            base.setIntensity(stability * getIntensity() + (1 - stability) * (targetIntensity + flickerIntensity * (float)(Globals.random.NextDouble() - .5) * targetIntensity));
-            base.setIntensity(0);
-
+            float target = stability * getIntensity() + (1 - stability) * (targetIntensity + flickerIntensity * (float)(Globals.random.NextDouble() - .5) * targetIntensity);
+            target = 0;
+            base.setIntensity(target);
             return new List<Action>();
         }
 
@@ -174,17 +202,33 @@ namespace dungeon_monogame
         }
     }
 
-    class PointLight : GameObject
+    class PointLight : Light
     {
+        List<SpotLight> lights;
         public PointLight() : base()
         {
-            addChild(new SpotLight(Vector3.UnitX, Vector3.UnitY));
-            addChild(new SpotLight(-Vector3.UnitX, Vector3.UnitY));
-            addChild(new SpotLight(Vector3.UnitY, Vector3.UnitZ));
-            addChild(new SpotLight(-Vector3.UnitY, Vector3.UnitZ));
-            addChild(new SpotLight(Vector3.UnitZ, Vector3.UnitY));
-            addChild(new SpotLight(-Vector3.UnitZ, Vector3.UnitY));
+            lights = new List<SpotLight>();
+            lights.Add(new SpotLight(Vector3.UnitX, Vector3.UnitY));
+            lights.Add(new SpotLight(-Vector3.UnitX, Vector3.UnitY));
+            lights.Add(new SpotLight(Vector3.UnitY, Vector3.UnitZ));
+            lights.Add(new SpotLight(-Vector3.UnitY, Vector3.UnitZ));
+            lights.Add(new SpotLight(Vector3.UnitZ, Vector3.UnitY));
+            lights.Add(new SpotLight(-Vector3.UnitZ, Vector3.UnitY));
+            foreach (Light l in lights)
+            {
+                addChild(l);
+            }
         }
+
+        public override void setIntensity(float intensity)
+        {
+            base.setIntensity(intensity);
+            foreach (Light l in lights)
+            {
+                l.setIntensity(intensity);
+            }
+        }
+
     }
 
 
@@ -199,7 +243,6 @@ namespace dungeon_monogame
         public SpotLight(Vector3 _target, Vector3 _up) {
             target = _target;
             up = _up;
-            setIntensity(2);
         }
 
 

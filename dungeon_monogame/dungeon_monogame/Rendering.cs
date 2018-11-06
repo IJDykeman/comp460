@@ -155,7 +155,7 @@ namespace dungeon_monogame
         {
             float aspectRatio =
                 graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight;
-            float fieldOfView = MathHelper.ToRadians(70f) ;
+            float fieldOfView = MathHelper.ToRadians(80f) ;
             float nearClipPlane = .1f;
             float farClipPlane = 1500;
             //return Matrix.CreateOrthographic(15, 15, .001f, 20);

@@ -75,7 +75,7 @@ namespace dungeon_monogame
 
             lightColor = Globals.ColorFromHSV(Globals.random.NextDouble() * 150 + 40, 1, 1);
 
-            lantern = new MagicLantern(0.45f, lightColor);
+            lantern = new MagicLantern(0.85f, lightColor);
             lantern.setStability(MagicLantern.LOW_STABILITY);
             addChild(lantern);
 
