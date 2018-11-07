@@ -21,8 +21,8 @@ namespace dungeon_monogame
             Vector3 offset = model1.getCenter();
             //offset = Vector3.One * 4.5f;
             
-            pose1 = new GameObject(model1, -offset, Vector3.One);
-            pose2 = new GameObject(model2, -offset, Vector3.One);
+            pose1 = new GameObjectModel(model1, -offset, Vector3.One);
+            pose2 = new GameObjectModel(model2, -offset, Vector3.One);
             addChild(pose1);
 
             this.aabb = model1.getAaabbFromModelExtents();
@@ -39,7 +39,7 @@ namespace dungeon_monogame
                 {
                     result.Add(new SpawnAction(new BalisticModel(Globals.randomVectorOnUnitSphere() + getLocation(), Globals.randomVectorOnUnitSphere() * 5f, .2f, @"slime/goo.vox")));
                 }
-                result.Add(new AofDamage(getLocation(), ActorTag.Player, 5, 1));
+                result.Add(new AofDamage(getLocation(), ObjectTag.Player, 5, 1));
                 result.Add(new DissapearAction(this));
                 result.Add(new SpawnAction(new Flash(getLocation())));
                 
@@ -72,7 +72,7 @@ namespace dungeon_monogame
                 addChild(pose1);
 
             }
-            result.Add(new MoveTowardTaggedActorAction(this, ActorTag.Player, 3, 25));
+            result.Add(new MoveTowardTaggedActorAction(this, ObjectTag.Player, 3, 25));
             Vector3 move = getTargetLocation() - getLocation();
             if (move.Length() < 4)
             {

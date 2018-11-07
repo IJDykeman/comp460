@@ -58,7 +58,7 @@ namespace dungeon_monogame
             Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
             //GameObject sword = new GameObject(MagicaVoxel.Read(@"simple_sword.vox"), new Vector3(1,20,0), Vector3.One * .1f);
             //playerActor.addChild(sword);
-            var torch = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"torch.vox"), new Vector3(.2f, 1.4f, -.3f), Vector3.One * .03f);
+            var torch = new GameObjectModel(MagicaVoxel.ChunkManagerFromVox(@"torch.vox"), new Vector3(.2f, 1.4f, -.3f), Vector3.One * .03f);
             //torchLight = new Light(1f, Color.LightGoldenrodYellow);
             torchLight = new FireLight();
             torchLight.setLocation(new Vector3(3, 8, 3));
@@ -66,7 +66,7 @@ namespace dungeon_monogame
             //torch.addChild(new GameObject(MagicaVoxel.Read(@"torch.vox"), new Vector3(-3, 0, 0), Vector3.One * .5f));
             playerActor.addChild(torch);
             //playerActor.addChild(new Light());
-            playerActor.addTag(ActorTag.Player);
+            playerActor.addTag(ObjectTag.Player);
         }
 
         public override List<Action> handleInput()

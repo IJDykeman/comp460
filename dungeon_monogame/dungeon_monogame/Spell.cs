@@ -22,7 +22,8 @@ namespace dungeon_monogame
 
             addChild(new Light(.6f, lightColor));
 
-            GameObject model = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-.5f-.5f-.5f) * -.0f, Vector3.One * .1f);
+            GameObject model = new GameObjectModel(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-.5f-.5f-.5f) * -.0f, Vector3.One * .2f);
+            model.addTag(ObjectTag.DoesNotCastShadow);
             addChild(model);
             model.setEmissiveness(lightColor);
         }
@@ -63,7 +64,7 @@ namespace dungeon_monogame
         protected bool hasCollided = false;
         protected Color lightColor;
         protected MagicLantern lantern;
-        int lifeForce = 120;
+        int lifeForce = 300;
 
 
         public StickingLight(Vector3 _location, Vector3 velocity)
@@ -77,9 +78,11 @@ namespace dungeon_monogame
 
             lantern = new MagicLantern(0.85f, lightColor);
             lantern.setStability(MagicLantern.LOW_STABILITY);
+            //lantern.setLocation(Vector3.UnitY * .5f);
             addChild(lantern);
 
-            GameObject model = new GameObject(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-1.5f -1.5f -1.5f) * -.0f, Vector3.One * .02f);
+            GameObject model = new GameObjectModel(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-1.5f -1.5f -1.5f)* 0f, Vector3.One * .05f);
+            model.addTag(ObjectTag.DoesNotCastShadow);
             addChild(model);
             model.setEmissiveness(lightColor);
         }
@@ -136,7 +139,7 @@ namespace dungeon_monogame
             setLocation(_location);
             ChunkManager model = MagicaVoxel.ChunkManagerFromVox(modelPath);
             Vector3 offset = model.getCenter();
-            obj = new GameObject(model, -offset, Vector3.One);
+            obj = new GameObjectModel(model, -offset, Vector3.One);
 
             this.aabb = model.getAaabbFromModelExtents();
             this.scale = Vector3.One * scale;
@@ -329,7 +332,7 @@ namespace dungeon_monogame
             ChunkManager model = MagicaVoxel.ChunkManagerFromVox(@"smoke.vox");
             Vector3 offset = model.getCenter();
             
-            shape = new GameObject(model, -offset * 0, Vector3.One);
+            shape = new GameObjectModel(model, -offset * 0, Vector3.One);
             shape.scale = Vector3.One * 6 * (.08f + (float)(Globals.random.NextDouble() - .5) * .03f);
             shape.setEmissiveness(color);
             addChild(shape);

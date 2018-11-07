@@ -10,47 +10,43 @@ namespace dungeon_monogame
 {
     class GameObject
     {
-        ChunkManager chunkManager;
         private Vector3 location = new Vector3();
         public Vector3 scale = Vector3.One;
         Quaternion rotation = Quaternion.Identity;
         protected List<GameObject> children;
         protected Color emissiveness = Color.Black;
-        private HashSet<ActorTag> tags = new HashSet<ActorTag>();
-
+        private HashSet<ObjectTag> tags = new HashSet<ObjectTag>();
 
         public GameObject()
         {
-            chunkManager = new ChunkManager();
             children = new List<GameObject>();
         }
 
-        public GameObject(ChunkManager _chunkManager, Vector3 _location, Vector3 _scale)
+        public GameObject(Vector3 _location, Vector3 _scale)
         {
             location = _location;
 
             scale = _scale;
 
-            chunkManager = _chunkManager;
             children = new List<GameObject>();
         }
 
-        public GameObject(ChunkManager _chunkManager, Vector3 _location, Vector3 _scale, Quaternion _rotation) : this(_chunkManager, _location, _scale)
+        public GameObject(Vector3 _location, Vector3 _scale, Quaternion _rotation) : this(_location, _scale)
         {
             rotation = _rotation;
         }
 
-        public void addTag(ActorTag tag)
+        public void addTag(ObjectTag tag)
         {
             tags.Add(tag);
         }
 
-        public bool hasTag(ActorTag tag)
+        public bool hasTag(ObjectTag tag)
         {
             return tags.Contains(tag);
         }
 
-        public List<GameObject> getChildrenWithTag(ActorTag tag)
+        public List<GameObject> getChildrenWithTag(ObjectTag tag)
         {
             List<GameObject> result = new List<GameObject>();
             if (hasTag(tag)) {
@@ -93,14 +89,14 @@ namespace dungeon_monogame
             }
         }
 
-        public void drawFirstPass(Effect effect, Matrix transform, BoundingFrustum frustum)
+        public virtual void drawFirstPass(Effect effect, Matrix transform, BoundingFrustum frustum, Predicate<GameObject> whetherDraw)
         {
+
             transform = getTransform(ref transform);
-            chunkManager.draw(effect, transform, this.emissiveness, frustum);
 
             foreach (GameObject child in children)
             {
-                child.drawFirstPass(effect, transform, frustum);
+                child.drawFirstPass(effect, transform, frustum, whetherDraw);
             }
         }
 
@@ -136,10 +132,6 @@ namespace dungeon_monogame
 
         public virtual void burn() { }
 
-        internal ChunkManager getChunkSpace()
-        {
-            return chunkManager;
-        }
 
         internal void recursiveRemove(GameObject obj)
         {

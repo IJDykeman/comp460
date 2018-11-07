@@ -11,7 +11,7 @@ namespace dungeon_monogame
     {
 
 
-        void act(GameObject world, GameTime dt);
+        void act(World world, GameTime dt);
     }
 
     class RequestPhysicsUpdate : Action
@@ -24,9 +24,10 @@ namespace dungeon_monogame
         }
 
 
-        public void act(GameObject world, GameTime dt)
+        public void act(World world, GameTime dt)
         {
-            foreach (Action act in actor.physicsUpdate(dt, world.getChunkSpace()))
+            ChunkManager manager = world.getChunkManager();
+            foreach (Action act in actor.physicsUpdate(dt, manager))
             {
                 act.act(world, dt);
             }
@@ -36,10 +37,10 @@ namespace dungeon_monogame
     class MoveTowardTaggedActorAction : Action
     {
         private Monster monster;
-        private ActorTag tag;
+        private ObjectTag tag;
         float minDist, maxDist;
 
-        public MoveTowardTaggedActorAction(Monster a, ActorTag _tag, float _minDist, float _maxDist)
+        public MoveTowardTaggedActorAction(Monster a, ObjectTag _tag, float _minDist, float _maxDist)
         {
             monster = a;
             tag = _tag;
@@ -48,7 +49,7 @@ namespace dungeon_monogame
         }
 
 
-        public void act(GameObject world, GameTime dt)
+        public void act(World world, GameTime dt)
         {
             List<GameObject> tagged = world.getChildrenWithTag(tag);
             if (tagged.Count > 0)
@@ -72,10 +73,10 @@ namespace dungeon_monogame
     {
         Vector3 center;
         float radius;
-        ActorTag tag;
+        ObjectTag tag;
         float damage;
 
-        public AofDamage(Vector3 _center, ActorTag _tag, float _radius, float _damage)
+        public AofDamage(Vector3 _center, ObjectTag _tag, float _radius, float _damage)
         {
             center = _center;
             radius = _radius;
@@ -84,7 +85,7 @@ namespace dungeon_monogame
         }
 
 
-        public void act(GameObject world, GameTime dt)
+        public void act(World world, GameTime dt)
         {
             foreach (Actor a in world.getChildrenWithTag(tag))
             {
@@ -106,7 +107,7 @@ namespace dungeon_monogame
         }
 
 
-        public void act(GameObject world, GameTime dt)
+        public void act(World world, GameTime dt)
         {
             world.addChild(actor);
         }
@@ -122,7 +123,7 @@ namespace dungeon_monogame
         }
 
 
-        public void act(GameObject world, GameTime dt)
+        public void act(World world, GameTime dt)
         {
             world.recursiveRemove(actor);
         }
@@ -140,7 +141,7 @@ namespace dungeon_monogame
         }
 
 
-        public void act(GameObject world, GameTime dt)
+        public void act(World world, GameTime dt)
         {
             List<GameObject> burnedObjects = world.recursiveGetWithinSphere(center, radius);
             foreach(GameObject obj in burnedObjects)

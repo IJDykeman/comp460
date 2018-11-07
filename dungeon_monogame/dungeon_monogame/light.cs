@@ -91,12 +91,16 @@ namespace dungeon_monogame
         public static readonly float LOW_STABILITY = .9f;
         public static readonly float MEDIUM_FLICKER_INTENSITY = 1.0f;
         public static readonly float HIGH_FLICKER_INTENSITY = 4.0f;
+        public MagicLantern(float _intensity, Color _color, Vector3 _)
+        {
+            targetIntensity = _intensity;
+            color = _color; 
+        }
+
         public MagicLantern(float _intensity, Color _color)
         {
             targetIntensity = _intensity;
             color = _color;
-
-            addChild(new HemisphereLight( _intensity, _color, Vector3.UnitY));
         }
 
         public void setStability(float s)
@@ -112,7 +116,6 @@ namespace dungeon_monogame
         protected override List<Action> update()
         {
             float target = stability * getIntensity() + (1 - stability) * (targetIntensity + flickerIntensity * (float)(Globals.random.NextDouble() - .5) * targetIntensity);
-            target = 0;
             base.setIntensity(target);
             return new List<Action>();
         }
@@ -178,7 +181,7 @@ namespace dungeon_monogame
         {
             Matrix viewMatrix = getViewMatrix();
             Matrix projection = getProjectionMatrix();
-            GBuffer LightPerspectiveGBuffer = Rendering.DrawGBuffer(viewMatrix, projection, shadowTargets);
+            GBuffer LightPerspectiveGBuffer = Rendering.DrawGBuffer(viewMatrix, projection, shadowTargets, a => true);
             return LightPerspectiveGBuffer;
         }
 
@@ -235,7 +238,7 @@ namespace dungeon_monogame
     class SpotLight : DirectionalLight
     {
         RenderTargets shadowTargets;
-        int backBufferWidth = 800;
+        int backBufferWidth = 600;
         Vector3 target = new Vector3(0, -1, 0);
         Vector3 up = new Vector3(0, 0, 1);
         Matrix rotation = Matrix.CreateFromYawPitchRoll(0,0, 0);
@@ -250,18 +253,15 @@ namespace dungeon_monogame
         {
             Vector3 location = transform.Translation;
             return Matrix.CreateLookAt(location, target + location, Vector3.Transform(up, rotation));
-
         }
 
 
         private Matrix getProjectionMatrix()
         {
-            //return Matrix.CreateOrthographic(25, 25, .1f, 100f);
-            
             float aspectRatio = 1;
             float fieldOfView = MathHelper.ToRadians(90f);
-            float nearClipPlane = 0.1f;
-            float farClipPlane = 40;
+            float nearClipPlane = 0.004f;
+            float farClipPlane = 80;
             return Matrix.CreatePerspectiveFieldOfView(
                 fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
         }
@@ -270,10 +270,10 @@ namespace dungeon_monogame
         {
             if (shadowTargets == null)
             {
-                shadowTargets = Rendering.getTargets(backBufferWidth, backBufferWidth);
+                shadowTargets = Rendering.getEmptyTargets(backBufferWidth, backBufferWidth);
             }
 
-            renderDirectionalLightFirstPass(transform);
+            renderSpotLightFirstPass(transform);
             foreach (GameObject child in children)
             {
                 child.drawAlternateGBufferFirstPass(transform);
@@ -282,11 +282,11 @@ namespace dungeon_monogame
         }
 
 
-        private GBuffer renderDirectionalLightFirstPass(Matrix transform)
+        private GBuffer renderSpotLightFirstPass(Matrix transform)
         {
             Matrix viewMatrix = getViewMatrix(transform);
             Matrix projection = getProjectionMatrix();
-            GBuffer LightPerspectiveGBuffer = Rendering.DrawGBuffer(viewMatrix, projection, shadowTargets);
+            GBuffer LightPerspectiveGBuffer = Rendering.DrawGBuffer(viewMatrix, projection, shadowTargets, a => !a.hasTag(ObjectTag.DoesNotCastShadow));
             return LightPerspectiveGBuffer;
         }
 
