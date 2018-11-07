@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 namespace dungeon_monogame
 {
 
-    enum ActorTag
+    enum ObjectTag
     {
-        Player
+        Player,
+        DoesNotCastShadow,
+        NeverMoves,
     }
 
 

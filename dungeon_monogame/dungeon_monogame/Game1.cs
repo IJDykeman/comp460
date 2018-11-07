@@ -17,7 +17,7 @@ namespace dungeon_monogame
 
         SpriteBatch spriteBatch;
 
-        WorldGeneration.TileMap map;
+        World map;
         ChunkManager landscapeChunks;
         GameObject landscape;
         Player player;
@@ -55,9 +55,9 @@ namespace dungeon_monogame
             // TODO: use this.Content to load your game content here
 
             //landscapeChunks = MagicaVoxel.ChunkManagerFromVox(@"castleOnHill.vox");
-            map = new WorldGeneration.TileMap(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
+            map = new World(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
 
-            landscape = new GameObject(map.getManager(), new Vector3(), Vector3.One);
+            landscape = new GameObjectModel(map.map.getManager(), new Vector3(), Vector3.One);
             //landscape.addChild(new DirectionalLight(GraphicsDevice));
             Rendering.LoadContent(Content, graphics, landscape);
             //ChunkManager landscape_model = MagicaVoxel.ChunkManagerFromVox("test.vox");
@@ -90,14 +90,14 @@ namespace dungeon_monogame
             List<Action> actions = landscape.updateWithChildren();
             actions.AddRange(player.handleInput());
             foreach (Action action in actions){
-                action.act(landscape, gameTime);
+                action.act(map, gameTime);
             }
-            map.notifyOfPlayerLocation(player.getCameraLocation());
+            map.map.notifyOfPlayerLocation(player.getCameraLocation());
             //map.report();
             base.Update(gameTime);
             Console.WriteLine(Globals.random.Next());
             Globals.horribleRandomRefresh();
-            map.update();
+
         }
 
 

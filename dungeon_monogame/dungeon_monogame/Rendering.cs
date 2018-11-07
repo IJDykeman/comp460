@@ -65,7 +65,7 @@ namespace dungeon_monogame
 
             
 
-            GBuffer buffer = DrawGBuffer(player.getViewMatrix(), projection(graphics), cameraTargets);
+            GBuffer buffer = DrawGBuffer(player.getViewMatrix(), projection(graphics), cameraTargets, a=>true);
 
             worldRootObject.drawAlternateGBufferFirstPass(Matrix.Identity);
 
@@ -115,7 +115,7 @@ namespace dungeon_monogame
 
         }
 
-        public static GBuffer DrawGBuffer(Matrix viewMatrix, Matrix projectionMatrix, RenderTargets targets)
+        public static GBuffer DrawGBuffer(Matrix viewMatrix, Matrix projectionMatrix, RenderTargets targets, Predicate<GameObject> predicate)
         {
 
             GraphicsDevice device = graphics.GraphicsDevice;
@@ -129,7 +129,7 @@ namespace dungeon_monogame
             createGBufferEffect.Parameters["xProjection"].SetValue(projectionMatrix);
             createGBufferEffect.Parameters["xView"].SetValue(viewMatrix);
             createGBufferEffect.Parameters["xWorld"].SetValue(Matrix.Identity);
-            worldRootObject.drawFirstPass(createGBufferEffect, Matrix.Identity,  new BoundingFrustum(viewMatrix * projectionMatrix));
+            worldRootObject.drawFirstPass(createGBufferEffect, Matrix.Identity,  new BoundingFrustum(viewMatrix * projectionMatrix), predicate );
 
             GBuffer buffer = targets.getTextures();
             device.SetRenderTargets(null);
@@ -163,7 +163,7 @@ namespace dungeon_monogame
                 fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
         }
 
-        internal static RenderTargets getTargets(int backBufferWidth1, int backBufferWidth2)
+        internal static RenderTargets getEmptyTargets(int backBufferWidth1, int backBufferWidth2)
         {
             return new RenderTargets(backBufferWidth1, backBufferWidth2, graphics.GraphicsDevice);
         }

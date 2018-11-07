@@ -20,8 +20,13 @@ namespace dungeon_monogame.WorldGeneration
         ConcurrentQueue<IntLoc> meshingQueue;
 
         TileSet tileSet;
-        ChunkManager m;
+        protected ChunkManager chunkManager;
         public static Vector3 playerPerspectiveLoc = new Vector3();
+
+        internal ChunkManager getChunkManager()
+        {
+            return chunkManager;
+        }
 
         public TileMap(TileSet _tiles)
         {
@@ -40,9 +45,14 @@ namespace dungeon_monogame.WorldGeneration
             Sphere sphere = tileSet.getSphere(tileIndex);
             multiplyInSphere(sphere, tileSpacePos);
             placeBlocksFromTile(tileSpacePos, m, tile);
+            postprocess(tileSpacePos);
         }
 
-        private static IntLoc placeBlocksFromTile(IntLoc tileSpacePos, ChunkManager m, Tile tile)
+        protected virtual void postprocess(IntLoc tileSpacePos)
+        {
+        }
+
+        private static void placeBlocksFromTile(IntLoc tileSpacePos, ChunkManager m, Tile tile)
         {
             for (int i = 0; i < WorldGenParamaters.tileWidth - 1; i++)
             {
@@ -65,14 +75,13 @@ namespace dungeon_monogame.WorldGeneration
                     }
                 }
             }
-            return tileSpacePos;
         }
 
         private void decide(IntLoc tileSpaceLoc)
         {
             Domain d = getDistributionAt(tileSpaceLoc);
             int tileIndex = d.getRandomTrueIndex();
-            placeTile(tileSpaceLoc, tileIndex, m);
+            placeTile(tileSpaceLoc, tileIndex, chunkManager);
 
             Domain _;
             distributions.TryRemove(tileSpaceLoc, out _);
@@ -124,9 +133,7 @@ namespace dungeon_monogame.WorldGeneration
 
         private void setDistributionAt(IntLoc loc, Domain d)
         {
-
                 distributions[loc] = d;
-
         }
 
         public void multiplyInSphere(Sphere sphere, IntLoc center)
@@ -146,40 +153,12 @@ namespace dungeon_monogame.WorldGeneration
                                 d = Domain.allTrue(d.k());
                             }
                             setDistributionAt(location, d);
-                            /*if (d.sum() != 0)
-                            {
-                                setDistributionAt(location, d);
-                            }*/
 
                         }
                     }
                 }
             }
         }
-
-        /*
-
-        public ProbabilityDistribution calculateDistributionAt(IntLoc center)
-        {
-            ProbabilityDistribution result = ProbabilityDistribution.evenOdds(tileSet.size());
-            for (int i = 0; i < WorldGenParamaters.sphereWidth; i++)
-            {
-                for (int j = 0; j < WorldGenParamaters.sphereWidth; j++)
-                {
-                    for (int k = 0; k < WorldGenParamaters.sphereWidth; k++)
-                    {
-                        IntLoc locationOfOtherSphereCenter = new IntLoc(i, j, k) + center - new IntLoc(WorldGenParamaters.sphereWidth / 2);
-                        if (decided(locationOfOtherSphereCenter))
-                        {
-
-                            IntLoc otherSphereIndex = (center - locationOfOtherSphereCenter) + new IntLoc(WorldGenParamaters.sphereWidth / 2);
-                            result = tileSet.getSphere(tilesDecided[locationOfOtherSphereCenter]).get(otherSphereIndex.i, otherSphereIndex.j, otherSphereIndex.k) * result;
-                        }
-                    }
-                }
-            }
-            return result;
-        }*/
 
         private bool undecidedTilesAreInTheAlwaysRegion()
         {
@@ -286,7 +265,7 @@ namespace dungeon_monogame.WorldGeneration
 
         public ChunkManager getManager()
         {
-            m = new ChunkManager();
+            chunkManager = new ChunkManager();
 
             /*for (int i = 0; i < 5; i++)
             {
@@ -312,27 +291,21 @@ namespace dungeon_monogame.WorldGeneration
                     stopwatch.Start();
                     while (stopwatch.ElapsedMilliseconds < 50)
                     {
-                    placeATile(m);
+                    placeATile(chunkManager);
                     }
                     remeshAroundPlayer();
-                    m.unmeshOutsideRange();
+                    chunkManager.unmeshOutsideRange();
                     
                 }
             }).Start();
 
 
-            return m;
-        }
-
-
-        public void update()
-        {
-
+            return chunkManager;
         }
 
         public void report()
         {
-            Console.WriteLine(m.getReport());
+            Console.WriteLine(chunkManager.getReport());
         }
 
 
@@ -348,9 +321,9 @@ namespace dungeon_monogame.WorldGeneration
             while (chunksNearPlayer.TryDequeue(out BFSloc))
             {
                 toMeshChunkLoc = (BFSloc + centerChunkPos - new IntLoc(meshRadius)) * Chunk.chunkWidth;
-                if (m.chunkNeedsMesh(toMeshChunkLoc))
+                if (chunkManager.chunkNeedsMesh(toMeshChunkLoc))
                 {
-                    m.remesh(m, toMeshChunkLoc);
+                    chunkManager.remesh(chunkManager, toMeshChunkLoc);
                 }
 
             }
