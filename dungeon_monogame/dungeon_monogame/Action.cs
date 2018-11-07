@@ -26,7 +26,7 @@ namespace dungeon_monogame
 
         public void act(World world, GameTime dt)
         {
-            ChunkManager manager = world.map.getChunkManager();
+            ChunkManager manager = world.getChunkManager();
             foreach (Action act in actor.physicsUpdate(dt, manager))
             {
                 act.act(world, dt);

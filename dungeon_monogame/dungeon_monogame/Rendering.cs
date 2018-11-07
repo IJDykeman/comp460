@@ -24,11 +24,11 @@ namespace dungeon_monogame
         private static float ambientLightLevel = 0.0f;
 
         static GraphicsDeviceManager graphics;
-        static GameObject worldRootObject;
+        static GameObjectModel worldRootObject;
 
         public static Texture2D debugTexture;
 
-        public static void LoadContent(ContentManager Content, GraphicsDeviceManager _graphics, GameObject _worldRoot)
+        public static void LoadContent(ContentManager Content, GraphicsDeviceManager _graphics, GameObjectModel _worldRoot)
         {
             graphics = _graphics;
             worldRootObject = _worldRoot;

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace dungeon_monogame.WorldGeneration
 {
-    class TileMap
+    class TileMap : GameObjectModel
     {
         public static readonly int alwaysMeshWithinRange = WorldGenParamaters.MeshWithinBlockRange; 
         public static readonly int alwaysUnmeshOutsideRange = (int)(alwaysMeshWithinRange * 1.5f);
@@ -20,7 +20,6 @@ namespace dungeon_monogame.WorldGeneration
         ConcurrentQueue<IntLoc> meshingQueue;
 
         TileSet tileSet;
-        protected ChunkManager chunkManager;
         public static Vector3 playerPerspectiveLoc = new Vector3();
 
         internal ChunkManager getChunkManager()
@@ -28,12 +27,14 @@ namespace dungeon_monogame.WorldGeneration
             return chunkManager;
         }
 
-        public TileMap(TileSet _tiles)
+        public TileMap(TileSet _tiles, Vector3 loc, Vector3 scale) : base(loc, scale)
         {
+            
             distributions = new System.Collections.Concurrent.ConcurrentDictionary<IntLoc, Domain>();
             tilesDecided = new Dictionary<IntLoc, int>();
             meshingQueue = new ConcurrentQueue<IntLoc>();
             tileSet = _tiles;
+            chunkManager = getManager();
 
 
         }

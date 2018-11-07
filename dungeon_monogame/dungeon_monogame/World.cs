@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace dungeon_monogame
 {
-    class World : GameObject
+    class World : TileMap
     {
-        public TileMap map;
+        //public TileMap map;
         List<IntLoc> tileSpaceLocsNeedingPostprocess;
 
-        public World(TileSet _tiles)
+        public World(TileSet _tiles) : base(_tiles, Vector3.Zero, Vector3.One)
         {
-            map = new TileMap(_tiles);
+            //map = new TileMap(_tiles);
             tileSpaceLocsNeedingPostprocess = new List<IntLoc>();
         }
 

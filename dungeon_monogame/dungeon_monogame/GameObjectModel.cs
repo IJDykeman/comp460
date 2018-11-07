@@ -6,9 +6,17 @@ namespace dungeon_monogame
 {
     internal class GameObjectModel : GameObject
     {
-        private ChunkManager chunkManager;
+        protected ChunkManager chunkManager;
         private Vector3 vector31;
         private Vector3 vector32;
+        private Vector3 loc;
+
+        public GameObjectModel(Vector3 loc, Vector3 scale)
+        {
+            chunkManager = new ChunkManager();
+            this.loc = loc;
+            this.scale = scale;
+        }
 
         public GameObjectModel(ChunkManager chunkManager, Vector3 vector31, Vector3 vector32) : base(vector31, vector32)
         {

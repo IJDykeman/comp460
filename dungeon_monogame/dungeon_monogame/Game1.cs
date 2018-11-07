@@ -57,9 +57,9 @@ namespace dungeon_monogame
             //landscapeChunks = MagicaVoxel.ChunkManagerFromVox(@"castleOnHill.vox");
             map = new World(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
 
-            landscape = new GameObjectModel(map.map.getManager(), new Vector3(), Vector3.One);
+            //landscape = new GameObjectModel(, new Vector3(), Vector3.One);
             //landscape.addChild(new DirectionalLight(GraphicsDevice));
-            Rendering.LoadContent(Content, graphics, landscape);
+            Rendering.LoadContent(Content, graphics, map);
             //ChunkManager landscape_model = MagicaVoxel.ChunkManagerFromVox("test.vox");
             //landscape = new GameObject(landscape_model, new Vector3(), Vector3.One);
 
@@ -67,8 +67,8 @@ namespace dungeon_monogame
             //landscapeChunks.makeColorfulFloor();
 
             player = new Player();
-            landscape.addChild(player.getActor());
-            landscape.addChild(new Slime(new Vector3(12, 20, 12)));
+            map.addChild(player.getActor());
+            map.addChild(new Slime(new Vector3(12, 20, 12)));
             //landscape.addChild(new GameObject(map.getManager(), new Vector3(1,2,1), Vector3.One * .2f));
             Console.WriteLine("global seed is " + Globals.getSeed().ToString());
             
@@ -87,12 +87,12 @@ namespace dungeon_monogame
             
             //player.update(gameTime.ElapsedGameTime.Milliseconds / 1000f, landscapeChunks);
             //player.update(0, chunkManager);
-            List<Action> actions = landscape.updateWithChildren();
+            List<Action> actions = map.updateWithChildren();
             actions.AddRange(player.handleInput());
             foreach (Action action in actions){
                 action.act(map, gameTime);
             }
-            map.map.notifyOfPlayerLocation(player.getCameraLocation());
+            map.notifyOfPlayerLocation(player.getCameraLocation());
             //map.report();
             base.Update(gameTime);
             Console.WriteLine(Globals.random.Next());
