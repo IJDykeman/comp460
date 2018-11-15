@@ -22,7 +22,9 @@ namespace dungeon_monogame
 
             addChild(new Light(.6f, lightColor));
 
-            GameObject model = new GameObjectModel(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-.5f-.5f-.5f) * -.0f, Vector3.One * .2f);
+            var spellModel = MagicaVoxel.ChunkManagerFromResource("dungeon_monogame.Content.voxel_models.spell.vox");
+
+            GameObject model = new GameObjectModel(spellModel, new Vector3(-.5f-.5f-.5f) * -.0f, Vector3.One * .2f);
             model.addTag(ObjectTag.DoesNotCastShadow);
             addChild(model);
             model.setEmissiveness(lightColor);
@@ -36,11 +38,13 @@ namespace dungeon_monogame
             result.Add(new SpawnAction(new Flash(getLocation() - .1f * Vector3.Normalize(previousVelocity))));
             for (int i = 0; i < Globals.random.Next(15, 30); i++)
             {
+                var spellModel = MagicaVoxel.ChunkManagerFromResource("dungeon_monogame.Content.voxel_models.spell.vox");
+
                 result.Add(new SpawnAction(new Spark(getLocation() - .2f * Vector3.Normalize(previousVelocity)
                     ,
                     Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 8f,
                     lightColor,
-                    @"spell.vox"
+                    spellModel
 
                     )));
 
@@ -80,8 +84,8 @@ namespace dungeon_monogame
             lantern.setStability(MagicLantern.LOW_STABILITY);
             //lantern.setLocation(Vector3.UnitY * .5f);
             addChild(lantern);
-
-            GameObject model = new GameObjectModel(MagicaVoxel.ChunkManagerFromVox(@"spell.vox"), new Vector3(-1.5f -1.5f -1.5f)* 0f, Vector3.One * .05f);
+            var spellModel = MagicaVoxel.ChunkManagerFromResource("dungeon_monogame.Content.voxel_models.spell.vox");
+            GameObject model = new GameObjectModel(spellModel, new Vector3(-1.5f -1.5f -1.5f)* 0f, Vector3.One * .05f);
             model.addTag(ObjectTag.DoesNotCastShadow);
             addChild(model);
             model.setEmissiveness(lightColor);
@@ -109,10 +113,12 @@ namespace dungeon_monogame
                 this.velocity *= 0;
                 if (Globals.random.NextDouble() > .995f)
                 {
+                    var spellModel = MagicaVoxel.ChunkManagerFromResource("dungeon_monogame.Content.voxel_models.spell.vox");
+
                     result.Add(new SpawnAction(new Spark(getLocation() - .2f * Vector3.Normalize(previousVelocity)
                         ,
                         Globals.randomVectorOnUnitSphere() * Globals.standardGaussianSample() * 2f,
-                        lightColor, @"spell.vox")));
+                        lightColor, spellModel)));
                 }
                 lifeForce--;
                 if (lifeForce < 0)
@@ -133,11 +139,10 @@ namespace dungeon_monogame
     {
         protected float scaleFactor = .99f;
         protected GameObject obj;
-        public BalisticModel(Vector3 _location, Vector3 velocity, float scale, string modelPath)
+        public BalisticModel(Vector3 _location, Vector3 velocity, float scale, ChunkManager model)
         {
             this.addVelocity(velocity);
             setLocation(_location);
-            ChunkManager model = MagicaVoxel.ChunkManagerFromVox(modelPath);
             Vector3 offset = model.getCenter();
             obj = new GameObjectModel(model, -offset, Vector3.One);
 
@@ -165,7 +170,7 @@ namespace dungeon_monogame
         float dissapear_on_collide_probability = .2f;
         Light light;
 
-        public Spark(Vector3 _location, Vector3 velocity, Color color, string modelPath) : base(_location, velocity, 1, modelPath)
+        public Spark(Vector3 _location, Vector3 velocity, Color color, ChunkManager model) : base(_location, velocity, 1, model)
            
         {
             
@@ -329,7 +334,8 @@ namespace dungeon_monogame
             {
                 addChild(light);
             }
-            ChunkManager model = MagicaVoxel.ChunkManagerFromVox(@"smoke.vox");
+            
+            ChunkManager model = MagicaVoxel.ChunkManagerFromResource("dungeon_monogame.Content.voxel_models.smoke.vox");
             Vector3 offset = model.getCenter();
             
             shape = new GameObjectModel(model, -offset * 0, Vector3.One);

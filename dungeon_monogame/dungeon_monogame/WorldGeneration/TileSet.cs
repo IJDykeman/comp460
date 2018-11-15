@@ -17,9 +17,11 @@ namespace dungeon_monogame.WorldGeneration
         public TileSet(string folderPath)
         {
 
-            string[] files = Directory.GetFiles(MagicaVoxel.tileRoot, "*.vox");
+            //string[] files = Directory.GetFiles(MagicaVoxel.tileRoot, "*.vox");
+            string[] files = Directory.GetFiles(MagicaVoxel.tileRoot);
             List<String> fileNameList = new List<string>();
             List<Tile> tilesList = new List<Tile>();
+            
             for (int i = 0; i < files.Length; i++)
             {
                 List<Block[,,]> tiles = MagicaVoxel.TilesFromPath(files[i]);

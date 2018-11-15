@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,11 @@ namespace dungeon_monogame.WorldGeneration
 
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_basic_test_11\";
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\15_dungeon\";
-        public static string tileRelativePath = @"..\..\..\..\..\..\..\..\21_dungeon\";
+
+        //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\21_dungeon\";
+
+        public static string tileRelativePath = FileManagement.getPathFromDialogue();
+
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_jake_9\";
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_65_dungeon\";
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_islands_65\";

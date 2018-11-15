@@ -28,7 +28,9 @@ namespace dungeon_monogame
 
         public static Texture2D debugTexture;
 
-        public static void LoadContent(ContentManager Content, GraphicsDeviceManager _graphics, GameObjectModel _worldRoot)
+
+
+            public static void LoadContent(ContentManager Content, GraphicsDeviceManager _graphics, GameObjectModel _worldRoot)
         {
             graphics = _graphics;
             worldRootObject = _worldRoot;
@@ -56,6 +58,12 @@ namespace dungeon_monogame
 
         public static void renderWorld(Player player)
         {
+
+            //graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width;
+            //graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
+            //graphics.IsFullScreen = false;
+            //graphics.ApplyChanges();
+
             GraphicsDevice GraphicsDevice = graphics.GraphicsDevice;
             using (SpriteBatch sprite = new SpriteBatch(GraphicsDevice))
             {

@@ -42,7 +42,7 @@ namespace dungeon_monogame
 
         float height = 3.5f * WorldGenParamaters.gameScale;
         float width = 1.5f * WorldGenParamaters.gameScale;
-        private bool flying = false;
+        private bool flying = true;
         Light torchLight;
 
         float mouseSensitivty = .002f;
@@ -56,14 +56,12 @@ namespace dungeon_monogame
 
             playerActor.setLocation(cameraPosition);
             Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
-            //GameObject sword = new GameObject(MagicaVoxel.Read(@"simple_sword.vox"), new Vector3(1,20,0), Vector3.One * .1f);
-            //playerActor.addChild(sword);
-            var torch = new GameObjectModel(MagicaVoxel.ChunkManagerFromVox(@"torch.vox"), new Vector3(.2f, 1.4f, -.3f), Vector3.One * .03f);
+            
+            var torch = new GameObjectModel(MagicaVoxel.ChunkManagerFromResource(@"dungeon_monogame.Content.voxel_models.torch.vox"), new Vector3(.2f, 1.4f, -.3f), Vector3.One * .03f);
             //torchLight = new Light(1f, Color.LightGoldenrodYellow);
             torchLight = new FireLight();
             torchLight.setLocation(new Vector3(3, 8, 3));
-            //torch.addChild(torchLight);
-            //torch.addChild(new GameObject(MagicaVoxel.Read(@"torch.vox"), new Vector3(-3, 0, 0), Vector3.One * .5f));
+            // torch.addChild(torchLight); // behaves badly wrt shadows
             playerActor.addChild(torch);
             //playerActor.addChild(new Light());
             playerActor.addTag(ObjectTag.Player);
@@ -136,12 +134,12 @@ namespace dungeon_monogame
             if (justHit(Keys.LeftControl, newState))
             {
                 flying = !flying;
-                speed = (flying ? flyingSpeed : walkingSpeed);
-                playerActor.setGravityFactor(flying ? 0f : 1f);
-                playerActor.setCollides(flying ? false : true);
+
 
             }
-
+            speed = (flying ? flyingSpeed : walkingSpeed);
+            playerActor.setGravityFactor(flying ? 0f : 1f);
+            playerActor.setCollides(flying ? false : true);
             if (flying)
             {
                 playerActor.setVelocity(Vector3.Zero);

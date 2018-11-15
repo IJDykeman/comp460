@@ -21,16 +21,31 @@ namespace dungeon_monogame
         ChunkManager landscapeChunks;
         GameObject landscape;
         Player player;
-
+        void OnResize(Object sender, EventArgs e)
+        {
+            
+            graphics.IsFullScreen = false;
+            graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
+            graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
+            
+        }
         public Game1()
         {
+
             graphics = new GraphicsDeviceManager(this);
             graphics.GraphicsProfile = GraphicsProfile.HiDef;
 
-            graphics.PreferredBackBufferWidth = 1920 *2 ;
-            graphics.PreferredBackBufferHeight = 1080 * 2;
+            graphics.PreferredBackBufferWidth = 1920 *1 ;
+            graphics.PreferredBackBufferHeight = 1080 * 1;
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
+
+
+            this.Window.AllowUserResizing = true;
+
+
+            this.Window.AllowUserResizing = true;
+            this.Window.ClientSizeChanged += new EventHandler<EventArgs>(OnResize);
 
         }
 
@@ -54,15 +69,11 @@ namespace dungeon_monogame
 
             // TODO: use this.Content to load your game content here
 
-            //landscapeChunks = MagicaVoxel.ChunkManagerFromVox(@"castleOnHill.vox");
             map = new World(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
 
             //landscape = new GameObjectModel(, new Vector3(), Vector3.One);
             //landscape.addChild(new DirectionalLight(GraphicsDevice));
             Rendering.LoadContent(Content, graphics, map);
-            //ChunkManager landscape_model = MagicaVoxel.ChunkManagerFromVox("test.vox");
-            //landscape = new GameObject(landscape_model, new Vector3(), Vector3.One);
-
 
             //landscapeChunks.makeColorfulFloor();
 
@@ -82,6 +93,7 @@ namespace dungeon_monogame
 
         protected override void Update(GameTime gameTime)
         {
+            graphics.ApplyChanges();
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             
