@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace dungeon_monogame
 {
@@ -15,8 +17,11 @@ namespace dungeon_monogame
         public Slime(Vector3 location)
         {
             setLocation(location);
-            ChunkManager model1 = MagicaVoxel.ChunkManagerFromVox("slime/slime1.vox");
-            ChunkManager model2 = MagicaVoxel.ChunkManagerFromVox("slime/slime2.vox");
+
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            ChunkManager model1 = MagicaVoxel.ChunkManagerFromResource("dungeon_monogame.Content.voxel_models.slime.slime1.vox");
+            ChunkManager model2 = MagicaVoxel.ChunkManagerFromResource("dungeon_monogame.Content.voxel_models.slime.slime2.vox");
             scale = Vector3.One * .4f;
             Vector3 offset = model1.getCenter();
             //offset = Vector3.One * 4.5f;
@@ -37,7 +42,8 @@ namespace dungeon_monogame
                 //spawn particles
                 for (int i = 0; i < 15; i++)
                 {
-                    result.Add(new SpawnAction(new BalisticModel(Globals.randomVectorOnUnitSphere() + getLocation(), Globals.randomVectorOnUnitSphere() * 5f, .2f, @"slime/goo.vox")));
+                    var gooModel = MagicaVoxel.ChunkManagerFromResource("dungeon_monogame.Content.voxel_models.slime.goo.vox");
+                    result.Add(new SpawnAction(new BalisticModel(Globals.randomVectorOnUnitSphere() + getLocation(), Globals.randomVectorOnUnitSphere() * 5f, .2f, gooModel)));
                 }
                 result.Add(new AofDamage(getLocation(), ObjectTag.Player, 5, 1));
                 result.Add(new DissapearAction(this));

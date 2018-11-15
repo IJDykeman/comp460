@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace dungeon_monogame
 {
@@ -18,7 +19,7 @@ namespace dungeon_monogame
     {
         public static string root = System.Reflection.Assembly.GetEntryAssembly().Location;
         public static string modelsRoot = root+@"..\..\..\..\..\..\..\..\voxel_models\";
-        public static string tileRoot = root + WorldGeneration.WorldGenParamaters.tileRelativePath;
+        public static string tileRoot = WorldGeneration.WorldGenParamaters.tileRelativePath;
         public static Color GetDefaultColor(int i)
         {
             return new Color(DefaultColors[i]);
@@ -50,7 +51,7 @@ namespace dungeon_monogame
         const int XYZI = ('X') + ('Y' << 8) + ('Z' << 16) + ('I' << 24);
         const int RGBA = ('R') + ('G' << 8) + ('B' << 16) + ('A' << 24);
 
-        public static Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> Read1(string path)
+        public static Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> Read1(Stream stream)
         {
             int xmin = 90000;
             int ymin = 90000;
@@ -58,7 +59,7 @@ namespace dungeon_monogame
             int xmax = -90000;
             int ymax = -90000;
             int zmax = -90000;
-            Stream stream = File.Open(path, FileMode.Open);
+            
             BinaryReader reader = new BinaryReader(stream);
             var magic = reader.ReadUInt32();
             var version = reader.ReadInt32();
@@ -146,9 +147,10 @@ namespace dungeon_monogame
 
         }
 
-        public static ChunkManager ChunkManagerFromVox(string path)
+
+        public static ChunkManager ChunkManagerFromStream(Stream stream)
         {
-            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(modelsRoot + path);
+            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(stream);
             ChunkManager manager = new ChunkManager();
             List<IntLoc> blockLocs = data.Item1;
             List<int> colorIndices = data.Item3;
@@ -164,9 +166,29 @@ namespace dungeon_monogame
             return manager;
         }
 
+        public static ChunkManager ChunkManagerFromVoxAbsolutePath(string path)
+        {
+            Stream stream = File.Open(path, FileMode.Open);
+            return ChunkManagerFromStream(stream);
+        }
+
+        public static ChunkManager ChunkManagerFromResource(string path)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            Stream stream = assembly.GetManifestResourceStream(path);
+            return ChunkManagerFromStream(stream);
+        }
+
+
+        public static ChunkManager ChunkManagerFromVox(string path)
+        {
+            return ChunkManagerFromVoxAbsolutePath(modelsRoot + path);
+        }
+
         public static Block[,,] blocksFromVox(string path)
         {
-            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(path);
+            Stream stream = File.Open(path, FileMode.Open);
+            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(stream);
             List<IntLoc> blockLocs = data.Item1;
             List<int> colorIndices = data.Item3;
             Color[] colors = data.Item2;
@@ -189,7 +211,7 @@ namespace dungeon_monogame
 
         public static List<Block[,,]> TilesFromPath(string path)
         {
-            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(path);
+            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(File.Open(path, FileMode.Open));
             List<IntLoc> blockLocs = data.Item1;
             List<int> colorIndices = data.Item3;
             Color[] colors = data.Item2;
