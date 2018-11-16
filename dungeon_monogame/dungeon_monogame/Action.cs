@@ -26,7 +26,7 @@ namespace dungeon_monogame
 
         public void act(World world, GameTime dt)
         {
-            ChunkManager manager = world.getChunkManager();
+            ChunkManager manager = world.getMap().getChunkManager();
             foreach (Action act in actor.physicsUpdate(dt, manager))
             {
                 act.act(world, dt);
@@ -148,8 +148,24 @@ namespace dungeon_monogame
             {
                 obj.burn();
             }
+        }
+    }
+
+    internal class AdjustAmbientLightAction : Action
+    {
+        private float v;
+
+        public AdjustAmbientLightAction(float v)
+        {
+            this.v = v;
+        }
+
+        public void act(World world, GameTime dt)
+        {
+            world.changeTotalAmbientPower(v);
 
         }
+
     }
 }
 

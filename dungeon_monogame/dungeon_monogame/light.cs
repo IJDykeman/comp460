@@ -205,6 +205,31 @@ namespace dungeon_monogame
         }
     }
 
+
+
+    class AmbientLight : Light
+    {
+        Vector3 direction;
+        public AmbientLight(float _intensity, Color _color, Vector3 _direction) : base(_intensity, _color)
+        {
+            direction = _direction;
+            direction.Normalize();
+        }
+
+        public override void drawSecondPass(Effect effect, Matrix transform, GraphicsDevice device)
+        {
+            effect.Parameters["lightIntensity"].SetValue(getIntensity() * 2);
+            effect.CurrentTechnique = effect.Techniques["AmbientLightTechnique"];
+            effect.Parameters["lightDirection"].SetValue(direction);
+
+            new QuadRenderer().Render(effect, device);
+            foreach (GameObject child in children)
+            {
+                child.drawSecondPass(effect, transform, device);
+            }
+        }
+    }
+
     class PointLight : Light
     {
         List<SpotLight> lights;

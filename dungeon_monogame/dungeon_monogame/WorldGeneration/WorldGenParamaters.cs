@@ -9,9 +9,10 @@ namespace dungeon_monogame.WorldGeneration
 {
     static class WorldGenParamaters
     {
-        public static readonly int tileWidth = 21;
-        public static readonly int sphereWidth = 9;
-        public static readonly int decideTilesWithinWidth = 8;
+        public static readonly bool exampleBased = true;
+        public static readonly int tileWidth = 3;
+        public static readonly int sphereWidth = 5;
+        public static readonly int decideTilesWithinWidth = 18;
         public static readonly int doNotGenerateOutsideRadius = decideTilesWithinWidth / 2 + 1;
         public static readonly float gameScale = 1f;
 

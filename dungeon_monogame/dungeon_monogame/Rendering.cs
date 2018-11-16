@@ -24,16 +24,16 @@ namespace dungeon_monogame
         private static float ambientLightLevel = 0.0f;
 
         static GraphicsDeviceManager graphics;
-        static GameObjectModel worldRootObject;
+        static World world;
 
         public static Texture2D debugTexture;
 
 
 
-            public static void LoadContent(ContentManager Content, GraphicsDeviceManager _graphics, GameObjectModel _worldRoot)
+            public static void LoadContent(ContentManager Content, GraphicsDeviceManager _graphics, World _world)
         {
             graphics = _graphics;
-            worldRootObject = _worldRoot;
+            world = _world;
             backBufferHeight = graphics.PreferredBackBufferHeight;
             backBufferWidth  = graphics.PreferredBackBufferWidth;
             createGBufferEffect = Content.Load<Effect>("DeferredRender");
@@ -75,7 +75,7 @@ namespace dungeon_monogame
 
             GBuffer buffer = DrawGBuffer(player.getViewMatrix(), projection(graphics), cameraTargets, a=>true);
 
-            worldRootObject.drawAlternateGBufferFirstPass(Matrix.Identity);
+            world.drawAlternateGBufferFirstPass(Matrix.Identity);
 
             //GBuffer LightPerspectiveGBuffer = renderDirectionalLightFirstPass(graphics, rootObject, player, GraphicsDevice);
             setupParams(player, buffer.diffuseTex, buffer.norm, buffer.depth, buffer.emissive);
@@ -84,7 +84,7 @@ namespace dungeon_monogame
             renderSceneEffect.Parameters["halfPixel"].SetValue(halfPixel);
             new QuadRenderer().Render(renderSceneEffect, GraphicsDevice);
             GraphicsDevice.BlendState = BlendState.Additive;
-            worldRootObject.drawSecondPass(renderSceneEffect, Matrix.Identity, GraphicsDevice);
+            world.drawSecondPass(renderSceneEffect, Matrix.Identity, GraphicsDevice);
 
             // render light coming directly from emmissize objects
             renderSceneEffect.CurrentTechnique = renderSceneEffect.Techniques["EmmissiveMaterialsTechnique"];
@@ -137,7 +137,7 @@ namespace dungeon_monogame
             createGBufferEffect.Parameters["xProjection"].SetValue(projectionMatrix);
             createGBufferEffect.Parameters["xView"].SetValue(viewMatrix);
             createGBufferEffect.Parameters["xWorld"].SetValue(Matrix.Identity);
-            worldRootObject.drawFirstPass(createGBufferEffect, Matrix.Identity,  new BoundingFrustum(viewMatrix * projectionMatrix), predicate );
+            world.drawFirstPass(createGBufferEffect, Matrix.Identity,  new BoundingFrustum(viewMatrix * projectionMatrix), predicate );
 
             GBuffer buffer = targets.getTextures();
             device.SetRenderTargets(null);

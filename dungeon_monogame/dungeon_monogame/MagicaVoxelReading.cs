@@ -223,6 +223,7 @@ namespace dungeon_monogame
             Block[,,] megaTile = new Block[xSize, ySize, zSize];
             for (int i = 0; i < blockLocs.Count; i++)
             {
+                // a megatile is a single model containing multiple tiles.  Can be convenient for creating complex tilesets.
                 megaTile[blockLocs[i].i, blockLocs[i].j, blockLocs[i].k] = new Block(1, colors[colorIndices[i]]);
             }
             List<Block[,,]> result = new List<Block[,,]>();
@@ -240,6 +241,49 @@ namespace dungeon_monogame
                                 for (int k = 0; k < WorldGeneration.WorldGenParamaters.tileWidth; k++)
                                 {
                                     smalltile[i, j, k] = megaTile[a * WorldGeneration.WorldGenParamaters.tileWidth + i, b * WorldGeneration.WorldGenParamaters.tileWidth + j, c * WorldGeneration.WorldGenParamaters.tileWidth + k];
+
+                                }
+                            }
+                        }
+                        result.Add(smalltile);
+                    }
+                }
+
+            }
+            return result;
+        }
+
+        public static List<Block[,,]> TilesFromExampleModel(string path)
+        {
+            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(File.Open(path, FileMode.Open));
+            List<IntLoc> blockLocs = data.Item1;
+            List<int> colorIndices = data.Item3;
+            Color[] colors = data.Item2;
+            Tuple<int, int, int, int, int, int> extents = data.Item4;
+
+            int xSize = (extents.Item2 - extents.Item1 + 1);
+            int ySize = (extents.Item4 - extents.Item3 + 1);
+            int zSize = (extents.Item6 - extents.Item5 + 1);
+            Block[,,] megaTile = new Block[xSize, ySize, zSize];
+            for (int i = 0; i < blockLocs.Count; i++)
+            {
+                megaTile[blockLocs[i].i, blockLocs[i].j, blockLocs[i].k] = new Block(1, colors[colorIndices[i]]);
+            }
+            List<Block[,,]> result = new List<Block[,,]>();
+            for (int a = 1; a < xSize -1; a++)
+            {
+                for (int b = 1; b < ySize -1; b++)
+                {
+                    for (int c = 1; c < zSize -1; c++)
+                    {
+                        Block[,,] smalltile = new Block[WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth];
+                        for (int i = 0; i < WorldGeneration.WorldGenParamaters.tileWidth; i++)
+                        {
+                            for (int j = 0; j < WorldGeneration.WorldGenParamaters.tileWidth; j++)
+                            {
+                                for (int k = 0; k < WorldGeneration.WorldGenParamaters.tileWidth; k++)
+                                {
+                                    smalltile[i, j, k] = megaTile[a + i-1, b + j-1, c + k-1];
 
                                 }
                             }

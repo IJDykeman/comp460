@@ -17,14 +17,21 @@ namespace dungeon_monogame.WorldGeneration
         public TileSet(string folderPath)
         {
 
-            //string[] files = Directory.GetFiles(MagicaVoxel.tileRoot, "*.vox");
             string[] files = Directory.GetFiles(MagicaVoxel.tileRoot);
             List<String> fileNameList = new List<string>();
             List<Tile> tilesList = new List<Tile>();
             
             for (int i = 0; i < files.Length; i++)
             {
-                List<Block[,,]> tiles = MagicaVoxel.TilesFromPath(files[i]);
+                List<Block[,,]> tiles;
+                if (WorldGenParamaters.exampleBased)
+                {
+                    tiles = MagicaVoxel.TilesFromExampleModel(files[i]);
+                }
+                else
+                {
+                    tiles = MagicaVoxel.TilesFromPath(files[i]);
+                }
                 foreach (Block[,,] blockSubArray in tiles)
                 {
                     if (!tilesList.Contains(new Tile(blockSubArray)))
@@ -70,6 +77,10 @@ namespace dungeon_monogame.WorldGeneration
 
         }
 
+        //List<Block[,,]> sliceUpExampleModel(string path)
+        //{
+
+        //}
 
 
         void buildTransitionMatrices()

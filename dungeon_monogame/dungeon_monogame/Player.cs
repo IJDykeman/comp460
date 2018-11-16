@@ -123,12 +123,12 @@ namespace dungeon_monogame
 
             if (justHit(Keys.Up, newState))
             {
-                Rendering.adjustAmbientLight(+0.1f);
+                result.Add(new AdjustAmbientLightAction(+0.1f));
             }
 
             if (justHit(Keys.Down, newState))
             {
-                Rendering.adjustAmbientLight(-0.1f);
+                result.Add(new AdjustAmbientLightAction(-0.1f));
             }
 
             if (justHit(Keys.LeftControl, newState))
@@ -206,4 +206,6 @@ namespace dungeon_monogame
             return playerActor;
         }
     }
+
+
 }

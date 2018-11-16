@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-
 namespace dungeon_monogame
 {
     /// <summary>
@@ -56,31 +55,35 @@ namespace dungeon_monogame
             base.Initialize();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
+
+        public void resetMap(string tileRootPath)
+        {
+
+        }
+
+        void dragDrop(object sender, System.Windows.Forms.DragEventArgs e)
+        {
+            string[] s = (string[])e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop, false);
+            int i=0;
+            //for (i = 0; i < s.Length; i++)
+                //listBox1.Items.Add(s[i]);
+        }
+
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            //Content.RootDirectory = "Content";
             // use C:\Program Files (x86)\MSBuild\MonoGame\v3.0\Tools pipeline tool for this
-
-            // TODO: use this.Content to load your game content here
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            //System.Windows.Forms.Form gameForm = (System.Windows.Forms.Form)System.Windows.Forms.Form.FromHandle(Window.Handle);
+            //gameForm.AllowDrop = true;
+            //gameForm.DragEnter += new DragEventHandler(gameForm_DragEnter);
+            //gameForm.DragDrop += new DragEventHandler(gameForm_DragDrop);
 
             map = new World(new WorldGeneration.TileSet(MagicaVoxel.tileRoot));
 
-            //landscape = new GameObjectModel(, new Vector3(), Vector3.One);
-            //landscape.addChild(new DirectionalLight(GraphicsDevice));
             Rendering.LoadContent(Content, graphics, map);
-
-            //landscapeChunks.makeColorfulFloor();
-
             player = new Player();
             map.addChild(player.getActor());
             map.addChild(new Slime(new Vector3(12, 20, 12)));
-            //landscape.addChild(new GameObject(map.getManager(), new Vector3(1,2,1), Vector3.One * .2f));
             Console.WriteLine("global seed is " + Globals.getSeed().ToString());
             
         }
@@ -104,7 +107,7 @@ namespace dungeon_monogame
             foreach (Action action in actions){
                 action.act(map, gameTime);
             }
-            map.notifyOfPlayerLocation(player.getCameraLocation());
+            map.getMap().notifyOfPlayerLocation(player.getCameraLocation());
             //map.report();
             base.Update(gameTime);
             Console.WriteLine(Globals.random.Next());

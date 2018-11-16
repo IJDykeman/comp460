@@ -353,6 +353,21 @@ float4 HemisphereLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
 }
 
 
+float4 AmbientLightPixelShaderFunction(VertexShaderOutput input) : COLOR0
+{
+	float4 colorData = tex2D(colorSampler, input.TexCoord);
+	float4 normalData = tex2D(normalSampler, input.TexCoord);
+	float3 normal = 2.0f * normalData.xyz - 1.0f;
+
+	float NdL = max(.05, dot(normal, lightDirection));
+	NdL = sqrt(-1 / (NdL + 1) + 1);
+	float3 diffuseLight = NdL * colorData.rgb;
+
+
+	return float4(diffuseLight * lightIntensity, 1);
+}
+
+
 
 technique DirectionalLightTechnique
 {
@@ -399,6 +414,15 @@ technique HemisphereLightTechnique
 	{
 		VertexShader = compile vs_2_0 VertexShaderFunction();
 		PixelShader = compile ps_2_0 HemisphereLightPixelShaderFunction();
+	}
+}
+
+technique AmbientLightTechnique
+{
+	pass Pass0
+	{
+		VertexShader = compile vs_2_0 VertexShaderFunction();
+		PixelShader = compile ps_2_0 AmbientLightPixelShaderFunction();
 	}
 }
 
