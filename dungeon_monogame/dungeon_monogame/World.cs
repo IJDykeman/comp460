@@ -23,13 +23,20 @@ namespace dungeon_monogame
             addChild(ambientLight1);
             ambientLight2 = new AmbientLight(0.1f, Color.White, new Vector3(-6, -1, -7));
             addChild(ambientLight2);
-            addChild(map);
-            setTotalAmbientPower(.3f);
+            
+            setTotalAmbientPower(GlobalSettings.defaultAmbientLight);
+        }
+
+        internal void exportModel()
+        {
+            map.getChunkManager().createMesh();
         }
 
         public void resetTileMap(TileSet tiles)
         {
+            recursiveRemove(map);
             map = new TileMap(tiles, Vector3.Zero, Vector3.One);
+            addChild(map);
 
         }
 
@@ -39,16 +46,16 @@ namespace dungeon_monogame
         }
 
         public void changeTotalAmbientPower(float delta)
-        {
-            float nPower = delta + totalAmbientPower;
-            nPower = Math.Min(nPower, 1);
-            nPower = Math.Max(nPower, 0);
-            setTotalAmbientPower(nPower);
+        { 
+            totalAmbientPower += delta;
+            totalAmbientPower = Math.Min(totalAmbientPower, GlobalSettings.maxAmbientLight);
+            totalAmbientPower = Math.Max(totalAmbientPower, GlobalSettings.minAmbientLight);
+            setTotalAmbientPower(totalAmbientPower);
         }
 
-        public void setTotalAmbientPower(float power)
+        void setTotalAmbientPower(float _totalAmbientPower)
         {
-            totalAmbientPower = power;
+            totalAmbientPower = _totalAmbientPower;
             ambientLight1.setIntensity(totalAmbientPower / 3 * 2);
             ambientLight2.setIntensity(totalAmbientPower / 3);
         }

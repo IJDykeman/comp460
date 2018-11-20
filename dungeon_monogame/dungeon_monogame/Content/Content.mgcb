@@ -55,3 +55,10 @@
 /processorParam:TextureFormat=Color
 /build:vignette.png
 
+#begin menuFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:menuFont.spritefont
+

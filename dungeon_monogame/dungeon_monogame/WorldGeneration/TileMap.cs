@@ -55,11 +55,12 @@ namespace dungeon_monogame.WorldGeneration
 
         private static void placeBlocksFromTile(IntLoc tileSpacePos, ChunkManager m, Tile tile)
         {
-            for (int i = 0; i < WorldGenParamaters.tileWidth - 1; i++)
+            int tileWidth = tile.tileWidth;
+            for (int i = 0; i < tileWidth - 1; i++)
             {
-                for (int j = 0; j < WorldGenParamaters.tileWidth - 1; j++)
+                for (int j = 0; j < tileWidth - 1; j++)
                 {
-                    for (int k = 0; k < WorldGenParamaters.tileWidth - 1; k++)
+                    for (int k = 0; k < tileWidth - 1; k++)
                     {
                         Block b = tile.get(i, j, k);
                         if (b.color.R == 252)
@@ -71,7 +72,7 @@ namespace dungeon_monogame.WorldGeneration
                             b.color.R = (byte)MathHelper.Clamp(b.color.R - Globals.random.Next(6), 0, 255);
                             b.color.G = (byte)MathHelper.Clamp(b.color.G - Globals.random.Next(6), 0, 255);
                             b.color.B = (byte)MathHelper.Clamp(b.color.B - Globals.random.Next(3), 0, 255);
-                            m.set((tileSpacePos * (WorldGenParamaters.tileWidth - 1)) + new IntLoc(i, j, k), b);
+                            m.set((tileSpacePos * (tileWidth - 1)) + new IntLoc(i, j, k), b);
                         }
                     }
                 }
@@ -188,7 +189,7 @@ namespace dungeon_monogame.WorldGeneration
 
         private IntLoc? lowestEntropyUndecidedLocation()
         {
-            IntLoc snapped_player_loc = new IntLoc(TileMap.playerPerspectiveLoc / WorldGenParamaters.tileWidth);
+            IntLoc snapped_player_loc = new IntLoc(TileMap.playerPerspectiveLoc / tileSet.getTileWidth());
 
             if (!decided(snapped_player_loc) && !(WorldGenParamaters.onlyOneHorizontalLevel || WorldGenParamaters.onlyOneVerticalLevel))
             {
@@ -283,22 +284,24 @@ namespace dungeon_monogame.WorldGeneration
             new Thread(() => { keepTilesUpdated(); }).Start();
             */
             decide(new IntLoc());
-            new Thread(() =>
+            Thread worker = new Thread(() =>
             {
-                
+
                 while (true)
                 {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
                     while (stopwatch.ElapsedMilliseconds < 50)
                     {
-                    placeATile(chunkManager);
+                        placeATile(chunkManager);
                     }
                     remeshAroundPlayer();
                     chunkManager.unmeshOutsideRange();
-                    
+
                 }
-            }).Start();
+            });
+            worker.IsBackground = true;
+            worker.Start();
 
 
             return chunkManager;

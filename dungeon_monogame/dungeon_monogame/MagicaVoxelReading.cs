@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using dungeon_monogame.WorldGeneration;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,6 @@ namespace dungeon_monogame
     {
         public static string root = System.Reflection.Assembly.GetEntryAssembly().Location;
         public static string modelsRoot = root+@"..\..\..\..\..\..\..\..\voxel_models\";
-        public static string tileRoot = WorldGeneration.WorldGenParamaters.tileRelativePath;
         public static Color GetDefaultColor(int i)
         {
             return new Color(DefaultColors[i]);
@@ -185,31 +185,7 @@ namespace dungeon_monogame
             return ChunkManagerFromVoxAbsolutePath(modelsRoot + path);
         }
 
-        public static Block[,,] blocksFromVox(string path)
-        {
-            Stream stream = File.Open(path, FileMode.Open);
-            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(stream);
-            List<IntLoc> blockLocs = data.Item1;
-            List<int> colorIndices = data.Item3;
-            Color[] colors = data.Item2;
-            Tuple<int, int, int, int, int, int> extents = data.Item4;
-            Block[,,] blocks;
-            if (path.Contains("\\tiles"))
-            {
-                blocks = new Block[WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth];
-            }
-            else
-            {
-                blocks = new Block[extents.Item2 - extents.Item1 + 1, extents.Item4 - extents.Item3 + 1, extents.Item6 - extents.Item5 + 1];
-            }
-            for (int i = 0; i < blockLocs.Count; i++)
-            {
-                blocks[blockLocs[i].i, blockLocs[i].j,blockLocs[i].k] = new Block(1, colors[colorIndices[i]]);
-            }
-            return blocks;
-        }
-
-        public static List<Block[,,]> TilesFromPath(string path)
+        public static List<Tile> TilesFromPath(string path, int tileWidth)
         {
             Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(File.Open(path, FileMode.Open));
             List<IntLoc> blockLocs = data.Item1;
@@ -217,35 +193,35 @@ namespace dungeon_monogame
             Color[] colors = data.Item2;
             Tuple<int, int, int, int, int, int> extents = data.Item4;
 
-            int xSize = (int)Math.Ceiling(((extents.Item2 - extents.Item1 + 1) / (double)WorldGeneration.WorldGenParamaters.tileWidth)) * WorldGeneration.WorldGenParamaters.tileWidth;
-            int ySize = (int)Math.Ceiling(((extents.Item4 - extents.Item3 + 1) / (double)WorldGeneration.WorldGenParamaters.tileWidth)) * WorldGeneration.WorldGenParamaters.tileWidth;
-            int zSize = (int)Math.Ceiling(((extents.Item6 - extents.Item5 + 1) / (double)WorldGeneration.WorldGenParamaters.tileWidth)) * WorldGeneration.WorldGenParamaters.tileWidth;
+            int xSize = (int)Math.Ceiling(((extents.Item2 - extents.Item1 + 1) / (double)tileWidth)) * tileWidth;
+            int ySize = (int)Math.Ceiling(((extents.Item4 - extents.Item3 + 1) / (double)tileWidth)) * tileWidth;
+            int zSize = (int)Math.Ceiling(((extents.Item6 - extents.Item5 + 1) / (double)tileWidth)) * tileWidth;
             Block[,,] megaTile = new Block[xSize, ySize, zSize];
             for (int i = 0; i < blockLocs.Count; i++)
             {
                 // a megatile is a single model containing multiple tiles.  Can be convenient for creating complex tilesets.
                 megaTile[blockLocs[i].i, blockLocs[i].j, blockLocs[i].k] = new Block(1, colors[colorIndices[i]]);
             }
-            List<Block[,,]> result = new List<Block[,,]>();
-            for (int a = 0; a < xSize / WorldGeneration.WorldGenParamaters.tileWidth; a++)
+            List<Tile> result = new List<Tile>();
+            for (int a = 0; a < xSize / tileWidth; a++)
             {
-                for (int b = 0; b < ySize / WorldGeneration.WorldGenParamaters.tileWidth; b++)
+                for (int b = 0; b < ySize / tileWidth; b++)
                 {
-                    for (int c = 0; c < zSize / WorldGeneration.WorldGenParamaters.tileWidth; c++)
+                    for (int c = 0; c < zSize / tileWidth; c++)
                     {
-                        Block[,,] smalltile = new Block[WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth];
-                        for (int i = 0; i < WorldGeneration.WorldGenParamaters.tileWidth; i++)
+                        Block[,,] smalltile = new Block[tileWidth, tileWidth, tileWidth];
+                        for (int i = 0; i < tileWidth; i++)
                         {
-                            for (int j = 0; j < WorldGeneration.WorldGenParamaters.tileWidth; j++)
+                            for (int j = 0; j < tileWidth; j++)
                             {
-                                for (int k = 0; k < WorldGeneration.WorldGenParamaters.tileWidth; k++)
+                                for (int k = 0; k < tileWidth; k++)
                                 {
-                                    smalltile[i, j, k] = megaTile[a * WorldGeneration.WorldGenParamaters.tileWidth + i, b * WorldGeneration.WorldGenParamaters.tileWidth + j, c * WorldGeneration.WorldGenParamaters.tileWidth + k];
+                                    smalltile[i, j, k] = megaTile[a * tileWidth + i, b * tileWidth + j, c * tileWidth + k];
 
                                 }
                             }
                         }
-                        result.Add(smalltile);
+                        result.Add(new Tile(smalltile, tileWidth));
                     }
                 }
 
@@ -253,7 +229,7 @@ namespace dungeon_monogame
             return result;
         }
 
-        public static List<Block[,,]> TilesFromExampleModel(string path)
+        public static List<Tile> TilesFromExampleModel(string path, int tileWidth)
         {
             Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(File.Open(path, FileMode.Open));
             List<IntLoc> blockLocs = data.Item1;
@@ -261,34 +237,40 @@ namespace dungeon_monogame
             Color[] colors = data.Item2;
             Tuple<int, int, int, int, int, int> extents = data.Item4;
 
-            int xSize = (extents.Item2 - extents.Item1 + 1);
-            int ySize = (extents.Item4 - extents.Item3 + 1);
-            int zSize = (extents.Item6 - extents.Item5 + 1);
-            Block[,,] megaTile = new Block[xSize, ySize, zSize];
+            int xSize = (extents.Item2 + 1);
+            int ySize = (extents.Item4 + 1);
+            int zSize = (extents.Item6 + 1);
+            int size = Math.Max(zSize, Math.Max(xSize, ySize));
+            Block[,,] megaTile = new Block[size, size, size];
             for (int i = 0; i < blockLocs.Count; i++)
             {
                 megaTile[blockLocs[i].i, blockLocs[i].j, blockLocs[i].k] = new Block(1, colors[colorIndices[i]]);
             }
-            List<Block[,,]> result = new List<Block[,,]>();
-            for (int a = 1; a < xSize -1; a++)
+            List<Tile> result = new List<Tile>();
+            for (int a = 1; a < xSize - 1; a++)
             {
-                for (int b = 1; b < ySize -1; b++)
+                for (int b = 1; b < ySize - 1; b++)
                 {
-                    for (int c = 1; c < zSize -1; c++)
+                    for (int c = 1; c < zSize - 1; c++)
                     {
-                        Block[,,] smalltile = new Block[WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth, WorldGeneration.WorldGenParamaters.tileWidth];
-                        for (int i = 0; i < WorldGeneration.WorldGenParamaters.tileWidth; i++)
+                        Block[,,] smalltile = new Block[tileWidth, tileWidth, tileWidth];
+                        for (int i = 0; i < tileWidth; i++)
                         {
-                            for (int j = 0; j < WorldGeneration.WorldGenParamaters.tileWidth; j++)
+                            for (int j = 0; j < tileWidth; j++)
                             {
-                                for (int k = 0; k < WorldGeneration.WorldGenParamaters.tileWidth; k++)
+                                for (int k = 0; k < tileWidth; k++)
                                 {
-                                    smalltile[i, j, k] = megaTile[a + i-1, b + j-1, c + k-1];
+                                    smalltile[i, j, k] = megaTile[a + i - 1, b + j - 1, c + k - 1];
 
                                 }
                             }
                         }
-                        result.Add(smalltile);
+
+                        if (!result.Contains(new Tile(smalltile, tileWidth)))
+                        {
+                            result.Add(new Tile(smalltile, tileWidth));
+
+                        }
                     }
                 }
 

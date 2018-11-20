@@ -14,14 +14,13 @@ namespace dungeon_monogame
 
         static RenderTargets cameraTargets;
         public static Texture2D vignette;
-        static int backBufferWidth, backBufferHeight;
-        static Color bgColor = Color.Black;
+        public static int backBufferWidth, backBufferHeight;
         static int scale_factor = 1;
 
 
         static Effect createGBufferEffect, renderSceneEffect;
         static Vector2 halfPixel;
-        private static float ambientLightLevel = 0.0f;
+        private static float ambientLightLevel = GlobalSettings.defaultAmbientLight;
 
         static GraphicsDeviceManager graphics;
         static World world;
@@ -30,31 +29,32 @@ namespace dungeon_monogame
 
 
 
-            public static void LoadContent(ContentManager Content, GraphicsDeviceManager _graphics, World _world)
+        public static void LoadContent(ContentManager Content, GraphicsDeviceManager _graphics, World _world)
         {
             graphics = _graphics;
             world = _world;
-            backBufferHeight = graphics.PreferredBackBufferHeight;
-            backBufferWidth  = graphics.PreferredBackBufferWidth;
+
             createGBufferEffect = Content.Load<Effect>("DeferredRender");
             renderSceneEffect = Content.Load<Effect>("RenderSceneFromGBuffer");
             vignette = Content.Load<Texture2D>("vignette");
-
-            cameraTargets = new RenderTargets(backBufferWidth, backBufferHeight, graphics.GraphicsDevice);
-
-
-
+            resetRendertargets();
             halfPixel.X = 0.5f / (float)graphics.GraphicsDevice.PresentationParameters.BackBufferWidth;
             halfPixel.Y = 0.5f / (float)graphics.GraphicsDevice.PresentationParameters.BackBufferHeight;
-
         }
 
-        public static void adjustAmbientLight(float delta)
+
+        public static void resetRendertargets()
         {
-            ambientLightLevel += delta;
-            ambientLightLevel = Math.Min(ambientLightLevel, 1.4f);
-            ambientLightLevel = Math.Max(ambientLightLevel, 0.0f);
+            if (graphics != null) //ignore resize events before loading content
+            {
+                backBufferHeight = graphics.PreferredBackBufferHeight;
+                backBufferWidth = graphics.PreferredBackBufferWidth;
+                cameraTargets = new RenderTargets(backBufferWidth, backBufferHeight, graphics.GraphicsDevice);
+            }
+
         }
+
+
 
         public static void renderWorld(Player player)
         {
@@ -70,8 +70,6 @@ namespace dungeon_monogame
                 sprite.Begin(depthStencilState: DepthStencilState.Default);
                 sprite.End();
             }
-
-            
 
             GBuffer buffer = DrawGBuffer(player.getViewMatrix(), projection(graphics), cameraTargets, a=>true);
 
@@ -95,15 +93,18 @@ namespace dungeon_monogame
             using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
             {
                 sprite.Begin(depthStencilState: DepthStencilState.None);
-                sprite.Draw(vignette, new Vector2(0, 0), null, Color.Black * .7f, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+                sprite.Draw(vignette, new Vector2(0, 0), null, Color.Black * GlobalSettings.vignetteStrength,
+                                0, new Vector2(0, 0), new Vector2(1.0f*graphics.PreferredBackBufferWidth/vignette.Width,
+                                1.0f * graphics.PreferredBackBufferHeight/ vignette.Height), SpriteEffects.None, 1);
 
+                /*
                 float squareScale = .2f;
                 int w = 800;
                 int h = w / 5 * 3;
                 if (debugTexture != null)
                 {
                     sprite.Draw(debugTexture, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), squareScale, SpriteEffects.None, 1);
-                }
+                }*/
                 //sprite.Draw(LightPerspectiveGBuffer.diffuseTex, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), squareScale, SpriteEffects.None, 1);
                 //sprite.Draw(LightPerspectiveGBuffer.norm, new Vector2(w, 0), null, Color.White, 0, new Vector2(0, 0), squareScale, SpriteEffects.None, 1);
                 //sprite.Draw(LightPerspectiveGBuffer.depth, new Vector2(0, h), null, Color.White, 0, new Vector2(0, 0), squareScale, SpriteEffects.None, 1);
@@ -111,6 +112,9 @@ namespace dungeon_monogame
 
                 sprite.End();
             }
+
+
+
 
         
             using (SpriteBatch sprite = new SpriteBatch(graphics.GraphicsDevice))
@@ -130,8 +134,8 @@ namespace dungeon_monogame
             targets.setTargets(device);
             // render options
             graphics.GraphicsDevice.BlendState = BlendState.Opaque;
-            device.RasterizerState = RasterizerState.CullNone;
-            device.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, bgColor, 1.0f, 0);
+            device.RasterizerState = GlobalSettings.DrawGBufferRasterizerState;
+            device.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, GlobalSettings.worldBackgroundColor, 1.0f, 0);
 
             createGBufferEffect.CurrentTechnique = createGBufferEffect.Techniques["RenderGBuffer"];
             createGBufferEffect.Parameters["xProjection"].SetValue(projectionMatrix);

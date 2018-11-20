@@ -7,11 +7,55 @@ using System.Threading.Tasks;
 
 namespace dungeon_monogame
 {
-    interface Action
+    abstract class Action
     {
 
 
-        void act(World world, GameTime dt);
+        public virtual void actOnWorld(World world, GameTime dt) { }
+        public virtual void actOnGame(Game1 game1) { }
+    }
+
+
+    class ToggleMainMenu : Action
+    {
+        public override void actOnGame(Game1 game1) {
+            game1.toggleMainMenu();
+        }
+    }
+
+    
+
+    class ExportModelAction : Action
+    {
+        public override void actOnWorld(World world, GameTime dt)
+        {
+            world.exportModel();
+        }
+    }
+
+
+    class ExitApplicationAction : Action
+    {
+        public override void actOnGame(Game1 game1)
+        {
+            game1.Exit();
+        }
+    }
+
+    class RequestTilesetLoad : Action
+    {
+        bool exampleBased;
+
+        public RequestTilesetLoad(bool _exampleBased)
+        {
+            exampleBased = _exampleBased;
+        }
+
+        public override void actOnGame(Game1 game1)
+        {
+
+            game1.loadNewTileset(exampleBased);
+        }
     }
 
     class RequestPhysicsUpdate : Action
@@ -24,12 +68,12 @@ namespace dungeon_monogame
         }
 
 
-        public void act(World world, GameTime dt)
+        public override void actOnWorld(World world, GameTime dt)
         {
             ChunkManager manager = world.getMap().getChunkManager();
             foreach (Action act in actor.physicsUpdate(dt, manager))
             {
-                act.act(world, dt);
+                act.actOnWorld(world, dt);
             }
         }
     }
@@ -49,7 +93,7 @@ namespace dungeon_monogame
         }
 
 
-        public void act(World world, GameTime dt)
+        public override void actOnWorld(World world, GameTime dt)
         {
             List<GameObject> tagged = world.getChildrenWithTag(tag);
             if (tagged.Count > 0)
@@ -85,7 +129,7 @@ namespace dungeon_monogame
         }
 
 
-        public void act(World world, GameTime dt)
+        public override void actOnWorld(World world, GameTime dt)
         {
             foreach (Actor a in world.getChildrenWithTag(tag))
             {
@@ -107,7 +151,7 @@ namespace dungeon_monogame
         }
 
 
-        public void act(World world, GameTime dt)
+        public override void actOnWorld(World world, GameTime dt)
         {
             world.addChild(actor);
         }
@@ -123,7 +167,7 @@ namespace dungeon_monogame
         }
 
 
-        public void act(World world, GameTime dt)
+        public override void actOnWorld(World world, GameTime dt)
         {
             world.recursiveRemove(actor);
         }
@@ -141,7 +185,7 @@ namespace dungeon_monogame
         }
 
 
-        public void act(World world, GameTime dt)
+        public override void actOnWorld(World world, GameTime dt)
         {
             List<GameObject> burnedObjects = world.recursiveGetWithinSphere(center, radius);
             foreach(GameObject obj in burnedObjects)
@@ -160,7 +204,7 @@ namespace dungeon_monogame
             this.v = v;
         }
 
-        public void act(World world, GameTime dt)
+        public override void actOnWorld(World world, GameTime dt)
         {
             world.changeTotalAmbientPower(v);
 

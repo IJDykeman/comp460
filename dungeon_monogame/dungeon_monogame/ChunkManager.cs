@@ -25,6 +25,64 @@ namespace dungeon_monogame
         }
 
 
+        public void createMesh()
+        {
+
+            StringBuilder verticesSb = new StringBuilder();
+            StringBuilder textureCoordsSb = new StringBuilder();
+            StringBuilder normalsSb = new StringBuilder();
+            StringBuilder indicesSb = new StringBuilder();
+            int totalIndicesInPreviousChunks = 0;
+            foreach (IntLoc loc in chunks.Keys)
+            {
+                Chunk c = chunks[loc];
+                if(c.vertices == null)
+                {
+                    continue;
+                }
+                for (int i = 0; i < c.vertices.Length; i++)
+                {
+
+                    var pos = c.vertices[i].Position;
+                    pos += loc.toVector3();
+                    //vertices.Add(c.vertices[i].Position);
+                    verticesSb.Append("v "
+                        + pos.X.ToString() + " "
+                        + pos.Y.ToString() + " "
+                        + pos.Z.ToString() + "\n");
+
+                    /*normalsSb.Append("vn "
+                        + c.vertices[i].Normal.X.ToString() + " "
+                        + c.vertices[i].Normal.Y.ToString() + " "
+                        + c.vertices[i].Normal.Z.ToString() + "\n");*/
+
+                    textureCoordsSb.Append("vt "
+                        + 1.ToString() + " "
+                        + 1.ToString() + "\n");
+                }
+                for (int i = 0; i < c.indices.Length; i += 3)
+                {
+                    indicesSb.Append("f "
+                         + (1+c.indices[i + 2] + totalIndicesInPreviousChunks).ToString() + " "
+                         + (1+c.indices[i + 1] + totalIndicesInPreviousChunks).ToString() + " "
+                         + (1+c.indices[i] + totalIndicesInPreviousChunks).ToString() + "\n");
+                }
+                totalIndicesInPreviousChunks += c.indices.Length;
+
+
+            }
+            StringBuilder file = new StringBuilder(10000);
+            file.Append(verticesSb);
+            file.Append(textureCoordsSb);
+            //file.Append(normalsSb);
+            file.Append(indicesSb);
+            var result = file.ToString();
+            System.IO.File.WriteAllText(@"C:\Users\Isaac\Desktop\scratch\obj.obj", result);
+
+
+
+        }
+
         public bool chunkNeedsMesh(IntLoc chunksLoc)
         {
             Chunk c;
@@ -49,39 +107,7 @@ namespace dungeon_monogame
         {
             return "Number of chunks: " + chunks.Count;
         }
-
-        public void remeshAllParallelizeableStep(Func<IntLoc, bool> decided)
-        {
-            /*IntLoc l;
-            while (chunkLocationsNeedingRemesh.TakeMinInLinearTime(a => (Math.Abs(a.i - TileMap.playerPerspectiveLoc.X) 
-                                                                                + Math.Abs(a.j - TileMap.playerPerspectiveLoc.Y) * 5 
-                                                                                + Math.Abs(a.k - TileMap.playerPerspectiveLoc.Z)), out l))
-            {
-                float d = IntLoc.EuclideanDistance(l, new IntLoc(TileMap.playerPerspectiveLoc));
-                if (d < TileMap.alwaysMeshWithinRange)
-                {
-                    chunks[l].remeshParallelStep(this, l.toVector3());
-                }
-                else
-                {
-                    chunkLocationsNeedingRemesh.Add(l);
-                }
-            }*/
-            IntLoc centerTilePos = new IntLoc(TileMap.playerPerspectiveLoc);
-            IntLoc toMeshTileLoc;
-            foreach (IntLoc BFSloc in Globals.gridBFS(WorldGenParamaters.decideTilesWithinWidth))
-            {
-                toMeshTileLoc = new IntLoc(-WorldGenParamaters.decideTilesWithinWidth / 2) + BFSloc + centerTilePos;
-                if (decided(toMeshTileLoc))
-                {
-                    IntLoc ToMeshChunkLoc = locToChunkLoc(toMeshTileLoc * WorldGenParamaters.tileWidth);
-                    chunks[ToMeshChunkLoc].remeshParallelStep(this, ToMeshChunkLoc.toVector3());
-                    break;
-
-                }
-
-            }
-        }
+        
 
         public void remesh(ChunkManager m, IntLoc chunksLoc)
         {

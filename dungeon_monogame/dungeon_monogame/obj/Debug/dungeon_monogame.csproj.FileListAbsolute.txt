@@ -15,8 +15,13 @@ c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_mo
 c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csprojResolveAssemblyReference.cache
 c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.exe
 c:\users\isaac\documents\visual studio 2015\Projects\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.pdb
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.exe
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.pdb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framework.dll.config
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\DeferredRender.xnb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\dfg.xnb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\Effect.xnb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\menuFont.xnb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\RenderSceneFromGBuffer.xnb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\vignette.xnb
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x86\SDL2.dll
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x64\SDL2.dll
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x86\soft_oal.dll
@@ -27,20 +32,11 @@ C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\A
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\x64\libopenal.so.1
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\libSDL2-2.0.0.dylib
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\libopenal.1.dylib
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framework.dll.config
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\dungeon_monogame.exe
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\dungeon_monogame.pdb
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framework.dll
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\DeferredRender.fx
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\dfg.png
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\dfg.xnb
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\Effect.xnb
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\Effect.fx
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\DeferredRender.xnb
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\RenderSceneFromGBuffer.xnb
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csprojResolveAssemblyReference.cache
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\vignette.xnb
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csproj.CoreCompileInputs.cache
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csproj.CopyComplete
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\RenderSceneFromGBuffer.fx
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\vignette.png
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\voxel_models\slime\goo.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\voxel_models\slime\slime1.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\voxel_models\slime\slime2.vox
@@ -58,3 +54,16 @@ C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\A
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\voxel_models\spell.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\voxel_models\test.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\voxel_models\torch.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\dungeon_monogame.exe.manifest
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\dungeon_monogame.application
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\dungeon_monogame.exe
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\dungeon_monogame.pdb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framework.dll
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csproj.CoreCompileInputs.cache
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.TrustInfo.xml
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.exe.manifest
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.application
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csproj.CopyComplete
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.exe
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.pdb
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\obj\Debug\dungeon_monogame.csprojResolveAssemblyReference.cache

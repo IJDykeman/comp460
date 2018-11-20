@@ -9,9 +9,10 @@ namespace dungeon_monogame.WorldGeneration
     class Tile
     {
         Block[,,] blocks;
-
-        public Tile(Block[,,] _blocks)
+        public int tileWidth;
+        public Tile(Block[,,] _blocks, int _tileWidth)
         {
+            tileWidth = _tileWidth;
             blocks = _blocks;
         }
 
@@ -27,11 +28,15 @@ namespace dungeon_monogame.WorldGeneration
 
         public static bool match(Tile a, Tile b, int di, int dj, int dl)
         {
-            int w = WorldGenParamaters.tileWidth;
-
-            for (int i = 0; i < WorldGenParamaters.tileWidth; i++)
+            if (a.tileWidth != b.tileWidth)
             {
-                for (int j = 0; j < WorldGenParamaters.tileWidth; j++)
+                return false;
+            }
+            int w = a.tileWidth;
+
+            for (int i = 0; i < a.tileWidth; i++)
+            {
+                for (int j = 0; j < a.tileWidth; j++)
                 {
                     if (di == 0 && dj == 1 && dl == 0)
                     {
@@ -169,39 +174,39 @@ namespace dungeon_monogame.WorldGeneration
         {
             List<Tuple<int, int>> l = ringOrder(5);
 
-            Block[,,] newBlocks = new Block[WorldGenParamaters.tileWidth, WorldGenParamaters.tileWidth, WorldGenParamaters.tileWidth];
+            Block[,,] newBlocks = new Block[tileWidth, tileWidth, tileWidth];
 
-            for (int ring = 1; ring <= WorldGenParamaters.tileWidth; ring += 2)
+            for (int ring = 1; ring <= tileWidth; ring += 2)
             {
                 List<Tuple<int, int>> ringIndices = ringOrder(ring);
-                for (int y = 0; y < WorldGenParamaters.tileWidth; y++)
+                for (int y = 0; y < tileWidth; y++)
                 {
                     for (int i = 0; i < ringIndices.Count; i++)
                     {
-                        int offset = (WorldGenParamaters.tileWidth - ring) / 2;
+                        int offset = (tileWidth - ring) / 2;
                         newBlocks[ringIndices[i].Item1 + offset, y,
                                   ringIndices[i].Item2 + offset] =
                             blocks[ringIndices[(i + ring - 1) % ringIndices.Count].Item1 + offset, y,
                                    ringIndices[(i + ring - 1) % ringIndices.Count].Item2 + offset];
                     }
-                    newBlocks[WorldGenParamaters.tileWidth / 2, y, WorldGenParamaters.tileWidth / 2] = blocks[WorldGenParamaters.tileWidth / 2, y, WorldGenParamaters.tileWidth / 2];
+                    newBlocks[tileWidth / 2, y, tileWidth / 2] = blocks[tileWidth / 2, y, tileWidth / 2];
                 }
 
             }
 
-            return new Tile(newBlocks);
+            return new Tile(newBlocks, tileWidth);
         }
 
         public override bool Equals(Object obj)
         {
             Tile o = (Tile)obj;
-            for (int i = 0; i < WorldGenParamaters.tileWidth; i++)
+            for (int i = 0; i < tileWidth; i++)
             {
-                for (int j = 0; j < WorldGenParamaters.tileWidth; j++)
+                for (int j = 0; j < tileWidth; j++)
                 {
-                    for (int k = 0; k < WorldGenParamaters.tileWidth; k++)
+                    for (int k = 0; k < tileWidth; k++)
                     {
-                        if (this.get(i,j,k).color != o.get(i, j, k).color)
+                        if (this.get(i, j, k).color != o.get(i, j, k).color)
                         {
                             return false;
                         }

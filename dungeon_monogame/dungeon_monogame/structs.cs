@@ -25,14 +25,15 @@ namespace dungeon_monogame
         public Vector3 Normal;
         public Color emissive;
 
-        public VertexPostitionColorPaintNormal(Vector3 nPosition, Color nColor, Color nPaintColor, Vector3 nNormal)
+        /*public VertexPostitionColorPaintNormal(Vector3 nPosition, Color nColor, Color nPaintColor, Vector3 nNormal, Color nInstrinsinColor)
         {
             Position = nPosition;
             Color = nColor;
             IndirectLightColor = nPaintColor;
             Normal = nNormal;
             emissive = Color.Black;
-        }
+            intrinsicColor = nInstrinsinColor;
+        }*/
 
         public VertexPostitionColorPaintNormal(Vector3 nPosition, Color nColor, Color nPaintColor, Vector3 nNormal, Color nEmissive)
         {
@@ -120,7 +121,7 @@ namespace dungeon_monogame
 
         private static int quickhash(int i)
         {
-            return (i* 1655131) % 227254201;
+            return i;// (i* 1655131) % 227254201;
         }
 
         public override int GetHashCode()

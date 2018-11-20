@@ -10,78 +10,72 @@ namespace dungeon_monogame.WorldGeneration
     class TileSet
     {
         Tile[] tiles;
-        Sphere[] spheres;
+        Sphere[] spheres; 
         Dictionary<IntLoc, DomainMatrix> deltaToTransitionMatrix;
+        
 
-
-        public TileSet(string folderPath)
+        public TileSet(string folderPath, bool exampleBased, int tileWidth)
         {
-
-            string[] files = Directory.GetFiles(MagicaVoxel.tileRoot);
+            string[] files = Directory.GetFiles(folderPath);
             List<String> fileNameList = new List<string>();
             List<Tile> tilesList = new List<Tile>();
-            
+
             for (int i = 0; i < files.Length; i++)
             {
-                List<Block[,,]> tiles;
-                if (WorldGenParamaters.exampleBased)
+                List<Tile> tilesFromThisFile;
+                if (exampleBased)
                 {
-                    tiles = MagicaVoxel.TilesFromExampleModel(files[i]);
+                    tilesFromThisFile = MagicaVoxel.TilesFromExampleModel(files[i], tileWidth);
                 }
                 else
                 {
-                    tiles = MagicaVoxel.TilesFromPath(files[i]);
+                    tilesFromThisFile = MagicaVoxel.TilesFromPath(files[i], tileWidth);
                 }
-                foreach (Block[,,] blockSubArray in tiles)
+
+                foreach (Tile blockSubArray in tilesFromThisFile)
                 {
-                    if (!tilesList.Contains(new Tile(blockSubArray)))
+                    if (!tilesList.Contains((blockSubArray)))
                     {
-                        tilesList.Add(new Tile(blockSubArray));
+                        tilesList.Add((blockSubArray));
                         fileNameList.Add(files[i]);
                     }
                     if (!files[i].Contains("norotation"))
                     {
                         Tile t;
-                        t = (new Tile(blockSubArray).getRotated90());
+                        t = ((blockSubArray).getRotated90());
                         if (!tilesList.Contains(t))
                         {
                             tilesList.Add(t);
                             fileNameList.Add(files[i]);
                         }
-                        t = (new Tile(blockSubArray).getRotated90().getRotated90());
+                        t = ((blockSubArray).getRotated90().getRotated90());
                         if (!tilesList.Contains(t))
                         {
                             tilesList.Add(t);
                             fileNameList.Add(files[i]);
                         }
-                        t = (new Tile(blockSubArray).getRotated90().getRotated90().getRotated90());
+                        t = ((blockSubArray).getRotated90().getRotated90().getRotated90());
                         if (!tilesList.Contains(t))
                         {
                             tilesList.Add(t);
                             fileNameList.Add(files[i]);
                         }
                     }
-
                 }
             }
             tiles = tilesList.ToArray();
             buildTransitionMatrices();
             Console.WriteLine("transition matrices built");
             spheres = new Sphere[tiles.Length];
-            //for (int i = 0; i < tiles.Length; i++)
-            //{
             Parallel.For(0, tiles.Length, i=> {
                 spheres[i] = new Sphere(this, i, fileNameList[i]);
             });
-            //}
-
         }
 
-        //List<Block[,,]> sliceUpExampleModel(string path)
-        //{
-
-        //}
-
+        public int getTileWidth()
+        {
+            return tiles[0].tileWidth;
+        }
 
         void buildTransitionMatrices()
         {

@@ -13,6 +13,7 @@ namespace dungeon_monogame
     abstract class InputHandler
     {
         protected KeyboardState oldKeyboardState;
+        protected MouseState oldMouseState = Mouse.GetState();
 
         public abstract List<Action> handleInput();
 
@@ -28,8 +29,10 @@ namespace dungeon_monogame
     {
         
         Vector3 cameraLookAlongVector = -Vector3.UnitZ;
+
+
+
         Vector3 cameraUpVector = Vector3.UnitY;
-        MouseState oldMouseState = Mouse.GetState();
         bool mouseEngaged = true;
 
         Actor playerActor;
@@ -55,8 +58,7 @@ namespace dungeon_monogame
             playerActor = new Actor(new AABB(height, width, width), true, 1f);
 
             playerActor.setLocation(cameraPosition);
-            Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
-            
+            setMouseToCenter();
             var torch = new GameObjectModel(MagicaVoxel.ChunkManagerFromResource(@"dungeon_monogame.Content.voxel_models.torch.vox"), new Vector3(.2f, 1.4f, -.3f), Vector3.One * .03f);
             //torchLight = new Light(1f, Color.LightGoldenrodYellow);
             torchLight = new FireLight();
@@ -65,6 +67,12 @@ namespace dungeon_monogame
             playerActor.addChild(torch);
             //playerActor.addChild(new Light());
             playerActor.addTag(ObjectTag.Player);
+            doFlyingLogic();
+        }
+
+        public void setMouseToCenter()
+        {
+            Mouse.SetPosition(Game1.graphics.GraphicsDevice.Viewport.Width / 2, Game1.graphics.GraphicsDevice.Viewport.Height / 2);
         }
 
         public override List<Action> handleInput()
@@ -116,19 +124,20 @@ namespace dungeon_monogame
                     movement -= Vector3.UnitY * speed;
                 }
             }
-            if (justHit(Keys.Tab, newState))
+            if (justHit(GlobalSettings.OpenMainMenuKey, newState))
             {
-                mouseEngaged = !mouseEngaged;
+                //mouseEngaged = !mouseEngaged;
+                result.Add(new ToggleMainMenu());
             }
 
-            if (justHit(Keys.Up, newState))
+            if (newState.IsKeyDown(Keys.Up))
             {
-                result.Add(new AdjustAmbientLightAction(+0.1f));
+                result.Add(new AdjustAmbientLightAction(+GlobalSettings.AmbientLightContinuousAdjustmentIncrement));
             }
 
-            if (justHit(Keys.Down, newState))
+            if (newState.IsKeyDown(Keys.Down))
             {
-                result.Add(new AdjustAmbientLightAction(-0.1f));
+                result.Add(new AdjustAmbientLightAction(-GlobalSettings.AmbientLightContinuousAdjustmentIncrement));
             }
 
             if (justHit(Keys.LeftControl, newState))
@@ -137,13 +146,7 @@ namespace dungeon_monogame
 
 
             }
-            speed = (flying ? flyingSpeed : walkingSpeed);
-            playerActor.setGravityFactor(flying ? 0f : 1f);
-            playerActor.setCollides(flying ? false : true);
-            if (flying)
-            {
-                playerActor.setVelocity(Vector3.Zero);
-            }
+            doFlyingLogic();
 
             if(justHit(Keys.M, newState))
             {
@@ -182,7 +185,16 @@ namespace dungeon_monogame
             return result;
         }
 
-
+        private void doFlyingLogic()
+        {
+            speed = (flying ? flyingSpeed : walkingSpeed);
+            playerActor.setGravityFactor(flying ? 0f : 1f);
+            playerActor.setCollides(flying ? false : true);
+            if (flying)
+            {
+                playerActor.setVelocity(Vector3.Zero);
+            }
+        }
 
         public Matrix getViewMatrix()
         {
