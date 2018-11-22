@@ -31,14 +31,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="dungeon_monogame.exe" size="8536576">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="dungeon_monogame.exe" size="8539648">
       <assemblyIdentity name="dungeon_monogame" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>04d/XQP0oLRpwtSXWvV+UbBfYIRSSEEUGwfX53ay11Q=</dsig:DigestValue>
+        <dsig:DigestValue>SGSpAayui1Zfh6Hjgucu4i/L2+hMUFjQEWihLjxgYLc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

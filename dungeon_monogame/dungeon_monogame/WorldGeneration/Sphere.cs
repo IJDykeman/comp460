@@ -53,7 +53,9 @@ namespace dungeon_monogame.WorldGeneration
                         Domain result = old * mask;
                         if (result.sum() == 0)
                         {
-                            throw new Exception("Sphere contains zero domain: " + name);
+                            throw new InvalidTilesetException("The tile " + name.Split('\\').Last() + " can't fit together with one or more of the other tiles in this tile set.  "
+                                                              +   "To fix this problem, carefully review your tiles, and look for places where blocks may not line up along the tiles' sides.  "
+                                                              +   "It may be helpful to remove some tiles from the tile set temporarily to narrow the problem down.");
                         }
 
                         sphere[queryLoc.i, queryLoc.j, queryLoc.k] = result;

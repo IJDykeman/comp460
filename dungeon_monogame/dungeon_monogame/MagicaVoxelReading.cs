@@ -59,6 +59,11 @@ namespace dungeon_monogame
             int xmax = -90000;
             int ymax = -90000;
             int zmax = -90000;
+
+            int sx, sy, sz;
+            sx = 0;
+            sy = 0;
+            sz = 0;
             
             BinaryReader reader = new BinaryReader(stream);
             var magic = reader.ReadUInt32();
@@ -87,9 +92,9 @@ namespace dungeon_monogame
                 {
                     case SIZE:
                         
-                        var sx = reader.ReadInt32();
-                        var sy = reader.ReadInt32();
-                        var sz = reader.ReadInt32();
+                        sx = reader.ReadInt32();
+                        sy = reader.ReadInt32();
+                        sz = reader.ReadInt32();
                         reader.ReadBytes(chunkSize - sizeof(int) * 3);
                         //voxelData = new VoxelData(new XYZ(sx, sy, sz), new Color[256]);
                         break;
@@ -143,6 +148,12 @@ namespace dungeon_monogame
             }
             stream.Close();
 
+            xmin = 0;
+            ymin = 0;
+            zmin = 0;
+            xmax = sx;
+            ymax = sy;
+            zmax = sz;
             return new Tuple<List<IntLoc>, Color[], List<int>, Tuple<int,int,int,int,int,int>>(blockLocs, colors, colorIndices, new Tuple<int,int,int,int,int,int>(xmin, xmax, ymin, ymax, zmin, zmax));
 
         }
@@ -183,6 +194,17 @@ namespace dungeon_monogame
         public static ChunkManager ChunkManagerFromVox(string path)
         {
             return ChunkManagerFromVoxAbsolutePath(modelsRoot + path);
+        }
+
+        public static List<int> getVoxelModelSize(string path)
+        {
+            Tuple<List<IntLoc>, Color[], List<int>, Tuple<int, int, int, int, int, int>> data = Read1(File.Open(path, FileMode.Open));
+            Tuple<int, int, int, int, int, int> extents = data.Item4;
+            int sx = extents.Item2 - extents.Item1;
+            int sy = extents.Item4 - extents.Item3;
+            int sz = extents.Item6 - extents.Item5;
+            List<int> result = new List<int> { sx, sy, sz };
+            return result;
         }
 
         public static List<Tile> TilesFromPath(string path, int tileWidth)

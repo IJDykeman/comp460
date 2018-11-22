@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace dungeon_monogame
 {
@@ -49,7 +50,10 @@ namespace dungeon_monogame
         }
         public Game1()
         {
-            
+            WorldGeneration.TileSet tiles = LoadNewTilesFromDialog(false);
+            map = new World(tiles);
+
+
             graphics = new GraphicsDeviceManager(this);
             graphics.GraphicsProfile = GraphicsProfile.HiDef;
 
@@ -100,8 +104,7 @@ namespace dungeon_monogame
             //gameForm.DragDrop += new DragEventHandler(gameForm_DragDrop);
 
             //TODO replace with generic default world
-            WorldGeneration.TileSet tiles = LoadNewTilesFromDialog(false);
-            map = new World(tiles);
+
 
             Rendering.LoadContent(Content, graphics, map);
             player = new Player();
@@ -109,27 +112,48 @@ namespace dungeon_monogame
             map.addChild(new Slime(new Vector3(12, 20, 12)));
             Console.WriteLine("global seed is " + Globals.getSeed().ToString());
 
+
         }
 
         private static WorldGeneration.TileSet LoadNewTilesFromDialog(bool isExampleBased)
         {
 
+            //try
+            //{
+            string tileRootPath = FileManagement.getPathFromDialogue();
             try
             {
-                string tileRootPath = FileManagement.getPathFromDialogue();
-                int tileWidth = WorldGenParamaters.exampleBasedTileWidth;
-                if (!isExampleBased)
-                {
-                    tileWidth = FileManagement.getIntFromDialogBox("Please enter the width of a tile in your tileset.  That is, if you made models of size 5x5x5 in MagicaVoxel, enter 5.", "Enter tile size");
-                }
-                WorldGeneration.TileSet tiles = new WorldGeneration.TileSet(tileRootPath, isExampleBased, tileWidth);
+                WorldGeneration.TileSet tiles = new WorldGeneration.TileSet(tileRootPath, isExampleBased);
                 return tiles;
+
             }
-            catch (Exception e)
+            catch (InvalidTilesetException e)
             {
-                FileManagement.ShowDialog("This folder does not contain a valid tile set.", "Error");
-                return null;
+                FileManagement.ShowDialog(e.Message, "This isn't a valid tile set.");
             }
+            catch (AggregateException ae)
+            {
+                var ignoredExceptions = new List<Exception>();
+                foreach (var e in ae.Flatten().InnerExceptions)
+                {
+                    if (e is InvalidTilesetException)
+                        FileManagement.ShowDialog(e.Message, "This isn't a valid tile set.");
+                    else
+                        ignoredExceptions.Add(e);
+                }
+                if (ignoredExceptions.Count > 0)
+                    throw new AggregateException(ignoredExceptions);
+            }
+
+
+
+
+            //}
+            //catch (Exception e)
+            //{
+            FileManagement.ShowDialog("This folder does not contain a valid tile set.", "Error");
+            //}
+            return null;
 
         }
 
@@ -140,6 +164,7 @@ namespace dungeon_monogame
             {
                 map.resetTileMap(tiles);
             }
+
         }
 
         protected override void UnloadContent()
@@ -189,6 +214,8 @@ namespace dungeon_monogame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            //myForm.Activate();
+
             IsMouseVisible = menuOpen;
             Rendering.renderWorld(player);
             if (menuOpen)
@@ -197,6 +224,7 @@ namespace dungeon_monogame
                 menu.draw(graphics);
             }
             base.Draw(gameTime);
+
         }
     }
 }

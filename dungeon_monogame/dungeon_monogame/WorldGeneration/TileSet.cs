@@ -7,28 +7,38 @@ using System.Threading.Tasks;
 
 namespace dungeon_monogame.WorldGeneration
 {
-    class TileSet
+    public class InvalidTilesetException : Exception
+    {
+        public InvalidTilesetException(string message)
+    : base(message)
+        {
+        }
+    }
+
+        class TileSet
     {
         Tile[] tiles;
         Sphere[] spheres; 
         Dictionary<IntLoc, DomainMatrix> deltaToTransitionMatrix;
         
 
-        public TileSet(string folderPath, bool exampleBased, int tileWidth)
+        public TileSet(string folderPath, bool exampleBased)
         {
             string[] files = Directory.GetFiles(folderPath);
             List<String> fileNameList = new List<string>();
             List<Tile> tilesList = new List<Tile>();
+
 
             for (int i = 0; i < files.Length; i++)
             {
                 List<Tile> tilesFromThisFile;
                 if (exampleBased)
                 {
-                    tilesFromThisFile = MagicaVoxel.TilesFromExampleModel(files[i], tileWidth);
+                    tilesFromThisFile = MagicaVoxel.TilesFromExampleModel(files[i], 3);
                 }
                 else
                 {
+                    int tileWidth = checkTilesetValidity(files);
                     tilesFromThisFile = MagicaVoxel.TilesFromPath(files[i], tileWidth);
                 }
 
@@ -67,9 +77,41 @@ namespace dungeon_monogame.WorldGeneration
             buildTransitionMatrices();
             Console.WriteLine("transition matrices built");
             spheres = new Sphere[tiles.Length];
-            Parallel.For(0, tiles.Length, i=> {
+            Parallel.For(0, tiles.Length, i =>
+            {
                 spheres[i] = new Sphere(this, i, fileNameList[i]);
             });
+        }
+
+        private static int checkTilesetValidity(string[] files)
+        {
+            if( files.Where(f => f.ToLower().EndsWith(".vox")).Count() == 0)
+            {
+                throw new InvalidTilesetException("There are no .vox files in this folder.  \n\nTile sets are folders of .vox files all of the same size that fit together to form a world.  You can download some example tile sets on our website.");
+            }
+            string smallestSidedTileName = "";
+            int smallestTileSide = -1;
+            for (int i = 0; i < files.Length; i++)
+            {
+                string fileName = files[i].Split('\\').Last();
+                List<int> dimensions = MagicaVoxel.getVoxelModelSize(files[i]);
+                int minSide = dimensions.Min();
+                if (smallestTileSide == -1)
+                {
+                    smallestSidedTileName = fileName;
+                    smallestTileSide = minSide;
+                }
+
+                List<int> invalidDimensions = dimensions.Where(x => x % smallestTileSide != 0).ToList();
+                if (invalidDimensions.Count > 0)
+                {
+                    throw new InvalidTilesetException("The tile " + fileName + " has a side of length " + invalidDimensions[0].ToString() + ", but the tile " + smallestSidedTileName
+                                                        + "has a side of length " + smallestTileSide.ToString() + ".  This won't work, becuase all your tiles need to be of the same size.  "
+                                                        + "For example, if you have one 5 by 5 by 5 .vox model in your tile set, all the tiles must be 5 by 5 by 5.");
+                }
+
+            }
+            return smallestTileSide; // the tile set tilewidth;
         }
 
         public int getTileWidth()

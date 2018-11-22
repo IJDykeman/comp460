@@ -18,11 +18,11 @@ namespace dungeon_monogame
                                 + "[esc]    open menu\n"
                                 + "[up arrow]    increase ambient light\n"
                                 + "[down arrow]    reduce ambient light\n"
-                                + "[right click]    launch a light.  This will travel forward and stick to objects in the world.\n"
+                                + "[right click]    launch a light\n"
                                 + "[left ctrl]    enter/exit flying mode\n"
-                                + "[Q]    while flying, go up\n"
-                                + "[left shift]    while flying, go down.\n"
-                                + "[M]    spawn a slime.\n";
+                                + "[Space]    Jump while walking, or while flying, go up\n"
+                                + "[left shift]    while flying, go down\n"
+                                + "[M]    spawn a slime\n";
 
 
         string caption = "";
