@@ -11,7 +11,7 @@ namespace dungeon_monogame.WorldGeneration
     {
         public static readonly int tileWidth = 21;
         public static readonly int exampleBasedTileWidth = 3;
-        public static readonly int sphereWidth = 5;
+        public static readonly int sphereWidth = 7;
         public static readonly int decideTilesWithinWidth = 7;
         public static readonly int doNotGenerateOutsideRadius = decideTilesWithinWidth / 2 + 1;
         public static readonly float gameScale = 1f;
@@ -31,10 +31,9 @@ namespace dungeon_monogame.WorldGeneration
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_town5\";
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_woods11\";
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_vertical_town_15\";
-        internal static bool onlyOneHorizontalLevel = false;
         internal static bool onlyOneVerticalLevel = false;
 
-        public static int MeshWithinBlockRange = decideTilesWithinWidth * tileWidth;
+        //public static int MeshWithinBlockRange =  decideTilesWithinWidth * tileWidth;
 
         //public static string tileRelativePath = @"..\..\..\..\..\..\..\..\tiles_biased_fantasy_towers_11\";
 

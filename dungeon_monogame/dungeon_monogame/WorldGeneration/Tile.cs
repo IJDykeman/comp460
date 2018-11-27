@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,8 +11,10 @@ namespace dungeon_monogame.WorldGeneration
     {
         Block[,,] blocks;
         public int tileWidth;
-        public Tile(Block[,,] _blocks, int _tileWidth)
+        public string name;
+        public Tile(Block[,,] _blocks, int _tileWidth, string _name)
         {
+            name = _name;
             tileWidth = _tileWidth;
             blocks = _blocks;
         }
@@ -172,29 +175,35 @@ namespace dungeon_monogame.WorldGeneration
 
         public Tile getRotated90()
         {
-            List<Tuple<int, int>> l = ringOrder(5);
-
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             Block[,,] newBlocks = new Block[tileWidth, tileWidth, tileWidth];
+
+            //Parallel.For(0, tileWidth, y =>
 
             for (int ring = 1; ring <= tileWidth; ring += 2)
             {
+                int offset = (tileWidth - ring) / 2;
+
                 List<Tuple<int, int>> ringIndices = ringOrder(ring);
                 for (int y = 0; y < tileWidth; y++)
                 {
+                    newBlocks[tileWidth / 2, y, tileWidth / 2] = blocks[tileWidth / 2, y, tileWidth / 2];
+
                     for (int i = 0; i < ringIndices.Count; i++)
                     {
-                        int offset = (tileWidth - ring) / 2;
+
+
                         newBlocks[ringIndices[i].Item1 + offset, y,
                                   ringIndices[i].Item2 + offset] =
                             blocks[ringIndices[(i + ring - 1) % ringIndices.Count].Item1 + offset, y,
                                    ringIndices[(i + ring - 1) % ringIndices.Count].Item2 + offset];
                     }
-                    newBlocks[tileWidth / 2, y, tileWidth / 2] = blocks[tileWidth / 2, y, tileWidth / 2];
                 }
 
             }
-
-            return new Tile(newBlocks, tileWidth);
+            double t = watch.ElapsedMilliseconds;
+            return new Tile(newBlocks, tileWidth, name);
         }
 
         public override bool Equals(Object obj)

@@ -15,12 +15,12 @@ namespace dungeon_monogame
         public static readonly float defaultAmbientLight = .7f;
         public static readonly float minAmbientLight = 0.0f;
         public static readonly Color worldBackgroundColor = Color.Black;
-        public static float vignetteStrength = .2f;
+        public static float vignetteStrength = 0f;
         public static Keys OpenMainMenuKey = Keys.Escape;
 
         public static float AmbientLightContinuousAdjustmentIncrement = 1f / 60f;
-        internal static int startingWindowWidth = 1200;
-        internal static int startingWindowHeight = 800;
+        internal static int startingWindowWidth = 1920;
+        internal static int startingWindowHeight = 1080;
 
         //UI
         public static readonly Color defaultButtonColor = Color.White;

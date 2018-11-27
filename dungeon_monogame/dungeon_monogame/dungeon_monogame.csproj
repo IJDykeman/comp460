@@ -10,7 +10,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>dungeon_monogame</RootNamespace>
-    <AssemblyName>dungeon_monogame</AssemblyName>
+    <AssemblyName>GenerateWorlds</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>DesktopGL</MonoGamePlatform>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -54,7 +54,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <ApplicationIcon>columnIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -76,6 +76,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'release_game|AnyCPU'">
+    <OutputPath>bin\release_game\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AABB.cs" />
@@ -232,6 +235,7 @@
     <None Include="dungeon_monogame_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="columnIcon.ico" />
     <Content Include="Content\DeferredRender.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -17,7 +17,7 @@ namespace dungeon_monogame
 
         public World(TileSet _tiles)
         {
-            resetTileMap(_tiles);
+            resetTileMap(_tiles, _tiles.worldAssumedFlat);
             tileSpaceLocsNeedingPostprocess = new List<IntLoc>();
             ambientLight1 = new AmbientLight(0.2f, Color.White, new Vector3(1,2,3));
             addChild(ambientLight1);
@@ -32,10 +32,10 @@ namespace dungeon_monogame
             map.getChunkManager().createMesh();
         }
 
-        public void resetTileMap(TileSet tiles)
+        public void resetTileMap(TileSet tiles, bool isFlatWorld)
         {
             recursiveRemove(map);
-            map = new TileMap(tiles, Vector3.Zero, Vector3.One);
+            map = new TileMap(tiles, Vector3.Zero, Vector3.One, isFlatWorld);
             addChild(map);
 
         }

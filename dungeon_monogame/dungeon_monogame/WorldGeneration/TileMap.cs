@@ -12,8 +12,7 @@ namespace dungeon_monogame.WorldGeneration
 {
     class TileMap : GameObjectModel
     {
-        public static readonly int alwaysMeshWithinRange = WorldGenParamaters.MeshWithinBlockRange; 
-        public static readonly int alwaysUnmeshOutsideRange = (int)(alwaysMeshWithinRange * 1.5f);
+
         System.Collections.Concurrent.ConcurrentDictionary<IntLoc, Domain> distributions;
         Dictionary<IntLoc, int> tilesDecided;
 
@@ -21,23 +20,27 @@ namespace dungeon_monogame.WorldGeneration
 
         TileSet tileSet;
         public static Vector3 playerPerspectiveLoc = new Vector3();
+        bool assumeFlatWorld;
+        public int alwaysMeshWithinRange;
+        public int alwaysUnmeshOutsideRange;
 
         internal ChunkManager getChunkManager()
         {
             return chunkManager;
         }
 
-        public TileMap(TileSet _tiles, Vector3 loc, Vector3 scale) : base(loc, scale)
+        public TileMap(TileSet _tiles, Vector3 loc, Vector3 scale, bool isFlatWorld) : base(loc, scale)
         {
-            
+            assumeFlatWorld = isFlatWorld;
             distributions = new System.Collections.Concurrent.ConcurrentDictionary<IntLoc, Domain>();
             tilesDecided = new Dictionary<IntLoc, int>();
             meshingQueue = new ConcurrentQueue<IntLoc>();
             tileSet = _tiles;
             chunkManager = getManager();
+            alwaysMeshWithinRange = WorldGenParamaters.decideTilesWithinWidth * tileSet.getTileWidth();
+            alwaysUnmeshOutsideRange = (int)(alwaysMeshWithinRange * 1.5f);
 
-
-        }
+    }
 
         public void placeTile(IntLoc tileSpacePos, int tileIndex, ChunkManager m)
         {
@@ -147,7 +150,7 @@ namespace dungeon_monogame.WorldGeneration
                     for (int k = 0; k < WorldGenParamaters.sphereWidth; k++)
                     {
                         IntLoc location = new IntLoc(i, j, k) + center - new IntLoc(WorldGenParamaters.sphereWidth / 2);
-                        if (!decided(location) && (location.j == 0 || !WorldGenParamaters.onlyOneHorizontalLevel) && (location.i == 0 || !WorldGenParamaters.onlyOneVerticalLevel))
+                        if (!decided(location) && (location.j == 0 || !assumeFlatWorld) && (location.i == 0 || !WorldGenParamaters.onlyOneVerticalLevel))
                         {
                             Domain d = getDistributionAt(location) * (sphere.get(i, j, k));
                             if(d.sum() == 0)
@@ -177,12 +180,13 @@ namespace dungeon_monogame.WorldGeneration
 
         private float decisionUrgency(Domain d, IntLoc tileLoc, IntLoc perspectiveTileLoc)
         {
-            float urgency = -d.sum();
+            float urgency = -d.sum() * 100;
 
             if (IntLoc.EuclideanDistance(perspectiveTileLoc, tileLoc) < WorldGenParamaters.decideTilesWithinWidth)
             {
                 urgency += 1000;
             }
+            urgency += -IntLoc.EuclideanDistance(perspectiveTileLoc, tileLoc);
             return urgency;
         }
 
@@ -191,7 +195,7 @@ namespace dungeon_monogame.WorldGeneration
         {
             IntLoc snapped_player_loc = new IntLoc(TileMap.playerPerspectiveLoc / tileSet.getTileWidth());
 
-            if (!decided(snapped_player_loc) && !(WorldGenParamaters.onlyOneHorizontalLevel || WorldGenParamaters.onlyOneVerticalLevel))
+            if (!decided(snapped_player_loc) && !(assumeFlatWorld || WorldGenParamaters.onlyOneVerticalLevel))
             {
                 return snapped_player_loc;
             }
@@ -296,7 +300,7 @@ namespace dungeon_monogame.WorldGeneration
                         placeATile(chunkManager);
                     }
                     remeshAroundPlayer();
-                    chunkManager.unmeshOutsideRange();
+                    chunkManager.unmeshOutsideRange(alwaysUnmeshOutsideRange);
 
                 }
             });
@@ -322,12 +326,19 @@ namespace dungeon_monogame.WorldGeneration
             IntLoc toMeshChunkLoc;
 
             IntLoc BFSloc;
+            int maxremeshes = 50;
+            int remeshesSoFar = 0;
             while (chunksNearPlayer.TryDequeue(out BFSloc))
             {
                 toMeshChunkLoc = (BFSloc + centerChunkPos - new IntLoc(meshRadius)) * Chunk.chunkWidth;
                 if (chunkManager.chunkNeedsMesh(toMeshChunkLoc))
                 {
                     chunkManager.remesh(chunkManager, toMeshChunkLoc);
+                    remeshesSoFar ++;
+                    if(remeshesSoFar > maxremeshes)
+                    {
+                        break;
+                    }
                 }
 
             }

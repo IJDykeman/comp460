@@ -243,7 +243,7 @@ namespace dungeon_monogame
                                 }
                             }
                         }
-                        result.Add(new Tile(smalltile, tileWidth));
+                        result.Add(new Tile(smalltile, tileWidth, path.Split('\\').Last()));
                     }
                 }
 
@@ -288,9 +288,10 @@ namespace dungeon_monogame
                             }
                         }
 
-                        if (!result.Contains(new Tile(smalltile, tileWidth)))
+                        Tile nTile = new Tile(smalltile, tileWidth, path.Split('\\').Last());
+                        if (!result.Contains(nTile))
                         {
-                            result.Add(new Tile(smalltile, tileWidth));
+                            result.Add(nTile);
 
                         }
                     }

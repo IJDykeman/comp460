@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Linq;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -53,7 +55,7 @@ namespace dungeon_monogame
             WorldGeneration.TileSet tiles = LoadNewTilesFromDialog(false);
             map = new World(tiles);
 
-
+            
             graphics = new GraphicsDeviceManager(this);
             graphics.GraphicsProfile = GraphicsProfile.HiDef;
 
@@ -61,7 +63,7 @@ namespace dungeon_monogame
             graphics.PreferredBackBufferHeight = GlobalSettings.startingWindowHeight;
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
-
+            Window.Title = "Generate Worlds";
 
             this.Window.AllowUserResizing = true;
 
@@ -115,44 +117,63 @@ namespace dungeon_monogame
 
         }
 
+        private static string[] getVoxFiles(string root)
+        {
+            List<string> allFiles = new List<string>(Directory.GetFiles(root));
+            return allFiles.Where(x => x.ToLower().EndsWith(".vox")).ToArray();
+
+        }
+
         private static WorldGeneration.TileSet LoadNewTilesFromDialog(bool isExampleBased)
         {
-
-            //try
-            //{
-            string tileRootPath = FileManagement.getPathFromDialogue();
+            bool userWantsFlatWorld = false;
             try
             {
-                WorldGeneration.TileSet tiles = new WorldGeneration.TileSet(tileRootPath, isExampleBased);
-                return tiles;
+                string[] files;
+                if (isExampleBased)
+                {
+                    string examplePath = FileManagement.OpenFileDialog();
+                    files = new string[] { examplePath };
+                }
+                else
+                {
+                    string tileSetDir = FileManagement.getDirectoryFromDialogue();
+                    userWantsFlatWorld = FileManagement.AskWhetherWorldIsFlat();
+
+                    files = getVoxFiles(tileSetDir);
+
+                }
+                try
+                {
+                    WorldGeneration.TileSet tiles = new WorldGeneration.TileSet(files, isExampleBased, userWantsFlatWorld);
+                    return tiles;
+
+                }
+                catch (InvalidTilesetException e)
+                {
+
+                    if (!userWantsFlatWorld)
+                    {
+                        WorldGeneration.TileSet tiles = new WorldGeneration.TileSet(files, isExampleBased, true);
+                        // this tileset generation succeeds with a flat world where it failed with a deep one
+                        // This means we can report to the user that they should be setting their world to flat.
+                        throw new InvalidTilesetException("This tile set isn't valid for a world that is more than one tile high.  " +
+                                                          "Perhaps you tried to create a landscape tile set without tiles to go below the ground or above the surface tiles.  " +
+                                                          "If you intend to have a world that is only one tile in height, please select \"one tile high world\" when you are selecting the tile set folder to load.");
+                    }
+                    
+
+                }
+
+
 
             }
             catch (InvalidTilesetException e)
             {
                 FileManagement.ShowDialog(e.Message, "This isn't a valid tile set.");
             }
-            catch (AggregateException ae)
-            {
-                var ignoredExceptions = new List<Exception>();
-                foreach (var e in ae.Flatten().InnerExceptions)
-                {
-                    if (e is InvalidTilesetException)
-                        FileManagement.ShowDialog(e.Message, "This isn't a valid tile set.");
-                    else
-                        ignoredExceptions.Add(e);
-                }
-                if (ignoredExceptions.Count > 0)
-                    throw new AggregateException(ignoredExceptions);
-            }
 
-
-
-
-            //}
-            //catch (Exception e)
-            //{
             FileManagement.ShowDialog("This folder does not contain a valid tile set.", "Error");
-            //}
             return null;
 
         }
@@ -162,7 +183,7 @@ namespace dungeon_monogame
             WorldGeneration.TileSet tiles = LoadNewTilesFromDialog(exampleBased);
             if (tiles != null)
             {
-                map.resetTileMap(tiles);
+                map.resetTileMap(tiles, tiles.worldAssumedFlat);
             }
 
         }

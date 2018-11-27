@@ -64,7 +64,7 @@ namespace dungeon_monogame
             torchLight = new FireLight();
             torchLight.setLocation(new Vector3(3, 8, 3));
             // torch.addChild(torchLight); // behaves badly wrt shadows
-            playerActor.addChild(torch);
+            //playerActor.addChild(torch);
             //playerActor.addChild(new Light());
             playerActor.addTag(ObjectTag.Player);
             doFlyingLogic();
@@ -161,8 +161,8 @@ namespace dungeon_monogame
 
             if (newMouseState.LeftButton == ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Released)
             {
-                FireBall spell = new FireBall(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 45f);
-                result.Add(new SpawnAction(spell));
+                //FireBall spell = new FireBall(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 45f);
+                //result.Add(new SpawnAction(spell));
             }
 
             if (newMouseState.RightButton == ButtonState.Pressed && oldMouseState.RightButton == ButtonState.Released)

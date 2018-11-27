@@ -139,9 +139,9 @@ namespace dungeon_monogame
         {
 
             IntLoc chunkLoc = locToChunkLoc(loc);
-            lock (this)
+            lock (this) // Lock to prevent race condition where two threads initliaze the same chunk
             {
-                if (!withinChunk(loc))
+                if (!ChunkLocWithinChunk(chunkLoc))
                 {
                     chunks[chunkLoc] = new Chunk();
                 }
@@ -181,9 +181,9 @@ namespace dungeon_monogame
             return l - (l % Chunk.chunkWidth);
         }
 
-        private bool withinChunk(IntLoc loc)
+        private bool ChunkLocWithinChunk(IntLoc loc)
         {
-            return chunks.ContainsKey(locToChunkLoc(loc));
+            return chunks.ContainsKey(loc);
         }
 
         bool IsLocked(object o)
@@ -279,11 +279,11 @@ namespace dungeon_monogame
             }
         }
 
-        public void unmeshOutsideRange()
+        public void unmeshOutsideRange(int unmeshRadius)
         {
             foreach (IntLoc l in chunks.Keys)
             {
-                if(IntLoc.EuclideanDistance(l, new IntLoc(TileMap.playerPerspectiveLoc)) > TileMap.alwaysUnmeshOutsideRange)
+                if(IntLoc.EuclideanDistance(l, new IntLoc(TileMap.playerPerspectiveLoc)) > unmeshRadius)
                 {
                     chunks[l].forgetMesh();
                 }
