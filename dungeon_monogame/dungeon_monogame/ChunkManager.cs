@@ -111,7 +111,13 @@ namespace dungeon_monogame
 
         public void remesh(ChunkManager m, IntLoc chunksLoc)
         {
-            chunks[chunksLoc].remeshParallelStep(m, chunksLoc.toVector3());
+            if (chunks.ContainsKey(chunksLoc))
+            {
+                lock (chunks[chunksLoc])
+                {
+                    chunks[chunksLoc].remeshParallelStep(m, chunksLoc.toVector3());
+                }
+            }
         }
 
 
@@ -135,18 +141,31 @@ namespace dungeon_monogame
             return chunks[locToChunkLoc(l)].getBlock(l % Chunk.chunkWidth);
         }
 
+        Chunk lastModifiedChunk = null;
+        IntLoc LastModifiedChunkLoc = new IntLoc();
+
         public void set(IntLoc loc, Block val)
         {
 
             IntLoc chunkLoc = locToChunkLoc(loc);
+            Chunk c;
             lock (this) // Lock to prevent race condition where two threads initliaze the same chunk
             {
-                if (!ChunkLocWithinChunk(chunkLoc))
+                
+                if (chunkLoc.Equals(LastModifiedChunkLoc) && lastModifiedChunk != null)
                 {
-                    chunks[chunkLoc] = new Chunk();
+                    c = lastModifiedChunk;
+                }
+                else
+                {
+                    if (!ChunkLocWithinChunk(chunkLoc))
+                    {
+                        chunks[chunkLoc] = new Chunk();
+                    }
+                    c = chunks[chunkLoc];
                 }
             }
-            Chunk c = chunks[chunkLoc];
+             
             IntLoc setLoc = loc % Chunk.chunkWidth;
             c.setBlock(setLoc, val);
 
@@ -201,14 +220,14 @@ namespace dungeon_monogame
                 Chunk c = p.Value;
                 IntLoc loc = p.Key;
 
-                if (IsLocked(c))
+                if (IsLocked(c.renderingLock))
                 {
                     continue; //someone else is working on this chunk.  let's not wait for them.
                 }
 
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                lock (c)
+                lock (c.renderingLock)
                 {
                     if(c.indices == null || c.vertices ==null)
                     {
@@ -217,7 +236,7 @@ namespace dungeon_monogame
                     }
                     if (c.vertexBuffer == null)
                     {
-                        if (c.empty() || !c.readyToDraw())
+                        if (c.hasVertices() || !c.readyToDraw())
                         {
                             continue;
                         }

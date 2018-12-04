@@ -37,7 +37,7 @@ namespace dungeon_monogame.WorldGeneration
             meshingQueue = new ConcurrentQueue<IntLoc>();
             tileSet = _tiles;
             chunkManager = getManager();
-            alwaysMeshWithinRange = WorldGenParamaters.decideTilesWithinWidth * tileSet.getTileWidth();
+            alwaysMeshWithinRange = 500;
             alwaysUnmeshOutsideRange = (int)(alwaysMeshWithinRange * 1.5f);
 
     }
@@ -59,6 +59,8 @@ namespace dungeon_monogame.WorldGeneration
         private static void placeBlocksFromTile(IntLoc tileSpacePos, ChunkManager m, Tile tile)
         {
             int tileWidth = tile.tileWidth;
+            IntLoc blockSpaceTileLoc = (tileSpacePos * (tileWidth - 1));
+            Chunk currentlyModifying = null;
             for (int i = 0; i < tileWidth - 1; i++)
             {
                 for (int j = 0; j < tileWidth - 1; j++)
@@ -66,16 +68,17 @@ namespace dungeon_monogame.WorldGeneration
                     for (int k = 0; k < tileWidth - 1; k++)
                     {
                         Block b = tile.get(i, j, k);
-                        if (b.color.R == 252)
+                        if (b.color.A == 0)
                         {
                             continue; // ignore air white
                         }
                         else
                         {
-                            b.color.R = (byte)MathHelper.Clamp(b.color.R - Globals.random.Next(6), 0, 255);
-                            b.color.G = (byte)MathHelper.Clamp(b.color.G - Globals.random.Next(6), 0, 255);
-                            b.color.B = (byte)MathHelper.Clamp(b.color.B - Globals.random.Next(3), 0, 255);
-                            m.set((tileSpacePos * (tileWidth - 1)) + new IntLoc(i, j, k), b);
+                            IntLoc loc = blockSpaceTileLoc + new IntLoc(i, j, k);
+                            b.color.R = (byte)MathHelper.Clamp(b.color.R - Globals.random.Next(GlobalSettings.BlockColorJitter), 0, 255);
+                            b.color.G = (byte)MathHelper.Clamp(b.color.G - Globals.random.Next(GlobalSettings.BlockColorJitter), 0, 255);
+                            b.color.B = (byte)MathHelper.Clamp(b.color.B - Globals.random.Next(GlobalSettings.BlockColorJitter / 2), 0, 255);
+                            m.set(loc, b);
                         }
                     }
                 }
@@ -299,6 +302,15 @@ namespace dungeon_monogame.WorldGeneration
                     {
                         placeATile(chunkManager);
                     }
+
+                }
+            });
+
+            Thread worker2 = new Thread(() =>
+            {
+
+                while (true)
+                {
                     remeshAroundPlayer();
                     chunkManager.unmeshOutsideRange(alwaysUnmeshOutsideRange);
 
@@ -306,6 +318,9 @@ namespace dungeon_monogame.WorldGeneration
             });
             worker.IsBackground = true;
             worker.Start();
+
+            worker2.IsBackground = true;
+            worker2.Start();
 
 
             return chunkManager;

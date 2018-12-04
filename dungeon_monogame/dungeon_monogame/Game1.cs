@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Reflection;
 
 namespace dungeon_monogame
 {
@@ -52,7 +53,19 @@ namespace dungeon_monogame
         }
         public Game1()
         {
-            WorldGeneration.TileSet tiles = LoadNewTilesFromDialog(false);
+
+            WorldGeneration.TileSet tiles = null;
+            try
+            {
+                string currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                string defaultTilesFolder = Path.Combine(currentDirectory, "Content/21_dungeon");
+                var files = getVoxFiles(defaultTilesFolder);
+                tiles = new WorldGeneration.TileSet(files, false, false);
+            }
+            catch (Exception e)
+            {
+                tiles = LoadNewTilesFromDialog(false);
+            }
             map = new World(tiles);
 
             

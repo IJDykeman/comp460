@@ -27,5 +27,7 @@ namespace dungeon_monogame
         public static readonly Color mousedOVerButtonColor= Color.Gray;
 
         public static RasterizerState DrawGBufferRasterizerState = RasterizerState.CullCounterClockwise;
+
+        public static int BlockColorJitter = 0;
     }
 }
