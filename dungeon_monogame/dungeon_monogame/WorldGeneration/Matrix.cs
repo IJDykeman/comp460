@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace dungeon_monogame.WorldGeneration
 {
-    class DomainMatrix
+    public class DomainMatrix
     {
         private bool[][] _matrix;
 

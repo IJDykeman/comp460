@@ -84,6 +84,7 @@
     <Compile Include="AABB.cs" />
     <Compile Include="Action.cs" />
     <Compile Include="Actor.cs" />
+    <Compile Include="AsyncTileSetLoader.cs" />
     <Compile Include="Chunk.cs" />
     <Compile Include="ChunkManager.cs" />
     <Compile Include="ContentManager.cs" />
@@ -314,6 +315,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Content\21_dungeon\teeStairTop.vox">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\trvial_tile_set\solidStone.vox">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="dungeon_monogame_TemporaryKey.pfx" />

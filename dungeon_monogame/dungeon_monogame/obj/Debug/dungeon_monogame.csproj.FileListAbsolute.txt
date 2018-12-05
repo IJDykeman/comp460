@@ -95,3 +95,4 @@ C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\A
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\21_dungeon\solidStone.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\21_dungeon\teeStairBottom.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\21_dungeon\teeStairTop.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Debug\Content\trvial_tile_set\solidStone.vox

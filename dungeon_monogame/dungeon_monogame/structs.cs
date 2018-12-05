@@ -89,7 +89,7 @@ namespace dungeon_monogame
 
     }
 
-    struct IntLoc
+    internal struct IntLoc
     {
         public int i, j, k;
 

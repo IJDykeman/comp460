@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using dungeon_monogame.WorldGeneration;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,6 +56,21 @@ namespace dungeon_monogame
         {
 
             game1.loadNewTileset(exampleBased);
+        }
+    }
+
+    class RequestWorldResetWithTileset : Action
+    {
+        TileSet tileset;
+
+        public RequestWorldResetWithTileset(TileSet _tileset)
+        {
+            tileset = _tileset;
+        }
+
+        public override void actOnGame(Game1 game1)
+        {
+            game1.setTileset(tileset);
         }
     }
 

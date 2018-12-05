@@ -19,7 +19,7 @@ namespace dungeon_monogame.WorldGeneration
         }
     }
 
-        class TileSet
+    internal class TileSet
     {
         Tile[] tiles;
         Sphere[] spheres; 
