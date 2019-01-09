@@ -16,6 +16,7 @@ namespace dungeon_monogame
         protected List<GameObject> children;
         protected Color emissiveness = Color.Black;
         private HashSet<ObjectTag> tags = new HashSet<ObjectTag>();
+        
 
         public GameObject()
         {
@@ -88,6 +89,16 @@ namespace dungeon_monogame
                 child.drawAlternateGBufferFirstPass(transform);
             }
         }
+
+
+        public virtual void draw2D(GraphicsDeviceManager device)
+        {
+            foreach (GameObject child in children)
+            {
+                child.draw2D(device);
+            }
+        }
+
 
         public virtual void drawFirstPass(Effect effect, Matrix transform, BoundingFrustum frustum, Predicate<GameObject> whetherDraw)
         {

@@ -99,6 +99,7 @@ namespace dungeon_monogame
                 spriteBatch.DrawString(DungeonContentManager.menuFont, captionToShow, new Vector2(size.X / 2, 50), color);
                 spriteBatch.End();
             }
+
         }
 
         private static void drawBackground(GraphicsDeviceManager graphics)

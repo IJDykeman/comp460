@@ -25,15 +25,15 @@ namespace dungeon_monogame
         }
 
 
-        public void createMesh()
+        public void writeChunksToFile(IEnumerable<IntLoc> chunkLocsToExport, string fileTag)
         {
 
             StringBuilder verticesSb = new StringBuilder();
             StringBuilder textureCoordsSb = new StringBuilder();
             StringBuilder normalsSb = new StringBuilder();
             StringBuilder indicesSb = new StringBuilder();
-            int totalIndicesInPreviousChunks = 0;
-            foreach (IntLoc loc in chunks.Keys)
+            int totalVerticesInPreviousChunks = 1; //becasue obj indiexes vertices from 1
+            foreach (IntLoc loc in chunkLocsToExport)
             {
                 Chunk c = chunks[loc];
                 if(c.vertices == null)
@@ -60,14 +60,15 @@ namespace dungeon_monogame
                         + 1.ToString() + " "
                         + 1.ToString() + "\n");
                 }
+                Debug.Assert(c.indices.Length % 3 == 0);
                 for (int i = 0; i < c.indices.Length; i += 3)
                 {
                     indicesSb.Append("f "
-                         + (1+c.indices[i + 2] + totalIndicesInPreviousChunks).ToString() + " "
-                         + (1+c.indices[i + 1] + totalIndicesInPreviousChunks).ToString() + " "
-                         + (1+c.indices[i] + totalIndicesInPreviousChunks).ToString() + "\n");
+                         + (c.indices[i + 2] + totalVerticesInPreviousChunks).ToString() + " "
+                         + (c.indices[i + 1] + totalVerticesInPreviousChunks).ToString() + " "
+                         + (c.indices[i] + totalVerticesInPreviousChunks).ToString() + "\n");
                 }
-                totalIndicesInPreviousChunks += c.indices.Length;
+                totalVerticesInPreviousChunks += c.vertices.Length;
 
 
             }
@@ -77,13 +78,16 @@ namespace dungeon_monogame
             //file.Append(normalsSb);
             file.Append(indicesSb);
             var result = file.ToString();
-            System.IO.File.WriteAllText(@"C:\Users\Isaac\Desktop\scratch\obj.obj", result);
-
-
-
+            System.IO.File.WriteAllText(@"C:\Users\Isaac\Desktop\scratch\obj" + fileTag + ".obj", result);
         }
 
-        public bool chunkNeedsMesh(IntLoc chunksLoc)
+        public void writeObjFile(IntLoc center)
+        {
+            var chunksToExport = chunks.Keys.OrderBy(loc => IntLoc.EuclideanDistance(loc, center)).Take(80);
+            writeChunksToFile(chunksToExport, "_1");
+        }
+
+            public bool chunkNeedsMesh(IntLoc chunksLoc)
         {
             Chunk c;
             if (chunks.TryGetValue(chunksLoc, out c))
@@ -255,9 +259,9 @@ namespace dungeon_monogame
                     effect.Parameters["xWorld"].SetValue(worldMatrix);
                     effect.Parameters["xEmissive"].SetValue(emission.ToVector4());
 
-                    //BoundingBox box = new BoundingBox(Vector3.Transform(new Vector3(), worldMatrix),
-                    //                Vector3.Transform(Vector3.One * Chunk.chunkWidth, worldMatrix));
-                    BoundingBox box = new BoundingBox(loc.toVector3(), loc.toVector3() + Vector3.One * Chunk.chunkWidth);
+                    // this should really be limitted to the true extents of the model witin the chunk, but this is a fine approximation,since it will never
+                    // cull something that should be visible.
+                    BoundingBox box = new BoundingBox(worldMatrix.Translation, worldMatrix.Translation + Vector3.One * Chunk.chunkWidth);
 
                     if (frustum != null)
                     {

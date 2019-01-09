@@ -29,7 +29,7 @@ namespace dungeon_monogame
 
         internal void exportModel()
         {
-            map.getChunkManager().createMesh();
+            map.writeObjFileNearPlayer();
         }
 
         public void resetTileMap(TileSet tiles, bool isFlatWorld)

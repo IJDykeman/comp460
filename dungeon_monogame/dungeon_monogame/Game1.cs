@@ -56,13 +56,11 @@ namespace dungeon_monogame
 
 
             string currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string defaultTilesFolder = Path.Combine(currentDirectory, "Content/trvial_tile_set");
+            string defaultTilesFolder = Path.Combine(currentDirectory, "Content\\trivial_tile_set");
+
             var files = TileSetLoader.getVoxFiles(defaultTilesFolder);
             WorldGeneration.TileSet tiles = new WorldGeneration.TileSet(files, false, false);
             map = new World(tiles);
-
-
-
 
             graphics = new GraphicsDeviceManager(this);
             graphics.GraphicsProfile = GraphicsProfile.HiDef;
@@ -119,7 +117,12 @@ namespace dungeon_monogame
             Rendering.LoadContent(Content, graphics, map);
             player = new Player();
             string currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            map.addChild(new TileSetLoader(false, path: Path.Combine(currentDirectory, "Content/21_dungeon")));
+
+
+
+            // TODO error check here
+            string[] voxFiles = TileSetLoader.getVoxFiles(Path.Combine(currentDirectory, "Content\\trivial_tile_set"));
+            map.addChild(new TileSetLoader(false, false, voxFiles));
             map.addChild(player.getActor());
             map.addChild(new Slime(new Vector3(12, 20, 12)));
             Console.WriteLine("global seed is " + Globals.getSeed().ToString());
@@ -136,7 +139,25 @@ namespace dungeon_monogame
 
         public void loadNewTileset(bool exampleBased)
         {
-            map.addChild(new TileSetLoader(exampleBased));
+
+            bool userWantsFlatWorld = false;
+
+            string[] files = TileSetLoader.getTilesetPathFromUser(exampleBased);
+            if (files != null)
+            {
+                if (!files.Any(x => x.ToUpper().EndsWith(".VOX")))
+                {
+                    FileManagement.ShowDialog("Please select an example .vox file or folder of .vox files that form a tile set.", "");
+                }
+                else
+                {
+                    if (!exampleBased)
+                    {
+                        userWantsFlatWorld = FileManagement.AskWhetherWorldIsFlat();
+                    }
+                    map.addChild(new TileSetLoader(exampleBased, userWantsFlatWorld, files));
+                }
+            }
 
         }
 
@@ -196,6 +217,7 @@ namespace dungeon_monogame
                 menu.updateDimensions(new Point(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
                 menu.draw(graphics);
             }
+            map.draw2D(graphics);
             base.Draw(gameTime);
 
         }

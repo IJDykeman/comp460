@@ -63,11 +63,8 @@ C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\A
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\columnRoomEntrance.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\columnRoomEntranceFromHallSideDoor.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\columnRoomWall.vox
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\columnRoomWallDamaged.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\columnRoomWalltop.vox
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\columnRoomWalltopDamaged.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\columnTop.vox
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\columnTopdDamaged.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\genericRoomConcaveCorner.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\genericRoomConvexCorner.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\genericRoomConvexHearthCorner.vox
@@ -81,3 +78,21 @@ C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\A
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\solidStone.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\teeStairBottom.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\21_dungeon\teeStairTop.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\4way.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\corner - Copy.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\corner.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\dirtCave.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\dirtHall.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\dirtTransition.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\hall - Copy (2).vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\hall - Copy.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\hall.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\hallRoomEntrance.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\solid.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\stairBottom.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\stairBottomTee.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\stairTop.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\stairTopTee.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\tee.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\solidStone.vox
+C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\trivial_tile_set\hall.vox

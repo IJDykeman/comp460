@@ -12,11 +12,17 @@ namespace dungeon_monogame.WorldGeneration
         Block[,,] blocks;
         public int tileWidth;
         public string name;
+        double weight_out_of_one = 1;
         public Tile(Block[,,] _blocks, int _tileWidth, string _name)
         {
             name = _name;
             tileWidth = _tileWidth;
             blocks = _blocks;
+        }
+
+        public double weight()
+        {
+            return weight_out_of_one;
         }
 
         public static bool potential(Tile a, Tile b, int di, int dj, int dl)

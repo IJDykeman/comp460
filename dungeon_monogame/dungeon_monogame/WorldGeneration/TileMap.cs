@@ -42,6 +42,11 @@ namespace dungeon_monogame.WorldGeneration
 
     }
 
+        public void writeObjFileNearPlayer()
+        {
+            chunkManager.writeObjFile(new IntLoc(playerPerspectiveLoc));
+        }
+
         public void placeTile(IntLoc tileSpacePos, int tileIndex, ChunkManager m)
         {
             tilesDecided[tileSpacePos] = tileIndex;
@@ -88,7 +93,8 @@ namespace dungeon_monogame.WorldGeneration
         private void decide(IntLoc tileSpaceLoc)
         {
             Domain d = getDistributionAt(tileSpaceLoc);
-            int tileIndex = d.getRandomTrueIndex();
+            double[] weights = Enumerable.Range(0, tileSet.size()).Select(i => tileSet.getTile(i).weight()).ToArray();
+            int tileIndex = d.getRandomTrueIndex(weights);
             placeTile(tileSpaceLoc, tileIndex, chunkManager);
 
             Domain _;
@@ -337,7 +343,7 @@ namespace dungeon_monogame.WorldGeneration
             int meshRadius = alwaysMeshWithinRange / Chunk.chunkWidth;
             ConcurrentQueue<IntLoc> chunksNearPlayer = getQueueFromBFS(meshRadius * 2);
             //m.remeshAllParallelizeableStep(decided);
-            IntLoc centerChunkPos = new IntLoc(TileMap.playerPerspectiveLoc / Chunk.chunkWidth);
+            IntLoc centerChunkPos = new IntLoc(TileMap.playerPerspectiveLoc / Chunk.chunkWidth );
             IntLoc toMeshChunkLoc;
 
             IntLoc BFSloc;

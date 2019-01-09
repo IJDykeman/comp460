@@ -161,8 +161,8 @@ namespace dungeon_monogame
 
             if (newMouseState.LeftButton == ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Released)
             {
-                //FireBall spell = new FireBall(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 45f);
-                //result.Add(new SpawnAction(spell));
+                Actor spell = new Spell(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 45f);//new FireBall(getCameraLocation(), Vector3.Normalize(getFacingVector()) * 45f);
+                result.Add(new SpawnAction(spell));
             }
 
             if (newMouseState.RightButton == ButtonState.Pressed && oldMouseState.RightButton == ButtonState.Released)

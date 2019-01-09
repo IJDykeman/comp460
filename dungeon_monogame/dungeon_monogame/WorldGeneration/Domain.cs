@@ -78,17 +78,24 @@ namespace dungeon_monogame.WorldGeneration
         {
             return Domain.sum(distribution);
         }
-        public int getRandomTrueIndex()
+
+        public int getRandomTrueIndex(double[] weights)
         {
-            List<int> trueIndices = new List<int>();
+            double[] masked_weights = Enumerable.Range(0, weights.Length).Select(i => weights[i] * (distribution[i] ? 1 : 0)).ToArray();
+            double choice = Globals.random.NextDouble() * masked_weights.Sum();
             for (int i=0; i < distribution.Length; i++)
             {
                 if (distribution[i])
                 {
-                    trueIndices.Add(i);
+                    choice -= masked_weights[i];
+                    if (choice <= 0)
+                    {
+                        return i;
+                    }
                 }
             }
-            return trueIndices[Globals.random.Next(trueIndices.Count())];
+
+            return 0;
 
         }
 

@@ -39,45 +39,53 @@ namespace dungeon_monogame.WorldGeneration
             {
                 tileWidth = checkTilesetValidity(files);
             }
-            Parallel.For(0, files.Length, i => {
-            
-                List<Tile> tilesFromThisFile;
-                if (exampleBased)
+            try
+            {
+                Parallel.For(0, files.Length, i =>
                 {
-                    tilesFromThisFile = MagicaVoxel.TilesFromExampleModel(files[i], 3);
-                }
-                else
-                {
-                    tilesFromThisFile = MagicaVoxel.TilesFromPath(files[i], tileWidth);
-                }
 
-                foreach (Tile blockSubArray in tilesFromThisFile)
-                {
-                    if (!allTilesInFile.Contains((blockSubArray)))
+                    List<Tile> tilesFromThisFile;
+                    if (exampleBased)
                     {
-                        allTilesInFile.Add((blockSubArray));
+                        tilesFromThisFile = MagicaVoxel.TilesFromExampleModel(files[i], 3);
                     }
-                    if (!files[i].Contains("norotation"))
+                    else
                     {
-                        Tile t;
-                        t = ((blockSubArray).getRotated90());
-                        if (!allTilesInFile.Contains(t))
+                        tilesFromThisFile = MagicaVoxel.TilesFromPath(files[i], tileWidth);
+                    }
+
+                    foreach (Tile blockSubArray in tilesFromThisFile)
+                    {
+                        if (!allTilesInFile.Contains((blockSubArray)))
                         {
-                            allTilesInFile.Add(t);
+                            allTilesInFile.Add((blockSubArray));
                         }
-                        t = t.getRotated90();
-                        if (!allTilesInFile.Contains(t))
+                        if (!files[i].Contains("norotation"))
                         {
-                            allTilesInFile.Add(t);
-                        }
-                        t = t.getRotated90();
-                        if (!allTilesInFile.Contains(t))
-                        {
-                            allTilesInFile.Add(t);
+                            Tile t;
+                            t = ((blockSubArray).getRotated90());
+                            if (!allTilesInFile.Contains(t))
+                            {
+                                allTilesInFile.Add(t);
+                            }
+                            t = t.getRotated90();
+                            if (!allTilesInFile.Contains(t))
+                            {
+                                allTilesInFile.Add(t);
+                            }
+                            t = t.getRotated90();
+                            if (!allTilesInFile.Contains(t))
+                            {
+                                allTilesInFile.Add(t);
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
+            catch(AggregateException e)
+            {
+                throw new InvalidTilesetException(e.InnerExceptions.First().Message);
+            }
             /*tiles = allTilesInFile.ToArray();
             buildTransitionMatrices();
             Console.WriteLine("transition matrices built");
@@ -109,12 +117,25 @@ namespace dungeon_monogame.WorldGeneration
 
             Stopwatch watch = new Stopwatch();
             watch.Start();
+
+
             try
             {
+                var exceptions = new ConcurrentQueue<Exception>();
+
                 Parallel.For(0, tiles.Length, i =>
                 {
-                    spheres[i] = new Sphere(this, i, flatWorld);
+                    try
+                    {
+                        spheres[i] = new Sphere(this, i, flatWorld);
+                    }
+                    catch (Exception e)
+                    {
+                        exceptions.Enqueue(e);
+                    }
                 });
+                if (exceptions.Count > 0) throw new AggregateException(exceptions);
+
             }
             catch (AggregateException ae)
             {

@@ -28,6 +28,6 @@ namespace dungeon_monogame
 
         public static RasterizerState DrawGBufferRasterizerState = RasterizerState.CullCounterClockwise;
 
-        public static int BlockColorJitter = 0;
+        public static int BlockColorJitter = 5;
     }
 }

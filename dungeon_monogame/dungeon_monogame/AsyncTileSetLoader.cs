@@ -1,4 +1,6 @@
 ﻿using dungeon_monogame.WorldGeneration;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,15 +15,8 @@ namespace dungeon_monogame
     {
         TileSet tileSet;
         Thread thread;
-        public TileSetLoader(bool isExampleBased, string path=null)
+        public TileSetLoader(bool isExampleBased, bool userWantsFlatWorld, string[] files)
         {
-            bool userWantsFlatWorld = false;
-
-            string[] files = getTilesetPathFromUser(isExampleBased, path:path);
-            if (isExampleBased)
-            {
-                userWantsFlatWorld = FileManagement.AskWhetherWorldIsFlat();
-            }
             thread = new Thread(() =>
             {
                 generateTileSet(files, isExampleBased, userWantsFlatWorld);
@@ -49,6 +44,25 @@ namespace dungeon_monogame
         }
 
 
+        public override void draw2D(GraphicsDeviceManager graphics)
+        {
+
+            string caption = "Loading tile set...";
+            using (SpriteBatch spriteBatch = new SpriteBatch(graphics.GraphicsDevice))
+            {
+                spriteBatch.Begin();
+                Color color = GlobalSettings.defaultButtonColor;
+                spriteBatch.DrawString(DungeonContentManager.menuFont, caption, new Vector2(5, 5), color);
+                spriteBatch.End();
+            }
+
+            foreach (GameObject child in children)
+            {
+                child.draw2D(graphics);
+            }
+        }
+
+
         private void generateTileSet(string[] files, bool isExampleBased, bool userWantsFlatWorld)
         {
             try
@@ -58,40 +72,53 @@ namespace dungeon_monogame
             }
             catch (InvalidTilesetException e)
             {
-
-                if (!userWantsFlatWorld)
+                try
                 {
-                    WorldGeneration.TileSet tiles = new WorldGeneration.TileSet(files, isExampleBased, true);
-                    // this tileset generation succeeds with a flat world where it failed with a deep one
-                    // This means we can report to the user that they should be setting their world to flat. 
+                    if (!userWantsFlatWorld)
+                    {
+                        WorldGeneration.TileSet tiles = new WorldGeneration.TileSet(files, isExampleBased, true);
+                        // this tileset generation succeeds with a flat world where it failed with a deep one
+                        // This means we can report to the user that they should be setting their world to flat. 
 
-                    string errorForFlatWorld = "This tile set isn't valid for a world that is more than one tile high.  " +
-                                                      "Perhaps you tried to create a landscape tile set without tiles to go below the ground or above the surface tiles.  " +
-                                                      "If you intend to have a world that is only one tile in height, please select \"one tile high world\" when you are selecting the tile set folder to load.";
-                    FileManagement.ShowDialog(errorForFlatWorld, "This isn't a valid tile set.");
+                        string errorForFlatWorld = "This tile set isn't valid for a world that is more than one tile high.  " +
+                                                          "Perhaps you tried to create a landscape tile set without tiles to go below the ground or above the surface tiles.  " +
+                                                          "If you intend to have a world that is only one tile in height, please select \"one tile high world\" when you are selecting the tile set folder to load.";
+                        FileManagement.ShowDialog(errorForFlatWorld, "This isn't a valid tile set.");
+                    }
+                    else
+                    {
+                        FileManagement.ShowDialog(e.Message, "This isn't a valid tile set.");
+                    }
                 }
-                else
+                catch (InvalidTilesetException e2)
                 {
                     FileManagement.ShowDialog(e.Message, "This isn't a valid tile set.");
                 }
             }
         }
 
-        private static string[] getTilesetPathFromUser(bool isExampleBased, string path=null)
+        private static bool pathIsObviouslyInvalid(string path)
+        {
+            return path == null || path == "";
+        }
+
+        public static string[] getTilesetPathFromUser(bool isExampleBased)
         {
             if (isExampleBased)
             {
-                if (path == null)
+                string path = FileManagement.OpenFileDialog();
+                if (pathIsObviouslyInvalid(path))
                 {
-                    path = FileManagement.OpenFileDialog();
+                    return null;
                 }
                 return new string[] { path };
             }
             else
             {
-                if (path == null)
+                string path = FileManagement.getDirectoryFromDialogue();
+                if (pathIsObviouslyInvalid(path))
                 {
-                    path = FileManagement.getDirectoryFromDialogue();
+                    return null;
                 }
                 return getVoxFiles(path);
             }
