@@ -161,6 +161,10 @@ namespace dungeon_monogame
             buttons.Add(new ExportModelButton());
             buttons.Add(new SetPlayerScaleButton());
             buttons.Add(new QuitButton());
+            for (int i =0; i<buttons.Count; i++)
+            {
+                buttons[i].setLocationBasedOnIndex(i);
+            }
 
         }
 
@@ -200,6 +204,11 @@ namespace dungeon_monogame
             
         }
 
+        public void setLocationBasedOnIndex(int index){
+            location = new Vector2(offsetFromLeft, offsetFromLeft * (index + 1));
+            size = DungeonContentManager.menuFont.MeasureString(text) + new Vector2(5, 5);
+        }
+
 
         public void draw(GraphicsDeviceManager graphics)
         {
@@ -219,10 +228,9 @@ namespace dungeon_monogame
         public LoadExampleButton()
         {
             text = "Load Example Model (experimental)";
-            tooltip = "Select a .vox model to load.  It will be automagically turned into a tile set, and an infinite world will be generated from that tile set.";
-
-            location = new Vector2(offsetFromLeft, offsetFromLeft);
-            size = DungeonContentManager.menuFont.MeasureString(text) + new Vector2(5,5);
+            tooltip = "Select a .vox model to load.  It will be automagically turned into a tile set, and an infinite world will be generated from that tile set.  "
+                      + "To turn a tile into a tileset, the tile is divided into pieces of size 3x3x3 which become tiles in the tile set.  This tileset should "
+                      + "produce worlds that look like that original tile, although this depends heavily on the original input.";
         }
         public override List<Action> clicked()
         {
@@ -240,8 +248,6 @@ namespace dungeon_monogame
             tooltip = "Select a folder containing a new tile set.  The world is then reset and regenerated using that new tile set.  " +
                       "The folder you select must contain .vox files for each tile.  These tiles must all be the same size, and that size must be odd-numbered.  " +
                       "For instance, you can have tiles that are each a 5x5x5 voxel model.";
-            location = new Vector2(offsetFromLeft, offsetFromLeft*2);
-            size = DungeonContentManager.menuFont.MeasureString(text) + new Vector2(5, 5);
         }
         public override List<Action> clicked()
         {
@@ -257,9 +263,6 @@ namespace dungeon_monogame
         {
             text = "Export .obj model";
             tooltip = "Save a .obj file of the world you are currently exploring.  This common format can then be imported into other 3D applications, such as Blender, Maya, Unity, and Unreal Engine.";
-
-            location = new Vector2(offsetFromLeft, offsetFromLeft * 3);
-            size = DungeonContentManager.menuFont.MeasureString(text) + new Vector2(5, 5);
         }
         public override List<Action> clicked()
         {
@@ -275,14 +278,14 @@ namespace dungeon_monogame
         {
             text = "Change player size";
             tooltip = "This lets you scale your avatar to be larger or smaller so that you move comfortably around in worlds of different sizes.";
-            location = new Vector2(offsetFromLeft, offsetFromLeft * 4);
-            size = DungeonContentManager.menuFont.MeasureString(text) + new Vector2(5, 5);
+            
 
         }
         public override List<Action> clicked()
         {
             List<Action> result = new List<Action>();
-            result.Add(new SetPlayerScaleAction(FileManagement.getIntFromDialogBox("Select a player scale", "This will be a multiplier on the default size of your avatar.")));
+            result.Add(new SetPlayerScaleAction(FileManagement.getIntFromDialogBox("This number will be a multiplier on the default size of your avatar.  The defualt value is 1.",
+                                                                                    "Select a player scale")));
             return result;
         }
     }
@@ -293,8 +296,6 @@ namespace dungeon_monogame
         {
             text = "Quit";
             tooltip = "Exit application.  The world you are exploring will not be automatically saved, but another world like it can be generated from the same tiles.";
-            location = new Vector2(offsetFromLeft, offsetFromLeft * 5);
-            size = DungeonContentManager.menuFont.MeasureString(text) + new Vector2(5, 5);
         }
         public override List<Action> clicked()
         {

@@ -82,8 +82,8 @@ namespace dungeon_monogame
             prompt.Height = 500;
             prompt.Text = caption;
 
-            Label textLabel = new Label() { Left = 50, Top = 20, Height = 200, Width = 400, Text = text };
-            NumericUpDown inputBox = new NumericUpDown() { Left = 50, Top = 300, Width = 400 };
+            Label textLabel = new Label() { Left = 50, Top = 20, Height = 200, Width = 400, Text = text};
+            NumericUpDown inputBox = new NumericUpDown() { Left = 50, Top = 300, Width = 400, Minimum=1, Maximum=20 };
             System.Windows.Forms.Button confirmation = new System.Windows.Forms.Button() { Text = "Ok", Left = 350, Width = 100, Top = 400 };
 
             confirmation.Click += (sender, e) => { prompt.Close(); };

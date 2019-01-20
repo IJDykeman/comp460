@@ -54,9 +54,11 @@ namespace dungeon_monogame
         internal void setScale(float _scale)
         {
             scale = _scale;
+            playerActor.setAabb(getAABB());
+            playerActor.setGravityFactor(1.0f * _scale);
         }
 
-        private float jumpVelocity = 6.5f;
+        private float baseJumpVelocity = 6.5f;
 
         public Player()
         {
@@ -131,7 +133,7 @@ namespace dungeon_monogame
                 }
                 else if (playerActor.isOnGround())
                 {
-                    playerActor.addVelocity(Vector3.UnitY * jumpVelocity);
+                    playerActor.addVelocity(Vector3.UnitY * baseJumpVelocity * scale);
                     
                 }
             }
@@ -214,9 +216,8 @@ namespace dungeon_monogame
 
         public Matrix getViewMatrix()
         {
-            Vector3 backup = getFacingVector() * 0;
             return Matrix.CreateLookAt(
-              getCameraLocation() + backup, getCameraLocation() + getFacingVector() + backup, cameraUpVector);
+              getCameraLocation(), getCameraLocation() + getFacingVector(), cameraUpVector);
         }
 
         public Vector3 getCameraLocation()
