@@ -34,6 +34,19 @@ namespace dungeon_monogame
         }
     }
 
+    class SetPlayerScaleAction : Action
+    {
+        float scale;
+        public SetPlayerScaleAction(float _scale)
+        {
+            scale = _scale;
+        }
+        public override void actOnGame(Game1 game1)
+        {
+            game1.setPlayerScale(scale);
+        }
+    }
+
 
     class ExitApplicationAction : Action
     {
@@ -54,7 +67,6 @@ namespace dungeon_monogame
 
         public override void actOnGame(Game1 game1)
         {
-
             game1.loadNewTileset(exampleBased);
         }
     }

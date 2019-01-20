@@ -38,36 +38,54 @@ namespace dungeon_monogame
         Actor playerActor;
         private float upDownRot = -2;
         private float leftRightRot = 0;
-        
-        static float walkingSpeed = 12f * WorldGenParamaters.gameScale;
-        static float flyingSpeed = walkingSpeed * 2.5f;
-        static float speed = 12f;
 
-        float height = 3.5f * WorldGenParamaters.gameScale;
-        float width = 1.5f * WorldGenParamaters.gameScale;
+        float scale = WorldGenParamaters.gameScale;
+
+        static readonly float baseWalkingSpeed = 12f;
+        static readonly float baseFlyingSpeed = baseWalkingSpeed * 2.5f;
+
+        float baseHeight = 3.5f;
+        float baseWidth = 1.5f;
         private bool flying = true;
         Light torchLight;
 
         float mouseSensitivty = .002f;
+
+        internal void setScale(float _scale)
+        {
+            scale = _scale;
+        }
+
         private float jumpVelocity = 6.5f;
 
         public Player()
         {
             
-            Vector3 cameraPosition = new Vector3(7,5,7);
-            playerActor = new Actor(new AABB(height, width, width), true, 1f);
+            playerActor = new Actor(getAABB(), true, 1f);
 
-            playerActor.setLocation(cameraPosition);
+            Vector3 startingPosition = new Vector3(7, 5, 7);
+            playerActor.setLocation(startingPosition);
             setMouseToCenter();
             var torch = new GameObjectModel(MagicaVoxel.ChunkManagerFromResource(@"dungeon_monogame.Content.voxel_models.torch.vox"), new Vector3(.2f, 1.4f, -.3f), Vector3.One * .03f);
-            //torchLight = new Light(1f, Color.LightGoldenrodYellow);
             torchLight = new FireLight();
             torchLight.setLocation(new Vector3(3, 8, 3));
-            // torch.addChild(torchLight); // behaves badly wrt shadows
-            //playerActor.addChild(torch);
-            //playerActor.addChild(new Light());
             playerActor.addTag(ObjectTag.Player);
-            doFlyingLogic();
+            setStateBasedOnFlying();
+        }
+
+        float getSpeed()
+        {
+            if (flying){
+                return baseFlyingSpeed * scale;
+            }
+            else {
+                return baseWalkingSpeed * scale;
+            }
+        }
+
+        AABB getAABB()
+        {
+            return new AABB(baseHeight * scale, baseWidth * scale, baseWidth * scale);
         }
 
         public void setMouseToCenter()
@@ -85,23 +103,23 @@ namespace dungeon_monogame
             Vector3 movement = playerActor.getVelocity();
             if (newState.IsKeyDown(Keys.W))
             {
-                movement -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.Pi)) * speed;
+                movement -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.Pi)) * getSpeed();
 
                // movement += getFacingVector() * speed;
             }
             if (newState.IsKeyDown(Keys.S))
             {
                 //movement -= getFacingVector() * speed;
-                movement -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(0)) * speed;
+                movement -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(0)) * getSpeed();
 
             }
             if (newState.IsKeyDown(Keys.A))
             {
-                movement += Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
+                movement += Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * getSpeed();
             }
             if (newState.IsKeyDown(Keys.D))
             {
-                movement -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * speed;
+                movement -= Vector3.Transform(Vector3.Normalize(getFacingVector() * new Vector3(1, 0, 1)), Matrix.CreateRotationY(MathHelper.PiOver2)) * getSpeed();
             }
 
 
@@ -109,7 +127,7 @@ namespace dungeon_monogame
             {
                 if (flying)
                 {
-                    movement += (Vector3.UnitY * speed);
+                    movement += (Vector3.UnitY * getSpeed());
                 }
                 else if (playerActor.isOnGround())
                 {
@@ -121,12 +139,11 @@ namespace dungeon_monogame
             {
                 if (flying)
                 {
-                    movement -= Vector3.UnitY * speed;
+                    movement -= Vector3.UnitY * getSpeed();
                 }
             }
             if (justHit(GlobalSettings.OpenMainMenuKey, newState))
             {
-                //mouseEngaged = !mouseEngaged;
                 result.Add(new ToggleMainMenu());
             }
 
@@ -146,14 +163,14 @@ namespace dungeon_monogame
 
 
             }
-            doFlyingLogic();
 
             if(justHit(Keys.M, newState))
             {
                 result.Add(new SpawnAction(new Slime(getCameraLocation())));
             }
 
-            
+            setStateBasedOnFlying();
+
 
             playerActor.setInstantaneousMovement(movement);
 
@@ -185,9 +202,8 @@ namespace dungeon_monogame
             return result;
         }
 
-        private void doFlyingLogic()
+        private void setStateBasedOnFlying()
         {
-            speed = (flying ? flyingSpeed : walkingSpeed);
             playerActor.setGravityFactor(flying ? 0f : 1f);
             playerActor.setCollides(flying ? false : true);
             if (flying)

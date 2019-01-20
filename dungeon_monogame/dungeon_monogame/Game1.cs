@@ -51,6 +51,12 @@ namespace dungeon_monogame
             Rendering.resetRendertargets();
 
         }
+
+        internal void setPlayerScale(float scale)
+        {
+            player.setScale(scale);
+        }
+
         public Game1()
         {
 

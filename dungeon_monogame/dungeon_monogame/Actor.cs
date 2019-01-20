@@ -192,8 +192,13 @@ namespace dungeon_monogame
 
         public AABB getAabb()
         {
-            // to be truly correct, this method would have to take the scale of the parent into account
+            // to be correct, this method would have to take the scale of the parent into account
             return new AABB(aabb.height * scale.Y, aabb.xWidth * scale.X, aabb.zWidth * scale.Z);
+        }
+
+        public void setAabb(AABB _aabb)
+        {
+            aabb = _aabb;
         }
 
 

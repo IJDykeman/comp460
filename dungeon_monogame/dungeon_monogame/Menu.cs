@@ -159,6 +159,7 @@ namespace dungeon_monogame
             buttons.Add(new LoadExampleButton());
             buttons.Add(new LoadTileSetButton());
             buttons.Add(new ExportModelButton());
+            buttons.Add(new SetPlayerScaleButton());
             buttons.Add(new QuitButton());
 
         }
@@ -268,13 +269,31 @@ namespace dungeon_monogame
         }
     }
 
+    class SetPlayerScaleButton : Button
+    {
+        public SetPlayerScaleButton()
+        {
+            text = "Change player size";
+            tooltip = "This lets you scale your avatar to be larger or smaller so that you move comfortably around in worlds of different sizes.";
+            location = new Vector2(offsetFromLeft, offsetFromLeft * 4);
+            size = DungeonContentManager.menuFont.MeasureString(text) + new Vector2(5, 5);
+
+        }
+        public override List<Action> clicked()
+        {
+            List<Action> result = new List<Action>();
+            result.Add(new SetPlayerScaleAction(FileManagement.getIntFromDialogBox("Select a player scale", "This will be a multiplier on the default size of your avatar.")));
+            return result;
+        }
+    }
+
     class QuitButton : Button
     {
         public QuitButton()
         {
             text = "Quit";
             tooltip = "Exit application.  The world you are exploring will not be automatically saved, but another world like it can be generated from the same tiles.";
-            location = new Vector2(offsetFromLeft, offsetFromLeft * 4);
+            location = new Vector2(offsetFromLeft, offsetFromLeft * 5);
             size = DungeonContentManager.menuFont.MeasureString(text) + new Vector2(5, 5);
         }
         public override List<Action> clicked()
