@@ -156,7 +156,7 @@ namespace dungeon_monogame
     {
         public MainMenu() : base()
         {
-            buttons.Add(new LoadExampleButton());
+            // buttons.Add(new LoadExampleButton());
             buttons.Add(new LoadTileSetButton());
             buttons.Add(new ExportModelButton());
             buttons.Add(new SetPlayerScaleButton());

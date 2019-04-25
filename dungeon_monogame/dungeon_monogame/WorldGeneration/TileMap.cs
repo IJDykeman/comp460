@@ -282,25 +282,11 @@ namespace dungeon_monogame.WorldGeneration
         {
             chunkManager = new ChunkManager();
 
-            /*for (int i = 0; i < 5; i++)
-            {
-                new Thread(() =>
-                {
-                   remeshParallel();
-                }).Start();
-            }
-
-            new Thread(() =>
-            {
-                unmeshFarawayTiles();
-            }).Start();
-            new Thread(() => { keepTilesUpdated(); }).Start();
-            */
             decide(new IntLoc());
             Thread worker = new Thread(() =>
             {
-
-                while (true)
+                // this is a hack to get these threads to quit when the application exits.
+                while (Game1.gameRunning)
                 {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
@@ -314,18 +300,18 @@ namespace dungeon_monogame.WorldGeneration
 
             Thread worker2 = new Thread(() =>
             {
-
-                while (true)
+                // this is a hack to get these threads to quit when the application exits.
+                while (Game1.gameRunning)
                 {
                     remeshAroundPlayer();
                     chunkManager.unmeshOutsideRange(alwaysUnmeshOutsideRange);
 
                 }
             });
-            worker.IsBackground = true;
+            worker.IsBackground = false;
             worker.Start();
 
-            worker2.IsBackground = true;
+            worker2.IsBackground = false;
             worker2.Start();
 
 

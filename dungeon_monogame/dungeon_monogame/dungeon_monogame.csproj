@@ -326,15 +326,6 @@
     <None Include="Content\15_dungeon\corner.vox">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Content\15_dungeon\dirtCave.vox">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\15_dungeon\dirtHall.vox">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\15_dungeon\dirtTransition.vox">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Content\15_dungeon\hall - Copy %282%29.vox">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -363,9 +354,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Content\15_dungeon\tee.vox">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Content\15_dungeon\solidStone.vox">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Content\trivial_tile_set\hall.vox">

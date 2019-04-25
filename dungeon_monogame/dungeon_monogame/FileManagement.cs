@@ -10,11 +10,17 @@ namespace dungeon_monogame
 {
     static class FileManagement
     {
+        static string usersLastPath = "C:\\";
         public static string getDirectoryFromDialogue()
         {
-            using (var fbd = new FolderBrowserDialog())
+            var fbd = new FolderBrowserDialog();
+            fbd.SelectedPath = usersLastPath;
+
+
+            using (fbd)
             {
                 DialogResult result = fbd.ShowDialog();
+                usersLastPath = fbd.SelectedPath;
                 return fbd.SelectedPath;
             }
         }

@@ -18,6 +18,7 @@ namespace dungeon_monogame
     internal class Game1 : Game
     {
         public static GraphicsDeviceManager graphics;
+        public static bool gameRunning = true;
 
         SpriteBatch spriteBatch;
 
@@ -71,8 +72,8 @@ namespace dungeon_monogame
             graphics = new GraphicsDeviceManager(this);
             graphics.GraphicsProfile = GraphicsProfile.HiDef;
 
-            graphics.PreferredBackBufferWidth = GlobalSettings.startingWindowWidth;
-            graphics.PreferredBackBufferHeight = GlobalSettings.startingWindowHeight;
+            graphics.PreferredBackBufferWidth = (int)(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width * .8);
+            graphics.PreferredBackBufferHeight = (int)(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height * .8);
             graphics.ApplyChanges();
             Content.RootDirectory = "Content";
             Window.Title = "Generate Worlds";
@@ -127,7 +128,7 @@ namespace dungeon_monogame
 
 
             // TODO error check here
-            string[] voxFiles = TileSetLoader.getVoxFiles(Path.Combine(currentDirectory, "Content\\trivial_tile_set"));
+            string[] voxFiles = TileSetLoader.getVoxFiles(Path.Combine(currentDirectory, "Content\\15_dungeon"));
             map.addChild(new TileSetLoader(false, false, voxFiles));
             map.addChild(player.getActor());
             map.addChild(new Slime(new Vector3(12, 20, 12)));
@@ -170,6 +171,11 @@ namespace dungeon_monogame
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            //static void OnProcessExit(object sender, EventArgs e)
+            //{
+            Console.WriteLine("I'm out of here");
+            gameRunning = false;
+            //}
         }
 
 
@@ -195,11 +201,11 @@ namespace dungeon_monogame
             {
                 action.actOnGame(this);
             }
-
+            player.update();
             foreach (Action action in actions){
                 action.actOnWorld(map, gameTime);
             }
-            map.getMap().notifyOfPlayerLocation(player.getCameraLocation());
+            map.getMap().notifyOfPlayerLocation(player.getWorldGenerationPerspectiveLocation());
             //map.report();
             base.Update(gameTime);
             Console.WriteLine(Globals.random.Next());

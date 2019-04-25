@@ -81,9 +81,6 @@ C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\A
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\4way.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\corner - Copy.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\corner.vox
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\dirtCave.vox
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\dirtHall.vox
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\dirtTransition.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\hall - Copy (2).vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\hall - Copy.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\hall.vox
@@ -94,5 +91,4 @@ C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\A
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\stairTop.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\stairTopTee.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\tee.vox
-C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\15_dungeon\solidStone.vox
 C:\Users\Isaac\Desktop\comp460\dungeon_monogame\dungeon_monogame\bin\DesktopGL\AnyCPU\Release\Content\trivial_tile_set\hall.vox

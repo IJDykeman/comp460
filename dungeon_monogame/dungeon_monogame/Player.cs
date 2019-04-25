@@ -43,6 +43,8 @@ namespace dungeon_monogame
 
         static readonly float baseWalkingSpeed = 12f;
         static readonly float baseFlyingSpeed = baseWalkingSpeed * 2.5f;
+        static readonly float baseGravityFactor = 1.0f;
+        float gravityFactor;
 
         float baseHeight = 3.5f;
         float baseWidth = 1.5f;
@@ -55,7 +57,6 @@ namespace dungeon_monogame
         {
             scale = _scale;
             playerActor.setAabb(getAABB());
-            playerActor.setGravityFactor(1.0f * _scale);
         }
 
         private float baseJumpVelocity = 6.5f;
@@ -72,7 +73,7 @@ namespace dungeon_monogame
             torchLight = new FireLight();
             torchLight.setLocation(new Vector3(3, 8, 3));
             playerActor.addTag(ObjectTag.Player);
-            setStateBasedOnFlying();
+            updatePlayerActorState();
         }
 
         float getSpeed()
@@ -171,7 +172,7 @@ namespace dungeon_monogame
                 result.Add(new SpawnAction(new Slime(getCameraLocation())));
             }
 
-            setStateBasedOnFlying();
+            
 
 
             playerActor.setInstantaneousMovement(movement);
@@ -204,9 +205,14 @@ namespace dungeon_monogame
             return result;
         }
 
-        private void setStateBasedOnFlying()
+        public void update()
         {
-            playerActor.setGravityFactor(flying ? 0f : 1f);
+            updatePlayerActorState();
+        }
+
+        private void updatePlayerActorState()
+        {
+            playerActor.setGravityFactor(flying ? 0f : 1f * scale);
             playerActor.setCollides(flying ? false : true);
             if (flying)
             {
@@ -223,6 +229,18 @@ namespace dungeon_monogame
         public Vector3 getCameraLocation()
         {
             return playerActor.getAabb().axisMax(Globals.axes.y, Vector3.One) * Vector3.UnitY - Vector3.UnitY * .2f + playerActor.getLocation();
+        }
+
+        public Vector3 getWorldGenerationPerspectiveLocation()
+        {
+            if (oldKeyboardState.IsKeyDown(Keys.V))
+            {
+                return new Vector3();
+            }
+            else
+            {
+                return getCameraLocation();
+            }
         }
 
         private Vector3 getFacingVector()

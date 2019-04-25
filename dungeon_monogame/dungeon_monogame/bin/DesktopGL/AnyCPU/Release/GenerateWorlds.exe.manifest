@@ -31,14 +31,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GenerateWorlds.exe" size="8437760">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GenerateWorlds.exe" size="8439808">
       <assemblyIdentity name="GenerateWorlds" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>7l0d/BdcLS8c1wQnmFall4+7QFFM1A9J7XheLODUVUI=</dsig:DigestValue>
+        <dsig:DigestValue>UbU0/MwrSZRthPjLNO/kaQcgq/P1UmXRTwaJ6kzrTNU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
