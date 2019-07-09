@@ -12,7 +12,7 @@ namespace dungeon_monogame.WorldGeneration
         public static readonly int tileWidth = 21;
         public static readonly int exampleBasedTileWidth = 3;
         public static readonly int sphereWidth = 7;
-        public static readonly int decideTilesWithinWidth = 9;
+        public static readonly int decideTilesWithinWidth = 12;
         public static readonly int doNotGenerateOutsideRadius = decideTilesWithinWidth / 2 + 1;
         public static readonly float gameScale = 1f;
 

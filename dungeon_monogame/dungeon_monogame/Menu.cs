@@ -14,7 +14,7 @@ namespace dungeon_monogame
         protected List<Button> buttons;
         protected Point size;
 
-        string defaultCaption = "Welcome to the tile tool\n"
+        string defaultCaption = "Welcome to Generate Worlds\n"
                                 + "[esc]    open menu\n"
                                 + "[up arrow]    increase ambient light\n"
                                 + "[down arrow]    reduce ambient light\n"

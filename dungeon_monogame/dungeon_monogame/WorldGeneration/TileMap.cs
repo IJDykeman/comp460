@@ -267,6 +267,12 @@ namespace dungeon_monogame.WorldGeneration
             }
         }
 
+        public bool canPlaceTile(ChunkManager m)
+        {
+            return lowestEntropyUndecidedLocation().HasValue;
+            
+        }
+
 
         public ConcurrentQueue<IntLoc> getQueueFromBFS(int width)
         {
@@ -290,10 +296,18 @@ namespace dungeon_monogame.WorldGeneration
                 {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
-                    while (stopwatch.ElapsedMilliseconds < 50)
+                    if (!canPlaceTile(chunkManager))
                     {
-                        placeATile(chunkManager);
+                        Thread.Sleep(100);
                     }
+                    else
+                    {
+                        while (stopwatch.ElapsedMilliseconds < 50)
+                        {
+                            placeATile(chunkManager);
+                        }
+                    }
+
 
                 }
             });
@@ -303,7 +317,12 @@ namespace dungeon_monogame.WorldGeneration
                 // this is a hack to get these threads to quit when the application exits.
                 while (Game1.gameRunning)
                 {
-                    remeshAroundPlayer();
+                    bool didAnyRemeshing;
+                    remeshAroundPlayer(out didAnyRemeshing);
+                    if (!didAnyRemeshing)
+                    {
+                        Thread.Sleep(100);
+                    }
                     chunkManager.unmeshOutsideRange(alwaysUnmeshOutsideRange);
 
                 }
@@ -324,7 +343,7 @@ namespace dungeon_monogame.WorldGeneration
         }
 
 
-        void remeshAroundPlayer()
+        void remeshAroundPlayer(out bool didAnyWork)
         {
             int meshRadius = alwaysMeshWithinRange / Chunk.chunkWidth;
             ConcurrentQueue<IntLoc> chunksNearPlayer = getQueueFromBFS(meshRadius * 2);
@@ -349,6 +368,7 @@ namespace dungeon_monogame.WorldGeneration
                 }
 
             }
+            didAnyWork = remeshesSoFar > 0;
         }
 
 

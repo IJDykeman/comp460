@@ -41,7 +41,7 @@ namespace dungeon_monogame
 
         float scale = WorldGenParamaters.gameScale;
 
-        static readonly float baseWalkingSpeed = 12f;
+        static readonly float baseWalkingSpeed = 20f;
         static readonly float baseFlyingSpeed = baseWalkingSpeed * 2.5f;
         static readonly float baseGravityFactor = 1.0f;
         float gravityFactor;
