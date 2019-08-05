@@ -172,8 +172,6 @@ namespace dungeon_monogame
                 result.Add(new SpawnAction(new Slime(getCameraLocation())));
             }
 
-            
-
 
             playerActor.setInstantaneousMovement(movement);
 
@@ -203,6 +201,11 @@ namespace dungeon_monogame
 
             playerActor.setRotation(Quaternion.CreateFromRotationMatrix(Matrix.CreateRotationY(leftRightRot)));
             return result;
+        }
+
+        internal void setLocationToOrigin()
+        {
+            playerActor.setLocation(Vector3.Zero);
         }
 
         public void update()

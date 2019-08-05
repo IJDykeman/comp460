@@ -118,9 +118,6 @@ namespace dungeon_monogame
             //gameForm.DragEnter += new DragEventHandler(gameForm_DragEnter);
             //gameForm.DragDrop += new DragEventHandler(gameForm_DragDrop);
 
-            //TODO replace with generic default world
-
-
             Rendering.LoadContent(Content, graphics, map);
             player = new Player();
             string currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
@@ -131,7 +128,7 @@ namespace dungeon_monogame
             string[] voxFiles = TileSetLoader.getVoxFiles(Path.Combine(currentDirectory, "Content\\15_dungeon"));
             map.addChild(new TileSetLoader(false, false, voxFiles));
             map.addChild(player.getActor());
-            map.addChild(new Slime(new Vector3(12, 20, 12)));
+            //map.addChild(new Slime(new Vector3(12, 20, 12)));
             Console.WriteLine("global seed is " + Globals.getSeed().ToString());
         }
 
@@ -165,6 +162,7 @@ namespace dungeon_monogame
                     map.addChild(new TileSetLoader(exampleBased, userWantsFlatWorld, files));
                 }
             }
+            player.setLocationToOrigin();
 
         }
 
