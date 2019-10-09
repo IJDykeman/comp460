@@ -17,6 +17,7 @@ namespace dungeon_monogame.WorldGeneration
         Dictionary<IntLoc, int> tilesDecided;
 
         ConcurrentQueue<IntLoc> meshingQueue;
+        ConcurrentQueue<IntLoc> postprocessingQueue;
 
         TileSet tileSet;
         public static Vector3 playerPerspectiveLoc = new Vector3();
@@ -35,12 +36,42 @@ namespace dungeon_monogame.WorldGeneration
             distributions = new System.Collections.Concurrent.ConcurrentDictionary<IntLoc, Domain>();
             tilesDecided = new Dictionary<IntLoc, int>();
             meshingQueue = new ConcurrentQueue<IntLoc>();
+            postprocessingQueue = new ConcurrentQueue<IntLoc>();
             tileSet = _tiles;
             chunkManager = getManager();
             alwaysMeshWithinRange = 500;
             alwaysUnmeshOutsideRange = (int)(alwaysMeshWithinRange * 1.5f);
 
-    }
+        }
+
+        public List<HemisphereLight> getLightsForTileLoc(IntLoc loc)
+        {
+            int tileWidth = tileSet.getTileWidth();
+            List<HemisphereLight> result = new List<HemisphereLight>();
+            if (tilesDecided.ContainsKey(loc))
+            {
+                Tile tile = tileSet.getTile(tilesDecided[loc]);
+                for (int i=0; i<tileWidth; i++)
+                {
+                    for (int p = 0; p < tileWidth; p++)
+                    {
+                        for (int k = 0; k < tileWidth; k++)
+                        {
+                            var color = tile.get(i, p, k).color;
+                            if (color.R == 255 || color.G == 255 || color.B == 255)
+                            {
+                                var light = new HemisphereLight(1, color, Vector3.UnitX, ((loc * tileWidth) + new IntLoc(i, p, k)).toVector3());
+                                //result.Add();
+                                addChild(light);
+                            }
+
+                        }
+                    }
+                    }
+            }
+            return result;
+
+        }
 
         public void writeObjFileNearPlayer()
         {
@@ -54,18 +85,32 @@ namespace dungeon_monogame.WorldGeneration
             Sphere sphere = tileSet.getSphere(tileIndex);
             multiplyInSphere(sphere, tileSpacePos);
             placeBlocksFromTile(tileSpacePos, m, tile);
-            postprocess(tileSpacePos);
+            concurrentPostprocess(tileSpacePos);
         }
 
-        protected virtual void postprocess(IntLoc tileSpacePos)
+        protected virtual void concurrentPostprocess(IntLoc tileSpacePos)
         {
+            postprocessingQueue.Enqueue(tileSpacePos);
+            
+        }
+        protected override List<Action> update()
+        {
+            for (int i=0; i<postprocessingQueue.Count; i++)
+            {
+                IntLoc loc;
+                //if(postprocessingQueue.TryDequeue(out loc))
+                //{
+                    //getLightsForTileLoc(loc);
+                //}
+            }
+            return new List<Action>();
         }
 
         private static void placeBlocksFromTile(IntLoc tileSpacePos, ChunkManager m, Tile tile)
         {
             int tileWidth = tile.tileWidth;
             IntLoc blockSpaceTileLoc = (tileSpacePos * (tileWidth - 1));
-            Chunk currentlyModifying = null;
+            
             for (int i = 0; i < tileWidth - 1; i++)
             {
                 for (int j = 0; j < tileWidth - 1; j++)
@@ -88,6 +133,7 @@ namespace dungeon_monogame.WorldGeneration
                     }
                 }
             }
+            
         }
 
         private void decide(IntLoc tileSpaceLoc)
@@ -176,7 +222,7 @@ namespace dungeon_monogame.WorldGeneration
 
         private bool undecidedTilesAreInTheAlwaysRegion()
         {
-            foreach (IntLoc loc in getQueueFromBFS(WorldGenParamaters.decideTilesWithinWidth * 2))
+            foreach (IntLoc loc in getQueueFromBFS(WorldGenParamaters.decideTilesWithinWidth))
             {
                 if (!decided(loc))
                 {
@@ -189,51 +235,67 @@ namespace dungeon_monogame.WorldGeneration
 
         private float decisionUrgency(Domain d, IntLoc tileLoc, IntLoc perspectiveTileLoc)
         {
-            float urgency = -d.sum() * 100;
 
-            if (IntLoc.EuclideanDistance(perspectiveTileLoc, tileLoc) < WorldGenParamaters.decideTilesWithinWidth)
-            {
-                urgency += 1000;
-            }
+            /*float urgency = -d.sum() * 100;
+
+
             urgency += -IntLoc.EuclideanDistance(perspectiveTileLoc, tileLoc);
-            return urgency;
+            */
+            float dist = IntLoc.EuclideanDistance(perspectiveTileLoc, tileLoc);
+            float distance_bell_curve = (float)Math.Exp(-(Math.Pow(dist / (WorldGenParamaters.decideTilesWithinWidth * 2), 2)));
+            float normalized_domain_knowledge = 1 - d.sum() * 1.0f / d.k();
+
+            float extra_close_factor = (dist < WorldGenParamaters.decideTilesWithinWidth / 2)?2:0;
+
+
+            return normalized_domain_knowledge + distance_bell_curve - 1 + extra_close_factor + (float)Globals.random.NextDouble() * .1f;
+            //return (1.0f - (float)Math.Pow(dist/width,1)) + offset - a;
+
         }
 
+        private bool isWorldFlat()
+        {
+            return (assumeFlatWorld || WorldGenParamaters.onlyOneVerticalLevel);
+        }
 
         private IntLoc? lowestEntropyUndecidedLocation()
         {
             IntLoc snapped_player_loc = new IntLoc(TileMap.playerPerspectiveLoc / tileSet.getTileWidth());
-
-            if (!decided(snapped_player_loc) && !(assumeFlatWorld || WorldGenParamaters.onlyOneVerticalLevel))
+            if (isWorldFlat())
+            {
+                snapped_player_loc.j = 0;
+            }
+            if (!decided(snapped_player_loc) && !isWorldFlat())
             {
                 return snapped_player_loc;
             }
-            double greatestUrgency = 10000000;
+            double greatestUrgency = -1;
             IntLoc? best = null;
             if (undecidedTilesAreInTheAlwaysRegion())
             {
                 foreach (IntLoc loc in distributions.Keys)
                 {
-                    //if(!decided(loc)){
                     Domain d = getDistributionAt(loc);
-                    float distance = IntLoc.EuclideanDistance(loc, snapped_player_loc);
                     double e = decisionUrgency(d, loc, snapped_player_loc);
                     bool isBetter = e > greatestUrgency;
-                    if ((!best.HasValue || isBetter) && distance < WorldGenParamaters.doNotGenerateOutsideRadius)
+                    if (!best.HasValue || isBetter)
                     {
                         greatestUrgency = e;
                         best = loc;
                         if (d.sum() == 1)
                         {
-                                return best;
+                            // there's only 1 possibility here, so place the tile
+                            return best;
                         }
                     }
-                    //}
                 }
 
             }
-
-            return best;
+            if (greatestUrgency > 0)
+            {
+                return best;
+            }
+            return null;
         }
 
         /*

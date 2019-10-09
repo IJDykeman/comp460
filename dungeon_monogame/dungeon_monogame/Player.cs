@@ -203,9 +203,11 @@ namespace dungeon_monogame
             return result;
         }
 
-        internal void setLocationToOrigin()
+        internal void resetPlayerNavigationState()
         {
-            playerActor.setLocation(Vector3.Zero);
+            playerActor.setLocation(Vector3.Zero + Vector3.Up * 10);
+            flying = true;
+            cameraLookAlongVector = Vector3.UnitX;
         }
 
         public void update()

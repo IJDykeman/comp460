@@ -60,10 +60,6 @@ namespace dungeon_monogame
             ambientLight2.setIntensity(totalAmbientPower / 3);
         }
 
-        protected void postprocess(IntLoc tileSpacePos)
-        {
-            tileSpaceLocsNeedingPostprocess.Add(tileSpacePos);
-        }
 
         public void update()
         {

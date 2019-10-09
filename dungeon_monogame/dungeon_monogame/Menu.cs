@@ -14,15 +14,16 @@ namespace dungeon_monogame
         protected List<Button> buttons;
         protected Point size;
 
-        string defaultCaption = "Welcome to Generate Worlds\n"
-                                + "[esc]    open menu\n"
-                                + "[up arrow]    increase ambient light\n"
-                                + "[down arrow]    reduce ambient light\n"
-                                + "[right click]    launch a light\n"
-                                + "[left ctrl]    enter/exit flying mode\n"
-                                + "[Space]    Jump while walking, or while flying, go up\n"
-                                + "[left shift]    while flying, go down\n"
-                                + "[M]    spawn a slime\n";
+        string defaultCaption = "Welcome to Generate Worlds\n\n"
+                                + "[esc]       open & close menu\n"
+                                + "[up arrow]       increase ambient light\n"
+                                + "[down arrow]       reduce ambient light\n"
+                                + "[right click]       launch a light\n"
+                                + "[right click]       launch a light\n"
+                                + "[left ctrl]       enter/exit flying mode\n"
+                                + "[Space]       Jump while walking, or while flying, go up\n"
+                                + "[left shift]       while flying, go down\n"
+                                + "[M]       spawn a slime\n";
 
 
         string caption = "";
@@ -105,7 +106,7 @@ namespace dungeon_monogame
         private static void drawBackground(GraphicsDeviceManager graphics)
         {
             Texture2D dummyTexture = new Texture2D(graphics.GraphicsDevice, 1, 1);
-            dummyTexture.SetData(new Color[] { new Color(0, 0, 0, .5f) });
+            dummyTexture.SetData(new Color[] { new Color(0, 0, 0, 1.0f) });
             using (SpriteBatch spriteBatch = new SpriteBatch(graphics.GraphicsDevice))
             {
                 spriteBatch.Begin();
@@ -157,6 +158,7 @@ namespace dungeon_monogame
         public MainMenu() : base()
         {
             // buttons.Add(new LoadExampleButton());
+            buttons.Add(new ContinueButton());
             buttons.Add(new LoadTileSetButton());
             buttons.Add(new ExportModelButton());
             buttons.Add(new SetPlayerScaleButton());
@@ -177,8 +179,8 @@ namespace dungeon_monogame
         protected Vector2 location;
         protected Vector2 size;
         public bool currentlyMousedOver = false;
-        protected int offsetFromLeft = 50;
-        protected int offsetFromTop = 50;
+        protected int offsetFromLeft = 70;
+        
 
         public Button()
         {
@@ -215,8 +217,27 @@ namespace dungeon_monogame
             using (SpriteBatch spriteBatch = new SpriteBatch(graphics.GraphicsDevice))
             {
                 spriteBatch.Begin();
+
+                for (int i = 0; i < 10; i++)
+                {
+
+                    int buffer = 6 + i;
+
+                    Texture2D dummyTexture = new Texture2D(graphics.GraphicsDevice, 1, 1);
+                    Color[] buttonColor = currentlyMousedOver ? new Color[] { new Color(.02f, .02f, .02f, .1f * i) } : new Color[] { new Color(.03f, .04f, .04f, .1f * i) };
+
+                    dummyTexture.SetData(buttonColor);
+                    Rectangle rect = new Rectangle(new Point((int)location.X - buffer, (int)location.Y - buffer),
+                                        new Point((int)size.X + buffer * 2, (int)size.Y + buffer * 2));
+                    spriteBatch.Draw(dummyTexture, rect, new Color(1, 1, 1, .1f));
+                }
+
+
                 Color color = currentlyMousedOver ? GlobalSettings.mousedOVerButtonColor: GlobalSettings.defaultButtonColor;
                 spriteBatch.DrawString(DungeonContentManager.menuFont, text, location, color);
+                
+
+
                 spriteBatch.End();
             }
         }
@@ -236,6 +257,22 @@ namespace dungeon_monogame
         {
             List<Action> result = new List<Action>();
             result.Add(new RequestTilesetLoad(true));
+            return result;
+        }
+    }
+
+
+    class ContinueButton : Button
+    {
+        public ContinueButton()
+        {
+            text = "Close menu and explore!";
+            tooltip = "Close the menu to walk or fly around your world.";
+        }
+        public override List<Action> clicked()
+        {
+            List<Action> result = new List<Action>();
+            result.Add(new ToggleMainMenu());
             return result;
         }
     }

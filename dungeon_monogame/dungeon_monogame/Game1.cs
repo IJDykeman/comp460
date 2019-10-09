@@ -162,7 +162,7 @@ namespace dungeon_monogame
                     map.addChild(new TileSetLoader(exampleBased, userWantsFlatWorld, files));
                 }
             }
-            player.setLocationToOrigin();
+            player.resetPlayerNavigationState();
 
         }
 

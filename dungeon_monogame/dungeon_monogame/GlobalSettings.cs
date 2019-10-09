@@ -22,7 +22,7 @@ namespace dungeon_monogame
 
         //UI
         public static readonly Color defaultButtonColor = Color.White;
-        public static readonly Color mousedOVerButtonColor= Color.Gray;
+        public static readonly Color mousedOVerButtonColor= Color.LightGray;
 
         public static RasterizerState DrawGBufferRasterizerState = RasterizerState.CullCounterClockwise;
 

@@ -56,9 +56,10 @@ namespace dungeon_monogame
     {
 
         Vector3 direction;
-        public HemisphereLight(float _intensity, Color _color, Vector3 _direction) : base(_intensity, _color)
+        public HemisphereLight(float _intensity, Color _color, Vector3 _direction, Vector3 _position) : base(_intensity, _color)
         {
             direction = _direction;
+            setLocation(_position);
         }
 
         public override void drawSecondPass(Effect effect, Matrix transform, GraphicsDevice device)
@@ -142,15 +143,6 @@ namespace dungeon_monogame
         Vector3 target = new Vector3(0, -1, 0);
         Vector3 up = new Vector3(0, 0, 1);
         Matrix rotation = Matrix.CreateFromYawPitchRoll(.3f, .75f, 0);
-
-
-        /*public DirectionalLight(GraphicsDevice device)
-        {
-            target = Vector3.Transform(target, rotation);
-            shadowTargets = new RenderTargets(backBufferWidth, backBufferWidth, device);
-
-        }*/
-
 
         Matrix getViewMatrix()
         {

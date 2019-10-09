@@ -34,7 +34,7 @@ namespace dungeon_monogame.WorldGeneration
             }
             else
             { 
-                // i think this is critical.  It means ignoring all placements before and including an eronous one.
+                // This is critical.  It means ignoring all placements before and including an eronous one.
                 setEvenOdds();
             }
             updateEntropy();
